@@ -1,4 +1,4 @@
-CFLAGS  = -Isrc -g -O3 -Wall -Wextra -pedantic -flto -std=c17 -fsanitize=address -march=native
+CFLAGS  = -Isrc -g -O3 -Wall -Wextra -pedantic -flto -std=c17 -march=native
 HEADERS = src/log.h src/lexer.h src/token.h
 SOURCES = src/log.c src/lexer.c src/token.c
 
@@ -24,9 +24,10 @@ for gdb: CFLAGS += -O0
 gdb: build
 	gdb $(EXE_PATH)
 
+for test: CFLAGS += -O0
 test:
 	mkdir -p $(BUILD_DIR)
-	gcc $(CFLAGS) -o $(TEST_PATH) $(TEST_DIR)/*.c $(SOURCES)
+	gcc $(CFLAGS) -o $(TEST_PATH) $(TEST_DIR)/*.c $(SOURCES) -lcriterion
 	$(TEST_PATH)
 
 clean:

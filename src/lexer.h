@@ -8,3 +8,4 @@ typedef struct {
 
 Lexer LexerInit(void);
 Token LexerNext(Lexer *lexer, const char *str);
+Token LexerFirst(const char *str);

@@ -1,8 +1,6 @@
 #include "lexer.h"
-#include "log.h"
 #include "token.h"
 #include <ctype.h>
-#include <stdlib.h>
 #include <string.h>
 
 Lexer LexerInit(void) {
@@ -34,12 +32,33 @@ Token LexerNext(Lexer *lexer, const char *str) {
         }
 
         const int len = lexer->pos - start;
+        if (len == 11 && strncmp(&str[start], ":predicates", len) == 0)
+            return TokenCreate(TOKEN_DEF_PREDICATE, start, len);
         if (len == 7 && strncmp(&str[start], ":action", len) == 0)
             return TokenCreate(TOKEN_DEF_ACTION, start, len);
+        if (len == 11 && strncmp(&str[start], ":parameters", len) == 0)
+            return TokenCreate(TOKEN_DEF_PARAMETERS, start, len);
+        if (len == 13 && strncmp(&str[start], ":precondition", len) == 0)
+            return TokenCreate(TOKEN_DEF_PRECONDITION, start, len);
+        if (len == 7 && strncmp(&str[start], ":effect", len) == 0)
+            return TokenCreate(TOKEN_DEF_EFFECT, start, len);
 
-        ERROR("Lexer failed to identify '%.*s' at position %d.", len, &str[start], start);
-        exit(1);
+        return TokenCreate(TOKEN_UNKNOWN, start, len);
     }
-    ERROR("Lexer failed to identify '%c' at position %d.", str[lexer->pos], lexer->pos);
-    exit(1);
+    if (isalpha(str[lexer->pos])) {
+        const int start = lexer->pos;
+
+        while (isalpha(str[lexer->pos]) || isdigit(str[lexer->pos]) || str[lexer->pos] == '-' ||
+               str[lexer->pos] == '_' || str[lexer->pos] == '.') {
+            lexer->pos++;
+        }
+
+        return TokenCreate(TOKEN_ID, start, lexer->pos - start);
+    }
+    return TokenCreate(TOKEN_UNKNOWN, lexer->pos, 1);
+}
+
+Token LexerFirst(const char *str) {
+    Lexer lexer = LexerInit();
+    return LexerNext(&lexer, str);
 }
