@@ -1,5 +1,5 @@
-#include "lexer.h"
-#include "token.h"
+#include "parsing/domain/lexer.h"
+#include "parsing/domain/token.h"
 #include <criterion/assert.h>
 #include <criterion/internal/assert.h>
 #include <criterion/parameterized.h>

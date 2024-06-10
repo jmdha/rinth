@@ -1,5 +1,4 @@
-#include "lexer.h"
-#include "token.h"
+#include "parsing/domain/lexer.h"
 #include <stdio.h>
 
 int main(void) {
