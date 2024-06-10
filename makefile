@@ -1,6 +1,6 @@
 CFLAGS  = -Isrc -g -O3 -Wall -Wextra -pedantic -flto -std=c17 -fsanitize=address -march=native
-HEADERS = src/log.h src/types.h src/temp.h
-SOURCES = src/log.c
+HEADERS = src/log.h src/lexer.h src/token.h
+SOURCES = src/log.c src/lexer.c src/token.c
 
 .PHONY: build
 

@@ -1,5 +1,4 @@
 #include "munit.h"
-#include <temp.h>
 
 static MunitResult test_temp(const MunitParameter params[], void *data) {
     munit_assert_int(temp_function(), ==, 4);
