@@ -13,5 +13,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: test
+    - name: Install Criterion
+      run: apt-get install -y libcriterion-dev
+    - name: Run tests
       run: make test
