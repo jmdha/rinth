@@ -1,4 +1,4 @@
-
+[![C/C++ CI](https://github.com/jamadaha/rinth/actions/workflows/c-cpp.yml/badge.svg)](https://github.com/jamadaha/rinth/actions/workflows/c-cpp.yml)
 ## Building
 To build the executable, simply run the following:
 ```
