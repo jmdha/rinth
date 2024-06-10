@@ -17,6 +17,15 @@ Test(lexing, id) {
     cr_assert_eq(TOKEN_ID, LexerFirst("a-b").kind);
     cr_assert_eq(TOKEN_ID, LexerFirst("a_c").kind);
     cr_assert_eq(TOKEN_ID, LexerFirst("a.q").kind);
+    cr_assert_eq(TOKEN_ID, LexerFirst("a.q?").kind);
+}
+Test(lexing, variable) {
+    cr_assert_eq(TOKEN_VARIABLE, LexerFirst("?a").kind);
+    cr_assert_eq(TOKEN_VARIABLE, LexerFirst("?a2").kind);
+    cr_assert_eq(TOKEN_VARIABLE, LexerFirst("?a-b").kind);
+    cr_assert_eq(TOKEN_VARIABLE, LexerFirst("?a_c").kind);
+    cr_assert_eq(TOKEN_VARIABLE, LexerFirst("?a.q").kind);
+    cr_assert_eq(TOKEN_VARIABLE, LexerFirst("?a.q?").kind);
 }
 Test(lexing, predicate) { cr_assert_eq(TOKEN_DEF_PREDICATE, LexerFirst(":predicates").kind); }
 Test(lexing, action) { cr_assert_eq(TOKEN_DEF_ACTION, LexerFirst(":action").kind); }

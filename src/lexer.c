@@ -45,15 +45,19 @@ Token LexerNext(Lexer *lexer, const char *str) {
 
         return TokenCreate(TOKEN_UNKNOWN, start, len);
     }
-    if (isalpha(str[lexer->pos])) {
+    if (isalpha(str[lexer->pos]) || str[lexer->pos] == '?') {
         const int start = lexer->pos;
 
         while (isalpha(str[lexer->pos]) || isdigit(str[lexer->pos]) || str[lexer->pos] == '-' ||
-               str[lexer->pos] == '_' || str[lexer->pos] == '.') {
+               str[lexer->pos] == '_' || str[lexer->pos] == '.' || str[lexer->pos] == '?') {
             lexer->pos++;
         }
 
-        return TokenCreate(TOKEN_ID, start, lexer->pos - start);
+        // If the first char of the name is a question mark it is a variable
+        // Otherwise it is simply an id
+        return TokenCreate(
+            str[start] == '?' ? TOKEN_VARIABLE : TOKEN_ID, start, lexer->pos - start
+        );
     }
     return TokenCreate(TOKEN_UNKNOWN, lexer->pos, 1);
 }
