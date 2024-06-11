@@ -1,14 +1,9 @@
+#include "parsing/domain/domain.h"
 #include "parsing/domain/lexer.h"
 #include <stdio.h>
 
 int main(void) {
-    const char *STR = "( \t\n :action )";
-    Lexer lexer     = LexerInit();
-    Token token     = LexerNext(&lexer, STR);
-
-    while (token.kind != TOKEN_EOF) {
-        printf("%s: %d - %d\n", TOKEN_NAME[token.kind], token.pos, token.len);
-        token = LexerNext(&lexer, STR);
-    }
+    Expression exp = {.kind = FACT, .data = {.FACT.predicate = 0, .FACT.parameter = 1}};
+    printf("%d %d %d\n", exp.kind, exp.data.UNARY.child->kind, exp.data.FACT.parameter);
     return 0;
 }
