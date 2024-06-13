@@ -24,6 +24,7 @@ typedef struct Expression {
             int parameter;
         } FACT;
         struct {
+            int children_count;
             struct Expression *children[MAX_EXPRESSION_BRACNHES];
         } NARY;
         struct {
@@ -36,8 +37,8 @@ typedef struct {
     char *name;
     int parameter_count;
     Parameter parameters[MAX_PARAMETERS];
-    Expression precondition;
-    Expression effect;
+    Expression *precondition;
+    Expression *effect;
 } Action;
 
 typedef struct {
@@ -47,3 +48,10 @@ typedef struct {
     int action_count;
     Action actions[MAX_ACTIONS];
 } Domain;
+
+int DomainParse(const char *str, Domain *domain);
+void DomainDelete(Domain *domain);
+void ActionDelete(Action *action);
+void ExpressionDelete(Expression *expression);
+void PredicateDelete(Predicate *predicate);
+void ParameterDelete(Parameter *parameter);
