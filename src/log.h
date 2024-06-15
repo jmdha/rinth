@@ -3,12 +3,15 @@
 #define LOG_WARN_ENABLED 1
 #define LOG_INFO_ENABLED 1
 
-#ifdef NDEBUG
-#define LOG_DEBUG_ENABLED 0
-#define LOG_TRACE_ENABLED 0
-#else
+#ifdef LOG_DEBUG
 #define LOG_DEBUG_ENABLED 1
 #define LOG_TRACE_ENABLED 1
+#elif LOG_TRACE
+#define LOG_DEBUG_ENABLED 0
+#define LOG_TRACE_ENABLED 1
+#else
+#define LOG_DEBUG_ENABLED 0
+#define LOG_TRACE_ENABLED 0
 #endif
 
 typedef enum LogLevel {

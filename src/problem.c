@@ -217,16 +217,14 @@ Problem ProblemParse(const char *str) {
         if (t.kind == RPAREN) break;
         Expect(t.kind, LPAREN);
         LexerNext(&t, &lexer);
+        TRACE("Parsing %s token in problem parsing", TOKEN_NAMES[t.kind]);
         switch (t.kind) {
         case DEF_NAME: ParseName(&problem.name, &t, &lexer, str); break;
         case DEF_DOMAIN: ParseName(&problem.domain, &t, &lexer, str); break;
         case DEF_OBJECTS: ParseList(problem.objects, &problem.object_count, &t, &lexer, str); break;
         case DEF_INIT: ParseFacts(problem.inits, &problem.init_count, &t, &lexer, str); break;
         case DEF_GOAL: ParseGoal(problem.goals, &problem.goal_count, &t, &lexer, str); break;
-        default: {
-            ERROR("Unexpected token %s", TOKEN_NAMES[t.kind]);
-            exit(1);
-        }
+        default: ERROR("Unexpected token %s", TOKEN_NAMES[t.kind]); exit(1);
         }
     }
     return problem;

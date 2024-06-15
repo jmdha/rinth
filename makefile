@@ -6,8 +6,7 @@ BUILD_DIR = build
 EXE_PATH  = $(BUILD_DIR)/$(EXE_NAME)
 TEST_PATH  = $(BUILD_DIR)/test
 
-CFLAGS  = -I$(SRC_DIR) -g -O3 -Wall -Wextra -pedantic -flto -std=c17 -march=native -fsanitize=address
-
+CFLAGS  = -I$(SRC_DIR) -g -O3 -Wall -Wextra -flto -std=c17 -march=native 
 SOURCES = $(shell find $(SRC_DIR) -type f -iname '*.c')
 
 args = `arg="$(filter-out $@,$(MAKECMDGOALS))" && echo $${arg:-${1}}`
@@ -18,14 +17,15 @@ build:
 	mkdir -p $(BUILD_DIR)
 	gcc $(CFLAGS) -o $(EXE_PATH) $(BIN_DIR)/main.c $(SOURCES)
 
-for gdb: CFLAGS += -O0
+for dbuild: CFLAGS += -O0 -D LOG_DEBUG
 dbuild:
 	mkdir -p $(BUILD_DIR)
 	gcc $(CFLAGS) -o $(EXE_PATH) $(BIN_DIR)/main.c $(SOURCES)
 
-# Do note: gcc when faced with multiple optimization flags will use the last
-gdb: dbuild
-	gdb $(EXE_PATH)
+for tbuild: CFLAGS += -fsanitize=address -D LOG_TRACE
+tbuild:
+	mkdir -p $(BUILD_DIR)
+	gcc $(CFLAGS) -o $(EXE_PATH) $(BIN_DIR)/main.c $(SOURCES)
 
 for test: CFLAGS += -O0
 test:

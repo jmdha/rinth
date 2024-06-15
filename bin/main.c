@@ -1,20 +1,20 @@
 #include "io.h"
+#include "log.h"
 #include "problem.h"
-#include <stdio.h>
-#include <time.h>
 
 int main(int argc, char **argv) {
+    LogInit();
+    INFO("Reading args");
     if (argc < 2) return 1;
     const char *path = argv[1];
-    File file        = FileOpen(path);
-    clock_t start    = clock();
-    Problem problem  = ProblemParse(file.buffer);
-    clock_t end      = clock();
-    double seconds   = (double)(end - start) / CLOCKS_PER_SEC;
-    printf("Parsing took: %f s\n", seconds);
+    INFO("Opening file");
+    File file       = FileOpen(path);
+    INFO("Parsing problem");
+    Problem problem = ProblemParse(file.buffer);
     // ProblemPrint(&problem);
+    INFO("Closing file");
     FileClose(&file);
+    INFO("Deleting problem");
     ProblemDelete(&problem);
-    printf("Throughput: %f MB/s \n", (double)file.len * 0.000001 / seconds);
     return 0;
 }

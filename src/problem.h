@@ -1,9 +1,9 @@
 #pragma once
 
-#define MAX_OBJECTS 10000
+#define MAX_OBJECTS 1000
 #define MAX_ARGS 8
-#define MAX_INITS 10000
-#define MAX_GOALS 10000
+#define MAX_INITS 1000
+#define MAX_GOALS 1000
 
 typedef struct {
     char *predicate;
@@ -22,6 +22,8 @@ typedef struct {
     Fact goals[MAX_GOALS];
 } Problem;
 
+// TODO: Reduce init time. Currently a large portion of the time is taken initializing struct.
+// A likely solution would be to use lists
 Problem ProblemParse(const char *str);
 void ProblemDelete(Problem *problem);
 
