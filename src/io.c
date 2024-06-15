@@ -13,19 +13,21 @@ File FileOpen(const char *path) {
     file.fd   = open(path, O_RDONLY);
     if (file.fd == -1) {
         ERROR("Failed to open file \"%s\"", path);
-        return file;
+        exit(1);
     }
 
     struct stat sb;
     if (fstat(file.fd, &sb) == -1) {
         ERROR("Failed to retrieve size of file \"%s\"", path);
-        return file;
+        close(file.fd);
+        exit(1);
     }
     file.len    = sb.st_size;
     file.buffer = mmap(NULL, file.len, PROT_READ, MAP_PRIVATE, file.fd, 0);
     if (file.buffer == MAP_FAILED) {
         ERROR("Failed to map file content of \"%s\"", path);
-        return file;
+        close(file.fd);
+        exit(1);
     }
 
     return file;

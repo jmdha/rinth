@@ -1,13 +1,20 @@
 #include "io.h"
+#include "problem.h"
 #include <stdio.h>
 #include <time.h>
 
-int main(void) {
-    clock_t start    = clock();
-    const char *path = "domain.pddl";
+int main(int argc, char **argv) {
+    if (argc < 2) return 1;
+    const char *path = argv[1];
     File file        = FileOpen(path);
+    clock_t start    = clock();
+    Problem problem  = ProblemParse(file.buffer);
+    clock_t end      = clock();
+    double seconds   = (double)(end - start) / CLOCKS_PER_SEC;
+    printf("Parsing took: %f s\n", seconds);
+    // ProblemPrint(&problem);
     FileClose(&file);
-    clock_t end   = clock();
-    float elapsed = (float)(end - start) / CLOCKS_PER_SEC;
-    printf("Time %f s\n", elapsed);
+    ProblemDelete(&problem);
+    printf("Throughput: %f MB/s \n", (double)file.len * 0.000001 / seconds);
+    return 0;
 }
