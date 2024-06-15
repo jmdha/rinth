@@ -227,6 +227,14 @@ Problem ProblemParse(const char *str) {
         default: ERROR("Unexpected token %s", TOKEN_NAMES[t.kind]); exit(1);
         }
     }
+
+    if (problem.object_count > MAX_OBJECTS * 0.5)
+        WARN("Problem has %d objects, which is near maximum.", problem.object_count);
+    if (problem.init_count > MAX_INITS * 0.5)
+        WARN("Problem has %d initial facts, which is near maximum.", problem.object_count);
+    if (problem.goal_count > MAX_GOALS * 0.5)
+        WARN("Problem has %d goal facts, which is near maximum.", problem.object_count);
+
     return problem;
 }
 

@@ -1,9 +1,9 @@
 #pragma once
 
-#define MAX_OBJECTS 1000
+#define MAX_OBJECTS 200
 #define MAX_ARGS 8
-#define MAX_INITS 1000
-#define MAX_GOALS 1000
+#define MAX_INITS 200
+#define MAX_GOALS 200
 
 typedef struct {
     char *predicate;
