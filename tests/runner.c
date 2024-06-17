@@ -6,7 +6,7 @@
 #define GREEN "\033[32m" /* Green */
 
 ReportHook(POST_TEST)(struct criterion_test_stats *stats) {
-    if (stats->failed_asserts == 0 && !stats->crashed) {
+    if (stats->failed_asserts == 0 && !stats->crashed && stats->exit_code == 0) {
         printf(
             "[ %16s.%-16s ] [ %f s ] [" GREEN "   OK   " RESET "]\n", stats->test->category,
             stats->test->name, stats->elapsed_time

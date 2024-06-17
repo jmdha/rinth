@@ -12,7 +12,6 @@ SOURCES = $(shell find $(SRC_DIR) -type f -iname '*.c')
 args = `arg="$(filter-out $@,$(MAKECMDGOALS))" && echo $${arg:-${1}}`
 
 .PHONY: build
-
 build:
 	mkdir -p $(BUILD_DIR)
 	gcc $(CFLAGS) -o $(EXE_PATH) $(BIN_DIR)/main.c $(SOURCES)
