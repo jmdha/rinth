@@ -16,6 +16,7 @@ static inline void ParseName(char **name, Token *t, Lexer *lexer, const char *st
 }
 
 static inline void ParseList(char **list, int *count, Token *t, Lexer *lexer, const char *str) {
+    *count = 0;
     while (LexerNext(t, lexer)) {
         if (t->kind == ID)
             WriteToken(&list[(*count)++], t, str);
@@ -77,6 +78,10 @@ Problem ProblemParse(const char *str) {
         default: ERROR("Unexpected token %s", TOKEN_NAMES[t.kind]); exit(1);
         }
     }
+
+    DEBUG("Objects: %d", problem.object_count);
+    DEBUG("Inits: %d", problem.init_count);
+    DEBUG("Goals: %d", problem.goal_count);
 
     if (problem.object_count > MAX_OBJECTS * 0.5)
         WARN("Problem has %d objects, which is near maximum.", problem.object_count);

@@ -47,7 +47,7 @@ void _LogOutput(LogLevel level, const char *msg, ...) {
         sprintf(out, RED "[%-5s %8.4fs] %s\n" RESET, LEVELS[level], time_stamp, formatted);
     else if (level == LOG_LEVEL_WARN)
         sprintf(out, YELLOW "[%-5s %8.4fs] %s\n" RESET, LEVELS[level], time_stamp, formatted);
-    else if (level == LOG_LEVEL_TRACE)
+    else if (level == LOG_LEVEL_TRACE || level == LOG_LEVEL_DEBUG)
         sprintf(out, GRAY "[%-5s %8.4fs] %s\n" RESET, LEVELS[level], time_stamp, formatted);
     else
         sprintf(out, "[%-5s %8.4fs] %s\n", LEVELS[level], time_stamp, formatted);

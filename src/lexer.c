@@ -26,13 +26,7 @@ void LexID(Lexer *lexer) {
 }
 
 bool MatchDef(TokenKind *kind, const char *str, int len) {
-    if (len == 6 && strncasecmp("define", str, len) == 0)
-        *kind = DEF_DEFINE;
-    else if (len == 6 && strncasecmp("domain", str, len) == 0)
-        *kind = DEF_NAME;
-    else if (len == 7 && strncasecmp("problem", str, len) == 0)
-        *kind = DEF_NAME;
-    else if (len == 13 && strncasecmp(":requirements", str, len) == 0)
+    if (len == 13 && strncasecmp(":requirements", str, len) == 0)
         *kind = DEF_REQUIREMENTS;
     else if (len == 11 && strncasecmp(":predicates", str, len) == 0)
         *kind = DEF_PREDICATES;
@@ -54,6 +48,16 @@ bool MatchDef(TokenKind *kind, const char *str, int len) {
         *kind = DEF_GOAL;
     else if (len == 7 && strncasecmp(":strips", str, len) == 0)
         *kind = REQ_STRIPS;
+    return true;
+}
+
+bool MatchKeyword(TokenKind *kind, const char *str, int len) {
+    if (len == 6 && strncasecmp("define", str, len) == 0)
+        *kind = DEF_DEFINE;
+    else if (len == 6 && strncasecmp("domain", str, len) == 0)
+        *kind = DEF_NAME;
+    else if (len == 7 && strncasecmp("problem", str, len) == 0)
+        *kind = DEF_NAME;
     else if (len == 3 && strncasecmp("and", str, len) == 0)
         *kind = EXP_AND;
     else if (len == 3 && strncasecmp("not", str, len) == 0)
@@ -96,7 +100,7 @@ bool LexerNext(Token *token, Lexer *lexer) {
         }
         LexID(lexer);
         const int len = lexer->pos - pos;
-        MatchDef(&token->kind, &lexer->str[pos], len);
+        MatchKeyword(&token->kind, &lexer->str[pos], len);
         token->pos = pos;
         token->len = len;
         break;

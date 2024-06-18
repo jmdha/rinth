@@ -16,7 +16,7 @@ build:
 	mkdir -p $(BUILD_DIR)
 	gcc $(CFLAGS) -o $(EXE_PATH) $(BIN_DIR)/main.c $(SOURCES)
 
-for dbuild: CFLAGS += -O0 -D LOG_DEBUG
+for dbuild: CFLAGS += -fsanitize=address -D LOG_DEBUG -O0
 dbuild:
 	mkdir -p $(BUILD_DIR)
 	gcc $(CFLAGS) -o $(EXE_PATH) $(BIN_DIR)/main.c $(SOURCES)
@@ -26,7 +26,7 @@ tbuild:
 	mkdir -p $(BUILD_DIR)
 	gcc $(CFLAGS) -o $(EXE_PATH) $(BIN_DIR)/main.c $(SOURCES)
 
-for test: CFLAGS += -O0
+for test: CFLAGS += -fsanitize=address -O0
 test:
 	mkdir -p $(BUILD_DIR)
 	gcc $(CFLAGS) -o $(TEST_PATH) $(TEST_DIR)/*.c $(SOURCES) -lcriterion
