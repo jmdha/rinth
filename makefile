@@ -9,8 +9,6 @@ TEST_PATH  = $(BUILD_DIR)/test
 CFLAGS  = -I$(SRC_DIR) -g -O3 -Wall -Wextra -flto -std=c17 -march=native 
 SOURCES = $(shell find $(SRC_DIR) -type f -iname '*.c')
 
-args = `arg="$(filter-out $@,$(MAKECMDGOALS))" && echo $${arg:-${1}}`
-
 .PHONY: build
 build:
 	mkdir -p $(BUILD_DIR)
