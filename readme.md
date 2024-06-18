@@ -1,3 +1,8 @@
+# rinth
+For now simply a parser of PDDL.
+
+The goal is at some point to make it into a grounded planner, however, that is on a standstill.
+
 [![C/C++ CI](https://github.com/jamadaha/rinth/actions/workflows/c-cpp.yml/badge.svg)](https://github.com/jamadaha/rinth/actions/workflows/c-cpp.yml)
 ## Building
 To build the executable, simply run the following:
