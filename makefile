@@ -1,34 +1,25 @@
-EXE_NAME  = rinth
-BIN_DIR = bin
+EXE_NAME = rinth
 SRC_DIR = src
+BIN_DIR = bin
 TEST_DIR = tests
-BUILD_DIR = build
-EXE_PATH  = $(BUILD_DIR)/$(EXE_NAME)
-TEST_PATH  = $(BUILD_DIR)/test
 
-CFLAGS  = -I$(SRC_DIR) -g -O3 -Wall -Wextra -flto -std=c17 -march=native 
-SOURCES = $(shell find $(SRC_DIR) -type f -iname '*.c')
+WFLAGS = -Wall -Wextra -Wshadow -pedantic
+CFLAGS  = -I$(SRC_DIR) -g -O3 -flto -std=c17 -march=native 
 
-.PHONY: build
-build:
-	mkdir -p $(BUILD_DIR)
-	gcc $(CFLAGS) -o $(EXE_PATH) $(BIN_DIR)/main.c $(SOURCES)
+SRCS = $(shell find src -type f -iname '*.c')
+OBJS = $(SRCS:.c=.o)
+
+.objs: $(OBJS)
 
 for dbuild: CFLAGS += -fsanitize=address -D LOG_DEBUG -O0
-dbuild:
-	mkdir -p $(BUILD_DIR)
-	gcc $(CFLAGS) -o $(EXE_PATH) $(BIN_DIR)/main.c $(SOURCES)
+dbuild: .objs
+	gcc $(CFLAGS) -o $(EXE_NAME) $(BIN_DIR)/main.c $(OBJS)
 
 for tbuild: CFLAGS += -fsanitize=address -D LOG_TRACE
 tbuild:
-	mkdir -p $(BUILD_DIR)
-	gcc $(CFLAGS) -o $(EXE_PATH) $(BIN_DIR)/main.c $(SOURCES)
+	gcc $(CFLAGS) -o $(EXE_NAME) $(BIN_DIR)/main.c $(OBJS)
 
 for test: CFLAGS += -fsanitize=address -O0
-test:
-	mkdir -p $(BUILD_DIR)
-	gcc $(CFLAGS) -o $(TEST_PATH) $(TEST_DIR)/*.c $(SOURCES) -lcriterion
-	$(TEST_PATH)
-
-clean:
-	rm -r $(BUILD_DIR)
+test: .objs
+	gcc $(CFLAGS) -o test_runner $(TEST_DIR)/*.c $(OBJS) -lcriterion
+	./test_runner
