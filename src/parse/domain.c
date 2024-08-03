@@ -6,7 +6,7 @@
 #include "log.h"
 
 static inline void
-ParseList(char **list, int *count, TokenKind kind, Token *t, Lexer *lexer, const char *str) {
+ParseList(char **list, uint *count, TokenKind kind, Token *t, Lexer *lexer, const char *str) {
     *count = 0;
     while (LexerNext(t, lexer)) {
         if (t->kind == kind)
@@ -26,7 +26,7 @@ static inline void ParseName(char **name, Token *t, Lexer *lexer, const char *st
 }
 
 static inline void
-ParseRequirements(char **list, int *count, Token *t, Lexer *lexer, const char *str) {
+ParseRequirements(char **list, uint *count, Token *t, Lexer *lexer, const char *str) {
     while (LexerNext(t, lexer)) {
         if (t->kind == RPAREN) return;
         bool is_requirement;
@@ -47,7 +47,7 @@ static inline void ParsePredicate(Predicate *predicate, Token *t, Lexer *lexer, 
 }
 
 static inline void
-ParsePredicates(Predicate *list, int *count, Token *t, Lexer *lexer, const char *str) {
+ParsePredicates(Predicate *list, uint *count, Token *t, Lexer *lexer, const char *str) {
     while (LexerNext(t, lexer)) {
         if (t->kind == LPAREN)
             ParsePredicate(&(list[(*count)++]), t, lexer, str);

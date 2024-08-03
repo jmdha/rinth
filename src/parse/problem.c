@@ -15,7 +15,7 @@ static inline void ParseName(char **name, Token *t, Lexer *lexer, const char *st
     ExpectNext(t, lexer, RPAREN);
 }
 
-static inline void ParseList(char **list, int *count, Token *t, Lexer *lexer, const char *str) {
+static inline void ParseList(char **list, uint *count, Token *t, Lexer *lexer, const char *str) {
     *count = 0;
     while (LexerNext(t, lexer)) {
         if (t->kind == ID)
@@ -35,7 +35,7 @@ static inline void ParseFact(Fact *fact, Token *t, Lexer *lexer, const char *str
 }
 
 static inline void
-ParseFacts(Fact *fact_list, int *count, Token *t, Lexer *lexer, const char *str) {
+ParseFacts(Fact *fact_list, uint *count, Token *t, Lexer *lexer, const char *str) {
     while (LexerNext(t, lexer)) {
         if (t->kind == LPAREN)
             ParseFact(&(fact_list[(*count)++]), t, lexer, str);
@@ -48,7 +48,8 @@ ParseFacts(Fact *fact_list, int *count, Token *t, Lexer *lexer, const char *str)
 }
 
 // TODO: Handle other things than AND
-static inline void ParseGoal(Fact *fact_list, int *count, Token *t, Lexer *lexer, const char *str) {
+static inline void
+ParseGoal(Fact *fact_list, uint *count, Token *t, Lexer *lexer, const char *str) {
     ExpectNext(t, lexer, LPAREN);
     ExpectNext(t, lexer, EXP_AND);
     ParseFacts(fact_list, count, t, lexer, str);
@@ -96,16 +97,16 @@ Problem ProblemParse(const char *str) {
 void ProblemDelete(Problem *problem) {
     free(problem->domain);
     free(problem->name);
-    for (int i = 0; i < problem->object_count; i++)
+    for (uint i = 0; i < problem->object_count; i++)
         free(problem->objects[i]);
-    for (int i = 0; i < problem->init_count; i++) {
+    for (uint i = 0; i < problem->init_count; i++) {
         free(problem->inits[i].predicate);
-        for (int t = 0; t < problem->inits[i].arg_count; t++)
+        for (uint t = 0; t < problem->inits[i].arg_count; t++)
             free(problem->inits[i].args[t]);
     }
-    for (int i = 0; i < problem->goal_count; i++) {
+    for (uint i = 0; i < problem->goal_count; i++) {
         free(problem->goals[i].predicate);
-        for (int t = 0; t < problem->goals[i].arg_count; t++)
+        for (uint t = 0; t < problem->goals[i].arg_count; t++)
             free(problem->goals[i].args[t]);
     }
 }
@@ -115,11 +116,11 @@ void ProblemPrint(Problem *problem) {
     printf("Name: %s\n", problem->domain);
     printf("Object count: %d\n", problem->object_count);
     printf("Objects:\n");
-    for (int i = 0; i < problem->object_count; i++)
+    for (uint i = 0; i < problem->object_count; i++)
         printf("\t%s\n", problem->objects[i]);
     printf("Init count: %d\n", problem->init_count);
     printf("Inits:\n");
-    for (int i = 0; i < problem->init_count; i++) {
+    for (uint i = 0; i < problem->init_count; i++) {
         printf("\t%s", problem->inits[i].predicate);
         for (int t = 0; t < problem->inits[i].arg_count; t++)
             printf(" %s", problem->inits[i].args[t]);
@@ -127,9 +128,9 @@ void ProblemPrint(Problem *problem) {
     }
     printf("Goal count: %d\n", problem->goal_count);
     printf("Goals:\n");
-    for (int i = 0; i < problem->goal_count; i++) {
+    for (uint i = 0; i < problem->goal_count; i++) {
         printf("\t%s", problem->goals[i].predicate);
-        for (int t = 0; t < problem->goals[i].arg_count; t++)
+        for (uint t = 0; t < problem->goals[i].arg_count; t++)
             printf(" %s", problem->goals[i].args[t]);
         printf("\n");
     }

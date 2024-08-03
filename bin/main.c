@@ -1,7 +1,7 @@
-#include "domain.h"
 #include "io.h"
 #include "log.h"
-#include "problem.h"
+#include "parse/domain.h"
+#include "parse/problem.h"
 
 int main(int argc, char **argv) {
     LogInit();

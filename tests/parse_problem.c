@@ -1,7 +1,6 @@
-#include "problem.h"
-#include <criterion/assert.h>
-#include <criterion/internal/assert.h>
-#include <criterion/parameterized.h>
+#include <criterion/criterion.h>
+
+#include "parse/problem.h"
 
 Test(parse_problem, empty) {
     const char *str = "(define"

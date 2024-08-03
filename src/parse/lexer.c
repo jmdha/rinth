@@ -13,7 +13,7 @@ const char *TOKEN_NAMES[MAX_TOKEN_KIND] = {
     "EXP_OR",         "LPAREN",           "RPAREN",           "VARIABLE",       "ID",
 };
 
-void TokenAssign(Token *token, TokenKind kind, int pos, int len) {
+void TokenAssign(Token *token, TokenKind kind, uint pos, uint len) {
     token->kind = kind;
     token->pos  = pos;
     token->len  = len;
@@ -25,7 +25,7 @@ void LexID(Lexer *lexer) {
         lexer->pos++;
 }
 
-bool MatchDef(TokenKind *kind, const char *str, int len) {
+bool MatchDef(TokenKind *kind, const char *str, uint len) {
     if (len == 13 && strncasecmp(":requirements", str, len) == 0)
         *kind = DEF_REQUIREMENTS;
     else if (len == 11 && strncasecmp(":predicates", str, len) == 0)
@@ -51,7 +51,7 @@ bool MatchDef(TokenKind *kind, const char *str, int len) {
     return true;
 }
 
-bool MatchKeyword(TokenKind *kind, const char *str, int len) {
+bool MatchKeyword(TokenKind *kind, const char *str, uint len) {
     if (len == 6 && strncasecmp("define", str, len) == 0)
         *kind = DEF_DEFINE;
     else if (len == 6 && strncasecmp("domain", str, len) == 0)

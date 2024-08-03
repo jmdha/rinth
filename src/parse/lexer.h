@@ -2,6 +2,8 @@
 
 #include <stdbool.h>
 
+#include "misc.h"
+
 typedef enum {
     DEF_DEFINE,
     DEF_NAME,
@@ -30,17 +32,17 @@ extern const char *TOKEN_NAMES[MAX_TOKEN_KIND];
 
 typedef struct {
     TokenKind kind;
-    int pos, len;
+    uint pos, len;
 } Token;
 
 typedef struct {
     const char *str;
-    int pos;
+    uint pos;
 } Lexer;
 
-void TokenAssign(Token *token, TokenKind kind, int pos, int len);
+void TokenAssign(Token *token, TokenKind kind, uint pos, uint len);
 
-bool MatchDef(TokenKind *kind, const char *str, int len);
+bool MatchDef(TokenKind *kind, const char *str, uint len);
 void LexID(Lexer *lexer);
 bool LexerNext(Token *token, Lexer *lexer);
 

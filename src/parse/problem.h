@@ -1,5 +1,7 @@
 #pragma once
 
+#include "misc.h"
+
 #define MAX_OBJECTS 500
 #define MAX_ARGS 4
 #define MAX_INITS 500
@@ -7,18 +9,18 @@
 
 typedef struct {
     char *predicate;
-    int arg_count;
+    uint arg_count;
     char *args[MAX_ARGS];
 } Fact;
 
 typedef struct {
     char *domain;
     char *name;
-    int object_count;
+    uint object_count;
     char *objects[MAX_OBJECTS];
-    int init_count;
+    uint init_count;
     Fact inits[MAX_INITS];
-    int goal_count;
+    uint goal_count;
     Fact goals[MAX_GOALS];
 } Problem;
 
