@@ -122,7 +122,7 @@ void ProblemPrint(Problem *problem) {
     printf("Inits:\n");
     for (uint i = 0; i < problem->init_count; i++) {
         printf("\t%s", problem->inits[i].predicate);
-        for (int t = 0; t < problem->inits[i].arg_count; t++)
+        for (uint t = 0; t < problem->inits[i].arg_count; t++)
             printf(" %s", problem->inits[i].args[t]);
         printf("\n");
     }

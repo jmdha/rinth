@@ -153,13 +153,13 @@ static inline void ExpressionDelete(Expression *exp) {
     switch (exp->kind) {
     case E_ATOM:
         free(exp->data.atom.predicate);
-        for (int i = 0; i < exp->data.atom.var_count; i++)
+        for (uint i = 0; i < exp->data.atom.var_count; i++)
             free(exp->data.atom.vars[i]);
         break;
     case E_NOT: ExpressionDelete(exp->data.unary); break;
     case E_AND:
     case E_OR:
-        for (int i = 0; i < exp->data.nary.count; i++)
+        for (uint i = 0; i < exp->data.nary.count; i++)
             ExpressionDelete(exp->data.nary.exps[i]);
         break;
     }
@@ -168,18 +168,18 @@ static inline void ExpressionDelete(Expression *exp) {
 
 void DomainDelete(Domain *domain) {
     free(domain->name);
-    for (int i = 0; i < domain->requirement_count; i++)
+    for (uint i = 0; i < domain->requirement_count; i++)
         free(domain->requirements[i]);
-    for (int i = 0; i < domain->predicate_count; i++) {
+    for (uint i = 0; i < domain->predicate_count; i++) {
         Predicate *p = &domain->predicates[i];
         free(p->name);
-        for (int t = 0; t < p->var_count; t++)
+        for (uint t = 0; t < p->var_count; t++)
             free(p->vars[t]);
     }
-    for (int i = 0; i < domain->action_count; i++) {
+    for (uint i = 0; i < domain->action_count; i++) {
         Action *a = &domain->actions[i];
         free(a->name);
-        for (int t = 0; t < a->var_count; t++)
+        for (uint t = 0; t < a->var_count; t++)
             free(a->vars[t]);
         ExpressionDelete(a->precondition);
         ExpressionDelete(a->effect);
