@@ -9,15 +9,15 @@
 #include "log.h"
 #include "problem.h"
 
-static inline void ParseName(char **name, Token *t, Lexer *lexer, const char *str) {
-    ExpectNext(t, lexer, ID);
+static inline void ParseName(char **name, Token *t, const char *str) {
+    ExpectNext(t, ID);
     WriteToken(name, t, str);
-    ExpectNext(t, lexer, RPAREN);
+    ExpectNext(t, RPAREN);
 }
 
-static inline void ParseList(char **list, uint *count, Token *t, Lexer *lexer, const char *str) {
+static inline void ParseList(char **list, uint *count, Token *t, const char *str) {
     *count = 0;
-    while (LexerNext(t, lexer)) {
+    while (LexerNext(t)) {
         if (t->kind == ID)
             WriteToken(&list[(*count)++], t, str);
         else if (t->kind == RPAREN)
@@ -28,17 +28,17 @@ static inline void ParseList(char **list, uint *count, Token *t, Lexer *lexer, c
     EOI(RPAREN);
 }
 
-static inline void ParseFact(Fact *fact, Token *t, Lexer *lexer, const char *str) {
-    ExpectNext(t, lexer, ID);
+static inline void ParseFact(Fact *fact, Token *t, const char *str) {
+    ExpectNext(t, ID);
     WriteToken(&fact->predicate, t, str);
-    ParseList(fact->args, &fact->arg_count, t, lexer, str);
+    ParseList(fact->args, &fact->arg_count, t, str);
 }
 
 static inline void
-ParseFacts(Fact *fact_list, uint *count, Token *t, Lexer *lexer, const char *str) {
-    while (LexerNext(t, lexer)) {
+ParseFacts(Fact *fact_list, uint *count, Token *t, const char *str) {
+    while (LexerNext(t)) {
         if (t->kind == LPAREN)
-            ParseFact(&(fact_list[(*count)++]), t, lexer, str);
+            ParseFact(&(fact_list[(*count)++]), t, str);
         else if (t->kind == RPAREN)
             return;
         else
@@ -49,33 +49,33 @@ ParseFacts(Fact *fact_list, uint *count, Token *t, Lexer *lexer, const char *str
 
 // TODO: Handle other things than AND
 static inline void
-ParseGoal(Fact *fact_list, uint *count, Token *t, Lexer *lexer, const char *str) {
-    ExpectNext(t, lexer, LPAREN);
-    ExpectNext(t, lexer, EXP_AND);
-    ParseFacts(fact_list, count, t, lexer, str);
-    ExpectNext(t, lexer, RPAREN);
+ParseGoal(Fact *fact_list, uint *count, Token *t, const char *str) {
+    ExpectNext(t, LPAREN);
+    ExpectNext(t, EXP_AND);
+    ParseFacts(fact_list, count, t, str);
+    ExpectNext(t, RPAREN);
 }
 
 Problem ProblemParse(const char *str) {
+    LexerInit(str);
     Problem problem = {
         .name = NULL, .domain = NULL, .object_count = 0, .init_count = 0, .goal_count = 0
     };
-    Lexer lexer = {.str = str, .pos = 0};
     Token t;
 
-    ExpectNext(&t, &lexer, LPAREN);
-    ExpectNext(&t, &lexer, DEF_DEFINE);
-    while (LexerNext(&t, &lexer)) {
+    ExpectNext(&t, LPAREN);
+    ExpectNext(&t, DEF_DEFINE);
+    while (LexerNext(&t)) {
         if (t.kind == RPAREN) break;
         Expect(t.kind, LPAREN);
-        LexerNext(&t, &lexer);
+        LexerNext(&t);
         TRACE("Parsing %s token in problem parsing", TOKEN_NAMES[t.kind]);
         switch (t.kind) {
-        case DEF_NAME: ParseName(&problem.name, &t, &lexer, str); break;
-        case DEF_DOMAIN: ParseName(&problem.domain, &t, &lexer, str); break;
-        case DEF_OBJECTS: ParseList(problem.objects, &problem.object_count, &t, &lexer, str); break;
-        case DEF_INIT: ParseFacts(problem.inits, &problem.init_count, &t, &lexer, str); break;
-        case DEF_GOAL: ParseGoal(problem.goals, &problem.goal_count, &t, &lexer, str); break;
+        case DEF_NAME: ParseName(&problem.name, &t, str); break;
+        case DEF_DOMAIN: ParseName(&problem.domain, &t, str); break;
+        case DEF_OBJECTS: ParseList(problem.objects, &problem.object_count, &t, str); break;
+        case DEF_INIT: ParseFacts(problem.inits, &problem.init_count, &t, str); break;
+        case DEF_GOAL: ParseGoal(problem.goals, &problem.goal_count, &t, str); break;
         default: ERROR("Unexpected token %s", TOKEN_NAMES[t.kind]); exit(1);
         }
     }

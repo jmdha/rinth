@@ -13,16 +13,23 @@ const char *TOKEN_NAMES[MAX_TOKEN_KIND] = {
     "EXP_OR",         "LPAREN",           "RPAREN",           "VARIABLE",       "ID",
 };
 
+const char *STR;
+uint POS;
+
+void LexerInit(const char *str) {
+    STR = str;
+    POS = 0;
+}
+
 void TokenAssign(Token *token, TokenKind kind, uint pos, uint len) {
     token->kind = kind;
     token->pos  = pos;
     token->len  = len;
 }
 
-void LexID(Lexer *lexer) {
-    while (isalpha(lexer->str[lexer->pos]) || isdigit(lexer->str[lexer->pos]) ||
-           lexer->str[lexer->pos] == '-' || lexer->str[lexer->pos] == '_')
-        lexer->pos++;
+void LexID() {
+    while (isalpha(STR[POS]) || isdigit(STR[POS]) || STR[POS] == '-' || STR[POS] == '_')
+        POS++;
 }
 
 bool MatchDef(TokenKind *kind, const char *str, uint len) {
@@ -69,21 +76,21 @@ bool MatchKeyword(TokenKind *kind, const char *str, uint len) {
     return true;
 }
 
-bool LexerNext(Token *token, Lexer *lexer) {
-    const int pos = lexer->pos++;
-    const char c  = lexer->str[pos];
+bool LexerNext(Token *token) {
+    const int pos = POS++;
+    const char c  = STR[pos];
 
-    if (isspace(c)) return LexerNext(token, lexer);
+    if (isspace(c)) return LexerNext(token);
 
     switch (c) {
     case '\0': return false;
     case '(': TokenAssign(token, LPAREN, pos, 1); break;
     case ')': TokenAssign(token, RPAREN, pos, 1); break;
     case ':': {
-        LexID(lexer);
-        const int len = lexer->pos - pos;
-        if (!MatchDef(&token->kind, &lexer->str[pos], len)) {
-            ERROR("Unknown definition \"%.*s\" found at position %d", len, &lexer->str[pos], pos);
+        LexID();
+        const int len = POS - pos;
+        if (!MatchDef(&token->kind, &STR[pos], len)) {
+            ERROR("Unknown definition \"%.*s\" found at position %d", len, &STR[pos], pos);
             exit(1);
         }
         token->pos = pos;
@@ -98,9 +105,9 @@ bool LexerNext(Token *token, Lexer *lexer) {
             ERROR("Unknown character '%c' at position %d", c, pos);
             exit(1);
         }
-        LexID(lexer);
-        const int len = lexer->pos - pos;
-        MatchKeyword(&token->kind, &lexer->str[pos], len);
+        LexID();
+        const int len = POS - pos;
+        MatchKeyword(&token->kind, &STR[pos], len);
         token->pos = pos;
         token->len = len;
         break;
@@ -135,8 +142,8 @@ void ExpectEither(TokenKind actual, TokenKind e1, TokenKind e2) {
     }
 }
 
-void ExpectNext(Token *t, Lexer *lexer, TokenKind kind) {
-    if (!LexerNext(t, lexer)) EOI(kind);
+void ExpectNext(Token *t, TokenKind kind) {
+    if (!LexerNext(t)) EOI(kind);
     Expect(t->kind, kind);
 }
 

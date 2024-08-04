@@ -35,20 +35,17 @@ typedef struct {
     uint pos, len;
 } Token;
 
-typedef struct {
-    const char *str;
-    uint pos;
-} Lexer;
+void LexerInit(const char *str);
 
 void TokenAssign(Token *token, TokenKind kind, uint pos, uint len);
 
 bool MatchDef(TokenKind *kind, const char *str, uint len);
-void LexID(Lexer *lexer);
-bool LexerNext(Token *token, Lexer *lexer);
+void LexID();
+bool LexerNext(Token *token);
 
 void EOI(TokenKind expected);
 void Expect(TokenKind actual, TokenKind expected);
 void ExpectEither(TokenKind actual, TokenKind e1, TokenKind e2);
-void ExpectNext(Token *t, Lexer *lexer, TokenKind kind);
+void ExpectNext(Token *t, TokenKind kind);
 void Expected(const char *str, TokenKind found);
 void WriteToken(char **id, Token *t, const char *str);
