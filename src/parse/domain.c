@@ -5,8 +5,7 @@
 #include "lexer.h"
 #include "log.h"
 
-static inline void
-ParseList(char **list, uint *count, TokenKind kind, Token *t, const char *str) {
+static void ParseList(char **list, uint *count, TokenKind kind, Token *t, const char *str) {
     *count = 0;
     while (LexerNext(t)) {
         if (t->kind == kind)
@@ -19,14 +18,13 @@ ParseList(char **list, uint *count, TokenKind kind, Token *t, const char *str) {
     EOI(RPAREN);
 }
 
-static inline void ParseName(char **name, Token *t, const char *str) {
+static void ParseName(char **name, Token *t, const char *str) {
     ExpectNext(t, ID);
     WriteToken(name, t, str);
     ExpectNext(t, RPAREN);
 }
 
-static inline void
-ParseRequirements(char **list, uint *count, Token *t, const char *str) {
+static void ParseRequirements(char **list, uint *count, Token *t, const char *str) {
     while (LexerNext(t)) {
         if (t->kind == RPAREN) return;
         bool is_requirement;
@@ -40,14 +38,13 @@ ParseRequirements(char **list, uint *count, Token *t, const char *str) {
     EOI(RPAREN);
 }
 
-static inline void ParsePredicate(Predicate *predicate, Token *t, const char *str) {
+static void ParsePredicate(Predicate *predicate, Token *t, const char *str) {
     ExpectNext(t, ID);
     WriteToken(&predicate->name, t, str);
     ParseList(predicate->vars, &predicate->var_count, VARIABLE, t, str);
 }
 
-static inline void
-ParsePredicates(Predicate *list, uint *count, Token *t, const char *str) {
+static void ParsePredicates(Predicate *list, uint *count, Token *t, const char *str) {
     while (LexerNext(t)) {
         if (t->kind == LPAREN)
             ParsePredicate(&(list[(*count)++]), t, str);
@@ -59,7 +56,7 @@ ParsePredicates(Predicate *list, uint *count, Token *t, const char *str) {
     EOI(RPAREN);
 }
 
-static inline void ParseExpression(Expression **exp, Token *t, const char *str) {
+static void ParseExpression(Expression **exp, Token *t, const char *str) {
     if (!LexerNext(t)) EOI(RPAREN);
     if (t->kind == RPAREN) return;
     Expression *e = malloc(sizeof(Expression));
@@ -92,7 +89,7 @@ static inline void ParseExpression(Expression **exp, Token *t, const char *str) 
     };
 }
 
-static inline void ParseAction(Action *action, Token *t, const char *str) {
+static void ParseAction(Action *action, Token *t, const char *str) {
     ExpectNext(t, ID);
     WriteToken(&action->name, t, str);
     TRACE("Parsing action %s", action->name);
@@ -131,9 +128,7 @@ Domain DomainParse(const char *str) {
         case DEF_PREDICATES:
             ParsePredicates(domain.predicates, &domain.predicate_count, &t, str);
             break;
-        case DEF_ACTION:
-            ParseAction(&domain.actions[domain.action_count++], &t, str);
-            break;
+        case DEF_ACTION: ParseAction(&domain.actions[domain.action_count++], &t, str); break;
         default: ERROR("Unexpected token %s", TOKEN_NAMES[t.kind]); exit(1);
         }
     }
@@ -149,7 +144,7 @@ Domain DomainParse(const char *str) {
     return domain;
 }
 
-static inline void ExpressionDelete(Expression *exp) {
+static void ExpressionDelete(Expression *exp) {
     switch (exp->kind) {
     case E_ATOM:
         free(exp->data.atom.predicate);

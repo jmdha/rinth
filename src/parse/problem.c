@@ -9,13 +9,13 @@
 #include "log.h"
 #include "problem.h"
 
-static inline void ParseName(char **name, Token *t, const char *str) {
+static void ParseName(char **name, Token *t, const char *str) {
     ExpectNext(t, ID);
     WriteToken(name, t, str);
     ExpectNext(t, RPAREN);
 }
 
-static inline void ParseList(char **list, uint *count, Token *t, const char *str) {
+static void ParseList(char **list, uint *count, Token *t, const char *str) {
     *count = 0;
     while (LexerNext(t)) {
         if (t->kind == ID)
@@ -28,14 +28,13 @@ static inline void ParseList(char **list, uint *count, Token *t, const char *str
     EOI(RPAREN);
 }
 
-static inline void ParseFact(Fact *fact, Token *t, const char *str) {
+static void ParseFact(Fact *fact, Token *t, const char *str) {
     ExpectNext(t, ID);
     WriteToken(&fact->predicate, t, str);
     ParseList(fact->args, &fact->arg_count, t, str);
 }
 
-static inline void
-ParseFacts(Fact *fact_list, uint *count, Token *t, const char *str) {
+static void ParseFacts(Fact *fact_list, uint *count, Token *t, const char *str) {
     while (LexerNext(t)) {
         if (t->kind == LPAREN)
             ParseFact(&(fact_list[(*count)++]), t, str);
@@ -48,8 +47,7 @@ ParseFacts(Fact *fact_list, uint *count, Token *t, const char *str) {
 }
 
 // TODO: Handle other things than AND
-static inline void
-ParseGoal(Fact *fact_list, uint *count, Token *t, const char *str) {
+static void ParseGoal(Fact *fact_list, uint *count, Token *t, const char *str) {
     ExpectNext(t, LPAREN);
     ExpectNext(t, EXP_AND);
     ParseFacts(fact_list, count, t, str);
