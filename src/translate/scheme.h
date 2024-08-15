@@ -1,0 +1,21 @@
+#pragma once
+
+#include <stdbool.h>
+
+#include "parse/domain.h"
+#include "misc.h"
+
+typedef struct {
+    uint predicate;
+    uint *v_args;
+    bool val;
+} Atom;
+
+typedef struct {
+    char *name;
+    Atom *v_pre;
+    Atom *v_eff;
+} Scheme;
+
+Scheme TranslateAction(const char **v_predicates, Action *action);
+Scheme *TranslateActions(const char **v_predicates, Action *actions, uint count);

@@ -1,7 +1,11 @@
+#define STB_DS_IMPLEMENTATION
+#include <stb_ds.h>
+
 #include "io.h"
 #include "log.h"
 #include "parse/domain.h"
 #include "parse/problem.h"
+#include "translate/task.h"
 
 int main(int argc, char **argv) {
     LogInit();
@@ -25,9 +29,14 @@ int main(int argc, char **argv) {
     TRACE("Closing problem file");
     FileClose(&problem_file);
     INFO("Parsing finished");
+    INFO("Translating");
+    Task task = Translate(&domain, &problem);
     TRACE("Deleting domain");
     DomainDelete(&domain);
     TRACE("Deleting problem");
     ProblemDelete(&problem);
+    TRACE("Deleting task");
+    TaskDelete(&task);
+    INFO("Done");
     return 0;
 }
