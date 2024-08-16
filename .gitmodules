@@ -1,0 +1,3 @@
+[submodule "third_party/jset"]
+	path = third_party/jset
+	url = https://github.com/jmdha/jset
