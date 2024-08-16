@@ -133,8 +133,8 @@ Domain DomainParse(const char *str) {
         }
     }
 
-    DEBUG("Predicates: %d", domain.predicate_count);
-    DEBUG("Actions: %d", domain.action_count);
+    INFO("Predicates: %d", domain.predicate_count);
+    INFO("Actions: %d", domain.action_count);
 
     if (domain.predicate_count > MAX_PREDICATES * 0.5)
         WARN("Domain has %d predicates, which is near maximum.", domain.predicate_count);

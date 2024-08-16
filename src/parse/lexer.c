@@ -6,7 +6,6 @@
 #include "lexer.h"
 #include "log.h"
 
-
 const char *STR;
 uint POS;
 
@@ -83,10 +82,8 @@ bool LexerNext(Token *token) {
     case ':': {
         LexID();
         const int len = POS - pos;
-        if (!MatchDef(&token->kind, &STR[pos], len)) {
+        if (!MatchDef(&token->kind, &STR[pos], len))
             ERROR("Unknown definition \"%.*s\" found at position %d", len, &STR[pos], pos);
-            exit(1);
-        }
         token->pos = pos;
         token->len = len;
         break;
@@ -95,10 +92,9 @@ bool LexerNext(Token *token) {
         token->kind = ID;
         if (c == '?')
             token->kind = VARIABLE;
-        else if (!isalpha(c)) {
+        else if (!isalpha(c))
             ERROR("Unknown character '%c' at position %d", c, pos);
-            exit(1);
-        }
+
         LexID();
         const int len = POS - pos;
         MatchKeyword(&token->kind, &STR[pos], len);
@@ -111,28 +107,18 @@ bool LexerNext(Token *token) {
     return true;
 }
 
-void EOI(TokenKind expected) {
-    ERROR("Unexpected end of input. Expected %s", TOKEN_NAMES[expected]);
-    exit(1);
-}
+void EOI(TokenKind expected) { ERROR("Unexpected end of input. Expected %s", TOKEN_NAMES[expected]); }
 
 void Expect(TokenKind actual, TokenKind expected) {
-    if (actual != expected) {
-        ERROR(
-            "Found unexpected token %s while expecting %s", TOKEN_NAMES[actual],
-            TOKEN_NAMES[expected]
-        );
-        exit(1);
-    }
+    if (actual != expected)
+        ERROR("Found unexpected token %s while expecting %s", TOKEN_NAMES[actual], TOKEN_NAMES[expected]);
 }
 
 void ExpectEither(TokenKind actual, TokenKind e1, TokenKind e2) {
     if (actual != e1 && actual != e2) {
         ERROR(
-            "Found unexpected token %s while expecting %s or %s", TOKEN_NAMES[actual],
-            TOKEN_NAMES[e1], TOKEN_NAMES[e2]
+            "Found unexpected token %s while expecting %s or %s", TOKEN_NAMES[actual], TOKEN_NAMES[e1], TOKEN_NAMES[e2]
         );
-        exit(1);
     }
 }
 
@@ -141,10 +127,7 @@ void ExpectNext(Token *t, TokenKind kind) {
     Expect(t->kind, kind);
 }
 
-void Expected(const char *str, TokenKind found) {
-    ERROR("Expected %s found %s", str, TOKEN_NAMES[found]);
-    exit(1);
-}
+void Expected(const char *str, TokenKind found) { ERROR("Expected %s found %s", str, TOKEN_NAMES[found]); }
 
 void WriteToken(char **id, Token *t, const char *str) {
     *id           = malloc(t->len + 1);

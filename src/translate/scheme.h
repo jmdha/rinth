@@ -2,8 +2,8 @@
 
 #include <stdbool.h>
 
-#include "parse/domain.h"
 #include "misc.h"
+#include "parse/domain.h"
 
 typedef struct {
     uint predicate;
@@ -17,5 +17,5 @@ typedef struct {
     Atom *v_eff;
 } Scheme;
 
-Scheme TranslateAction(const char **v_predicates, Action *action);
-Scheme *TranslateActions(const char **v_predicates, Action *actions, uint count);
+Scheme TranslateAction(char **v_predicates, Action *action);
+Scheme *TranslateActions(char **v_predicates, Action *actions, uint count);

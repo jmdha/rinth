@@ -11,7 +11,7 @@ typedef struct {
     char *predicate;
     uint arg_count;
     char *args[MAX_ARGS];
-} Fact;
+} SFact;
 
 typedef struct {
     char *domain;
@@ -19,9 +19,9 @@ typedef struct {
     uint object_count;
     char *objects[MAX_OBJECTS];
     uint init_count;
-    Fact inits[MAX_INITS];
+    SFact inits[MAX_INITS];
     uint goal_count;
-    Fact goals[MAX_GOALS];
+    SFact goals[MAX_GOALS];
 } Problem;
 
 Problem ProblemParse(const char *str);

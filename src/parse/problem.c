@@ -28,13 +28,13 @@ static void ParseList(char **list, uint *count, Token *t, const char *str) {
     EOI(RPAREN);
 }
 
-static void ParseFact(Fact *fact, Token *t, const char *str) {
+static void ParseFact(SFact *fact, Token *t, const char *str) {
     ExpectNext(t, ID);
     WriteToken(&fact->predicate, t, str);
     ParseList(fact->args, &fact->arg_count, t, str);
 }
 
-static void ParseFacts(Fact *fact_list, uint *count, Token *t, const char *str) {
+static void ParseFacts(SFact *fact_list, uint *count, Token *t, const char *str) {
     while (LexerNext(t)) {
         if (t->kind == LPAREN)
             ParseFact(&(fact_list[(*count)++]), t, str);
@@ -47,7 +47,7 @@ static void ParseFacts(Fact *fact_list, uint *count, Token *t, const char *str) 
 }
 
 // TODO: Handle other things than AND
-static void ParseGoal(Fact *fact_list, uint *count, Token *t, const char *str) {
+static void ParseGoal(SFact *fact_list, uint *count, Token *t, const char *str) {
     ExpectNext(t, LPAREN);
     ExpectNext(t, EXP_AND);
     ParseFacts(fact_list, count, t, str);
@@ -78,9 +78,9 @@ Problem ProblemParse(const char *str) {
         }
     }
 
-    DEBUG("Objects: %d", problem.object_count);
-    DEBUG("Inits: %d", problem.init_count);
-    DEBUG("Goals: %d", problem.goal_count);
+    INFO("Objects: %d", problem.object_count);
+    INFO("Inits: %d", problem.init_count);
+    INFO("Goals: %d", problem.goal_count);
 
     if (problem.object_count > MAX_OBJECTS * 0.5)
         WARN("Problem has %d objects, which is near maximum.", problem.object_count);

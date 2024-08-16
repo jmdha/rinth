@@ -2,6 +2,7 @@
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <time.h>
 
@@ -56,4 +57,7 @@ void _LogOutput(LogLevel level, const char *msg, ...) {
         fprintf(stderr, "%s", out);
     else
         fprintf(stdout, "%s", out);
+
+    if (is_error)
+        abort();
 }
