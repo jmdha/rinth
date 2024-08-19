@@ -55,3 +55,7 @@ uint *IndexizeFacts(Fact *v_facts, Fact *v_to_be_indexed) {
 
     return v_indexes;
 }
+
+void FactFree(Fact *fact) {
+    arrfree(fact->v_args);
+}

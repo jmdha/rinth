@@ -19,3 +19,4 @@ typedef struct {
 
 Scheme TranslateAction(char **v_predicates, Action *action);
 Scheme *TranslateActions(char **v_predicates, Action *actions, uint count);
+void SchemeFree(Scheme *scheme);

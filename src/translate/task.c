@@ -44,6 +44,16 @@ Task Translate(Domain *domain, Problem *problem) {
     //uint *v_init = IndexizeFacts(v_facts, v_init_facts);
     //TRACE("Indexing goal");
     //uint *v_goal = IndexizeFacts(v_facts, v_goal_facts);
+    
+    for (uint i = 0; i < arrlenu(v_init_facts); i++)
+        FactFree(&v_init_facts[i]);
+    arrfree(v_init_facts);
+    for (uint i = 0; i < arrlenu(v_goal_facts); i++)
+        FactFree(&v_goal_facts[i]);
+    arrfree(v_goal_facts);
+    for (uint i = 0; i < arrlenu(v_schemes); i++)
+        SchemeFree(&v_schemes[i]);
+    arrfree(v_schemes);
     Task task    = {
            .v_predicates = v_predicates, //
            .v_objects    = v_objects,
@@ -54,4 +64,19 @@ Task Translate(Domain *domain, Problem *problem) {
     return task;
 }
 
-void TaskDelete(Task *) {}
+void TaskDelete(Task *task) {
+    for (uint i = 0; i < arrlenu(task->v_predicates); i++)
+        free(task->v_predicates[i]);
+    arrfree(task->v_predicates);
+    for (uint i = 0; i < arrlenu(task->v_objects); i++)
+        free(task->v_objects[i]);
+    arrfree(task->v_objects);
+    for (uint i = 0; i < arrlenu(task->v_operators); i++)
+        OperatorFree(&task->v_operators[i]);
+    arrfree(task->v_operators);
+    for (uint i = 0; i < arrlenu(task->v_facts); i++)
+        FactFree(&task->v_facts[i]);
+    arrfree(task->v_facts);
+    arrfree(task->v_init);
+    arrfree(task->v_goal);
+}

@@ -7,3 +7,5 @@ typedef struct {
     uint *v_pre;
     uint *v_eff;
 } Operator;
+
+void OperatorFree(Operator *operator);

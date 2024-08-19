@@ -78,3 +78,13 @@ Scheme *TranslateActions(char **v_predicates, Action *actions, uint count) {
 
     return v_schemes;
 }
+
+void SchemeFree(Scheme *scheme) {
+    free(scheme->name);
+    for (uint i = 0; i < arrlenu(scheme->v_pre); i++)
+        arrfree(scheme->v_pre[i].v_args);
+    arrfree(scheme->v_pre);
+    for (uint i = 0; i < arrlenu(scheme->v_eff); i++)
+        arrfree(scheme->v_eff[i].v_args);
+    arrfree(scheme->v_eff);
+}
