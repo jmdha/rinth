@@ -8,13 +8,11 @@ Test(parse_problem, empty) {
 
     Problem problem = ProblemParse(str);
 
-    cr_assert_eq(problem.name, NULL);
-    cr_assert_eq(problem.domain, NULL);
+    cr_assert_eq(problem.name.ptr, NULL);
+    cr_assert_eq(problem.domain.ptr, NULL);
     cr_assert_eq(problem.object_count, 0);
     cr_assert_eq(problem.init_count, 0);
     cr_assert_eq(problem.goal_count, 0);
-
-    ProblemDelete(&problem);
 }
 
 Test(parse_problem, name) {
@@ -24,13 +22,11 @@ Test(parse_problem, name) {
 
     Problem problem = ProblemParse(str);
 
-    cr_assert_str_eq(problem.name, "a");
-    cr_assert_eq(problem.domain, NULL);
+    cr_assert(strncmp(problem.name.ptr, "a", problem.name.len) == 0);
+    cr_assert_eq(problem.domain.ptr, NULL);
     cr_assert_eq(problem.object_count, 0);
     cr_assert_eq(problem.init_count, 0);
     cr_assert_eq(problem.goal_count, 0);
-
-    ProblemDelete(&problem);
 }
 
 Test(parse_problem, domain) {
@@ -40,13 +36,11 @@ Test(parse_problem, domain) {
 
     Problem problem = ProblemParse(str);
 
-    cr_assert_eq(problem.name, NULL);
-    cr_assert_str_eq(problem.domain, "a");
+    cr_assert_eq(problem.name.ptr, NULL);
+    cr_assert(strncmp(problem.domain.ptr, "a", problem.domain.len) == 0);
     cr_assert_eq(problem.object_count, 0);
     cr_assert_eq(problem.init_count, 0);
     cr_assert_eq(problem.goal_count, 0);
-
-    ProblemDelete(&problem);
 }
 
 Test(parse_problem, objects) {
@@ -56,15 +50,13 @@ Test(parse_problem, objects) {
 
     Problem problem = ProblemParse(str);
 
-    cr_assert_eq(problem.name, NULL);
-    cr_assert_eq(problem.domain, NULL);
+    cr_assert_eq(problem.name.ptr, NULL);
+    cr_assert_eq(problem.domain.ptr, NULL);
     cr_assert_eq(problem.object_count, 3);
     cr_assert_eq(problem.init_count, 0);
     cr_assert_eq(problem.goal_count, 0);
 
-    cr_assert_str_eq(problem.objects[0], "a");
-    cr_assert_str_eq(problem.objects[1], "bb");
-    cr_assert_str_eq(problem.objects[2], "c-_");
-
-    ProblemDelete(&problem);
+    cr_assert(strncmp(problem.objects[0].ptr, "a", problem.objects[0].len) == 0);
+    cr_assert(strncmp(problem.objects[1].ptr, "bb", problem.objects[1].len) == 0);
+    cr_assert(strncmp(problem.objects[2].ptr, "c-_", problem.objects[2].len) == 0);
 }

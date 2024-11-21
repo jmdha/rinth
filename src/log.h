@@ -1,7 +1,7 @@
 #pragma once
 
-#define LOG_WARN_ENABLED 1
-#define LOG_INFO_ENABLED 1
+#define LOG_WARN_ENABLED 0
+#define LOG_INFO_ENABLED 0
 
 #ifdef LOG_DEBUG
 #define LOG_DEBUG_ENABLED 1

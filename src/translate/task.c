@@ -9,8 +9,8 @@ static char **LoadPredicates(uint count, Predicate *predicates) {
     char **v_predicates = NULL;
 
     for (uint i = 0; i < count; i++) {
-        arrpush(v_predicates, predicates[i].name);
-        predicates[i].name = NULL;
+        //arrpush(v_predicates, predicates[i].name);
+        //predicates[i].name = NULL;
     }
 
     return v_predicates;

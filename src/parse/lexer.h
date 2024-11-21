@@ -7,7 +7,7 @@
 
 typedef struct {
     TokenKind kind;
-    uint pos, len;
+    string str;
 } Token;
 
 void LexerInit(const char *str);
@@ -23,4 +23,3 @@ void Expect(TokenKind actual, TokenKind expected);
 void ExpectEither(TokenKind actual, TokenKind e1, TokenKind e2);
 void ExpectNext(Token *t, TokenKind kind);
 void Expected(const char *str, TokenKind found);
-void WriteToken(char **id, Token *t, const char *str);

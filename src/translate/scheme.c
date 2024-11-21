@@ -4,25 +4,25 @@
 #include "scheme.h"
 
 static Atom TranslateAtom(char **v_predicates, char **vars, uint count, Expression *expression, bool val) {
-    int predicate = -1;
-    for (uint i = 0; i < arrlenu(v_predicates); i++)
-        if (strcmp(v_predicates[i], expression->data.atom.predicate) == 0) predicate = i;
-    if (predicate == -1) ERROR("Action has undeclared predicate %s", expression->data.atom.predicate);
+   // int predicate = -1;
+   // for (uint i = 0; i < arrlenu(v_predicates); i++)
+   //     if (strcmp(v_predicates[i], expression->data.atom.predicate) == 0) predicate = i;
+   // if (predicate == -1) ERROR("Action has undeclared predicate %s", expression->data.atom.predicate);
 
-    uint *v_args = NULL;
-    for (uint i = 0; i < expression->data.atom.var_count; i++) {
-        int arg = -1;
-        for (uint t = 0; t < count; t++)
-            if (strcmp(vars[t], expression->data.atom.vars[i]) == 0) arg = t;
-        if (predicate == -1) {
-            ERROR("Action has undeclared arg %s", expression->data.atom.vars[i]);
-            abort();
-        }
-        arrpush(v_args, arg);
-    }
+   // uint *v_args = NULL;
+   // for (uint i = 0; i < expression->data.atom.var_count; i++) {
+   //     int arg = -1;
+   //     for (uint t = 0; t < count; t++)
+   //         if (strcmp(vars[t], expression->data.atom.vars[i]) == 0) arg = t;
+   //     if (predicate == -1) {
+   //         ERROR("Action has undeclared arg %s", expression->data.atom.vars[i]);
+   //         abort();
+   //     }
+   //     arrpush(v_args, arg);
+   // }
 
-    Atom atom = {.predicate = predicate, .v_args = v_args, .val = val};
-    return atom;
+   // Atom atom = {.predicate = predicate, .v_args = v_args, .val = val};
+   // return atom;
 }
 
 static Atom *TranslateExpression(char **v_predicates, char **vars, uint count, Expression *expression) {
@@ -60,14 +60,14 @@ static Atom *TranslateExpression(char **v_predicates, char **vars, uint count, E
 }
 
 Scheme TranslateAction(char **v_predicates, Action *action) {
-    TRACE("Translating action %s", action->name);
-    Scheme scheme = {
-        .name  = action->name,
-        .v_pre = TranslateExpression(v_predicates, action->vars, action->var_count, action->precondition),
-        .v_eff = TranslateExpression(v_predicates, action->vars, action->var_count, action->effect),
-    };
-    action->name = NULL;
-    return scheme;
+   // TRACE("Translating action %s", action->name);
+   // Scheme scheme = {
+   //     .name  = action->name,
+   //     .v_pre = TranslateExpression(v_predicates, action->vars, action->var_count, action->precondition),
+   //     .v_eff = TranslateExpression(v_predicates, action->vars, action->var_count, action->effect),
+   // };
+   // action->name = NULL;
+   // return scheme;
 }
 
 Scheme *TranslateActions(char **v_predicates, Action *actions, uint count) {

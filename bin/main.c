@@ -31,10 +31,6 @@ int main(int argc, char **argv) {
     INFO("Parsing finished");
     INFO("Translating");
     Task task = Translate(&domain, &problem);
-    TRACE("Deleting domain");
-    DomainDelete(&domain);
-    TRACE("Deleting problem");
-    ProblemDelete(&problem);
     TRACE("Deleting task");
     TaskDelete(&task);
     INFO("Done");

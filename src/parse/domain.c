@@ -5,11 +5,11 @@
 #include "lexer.h"
 #include "log.h"
 
-static void ParseList(char **list, uint *count, TokenKind kind, Token *t, const char *str) {
+static void ParseList(string *list, uint *count, TokenKind kind, Token *t) {
     *count = 0;
     while (LexerNext(t)) {
         if (t->kind == kind)
-            WriteToken(&list[(*count)++], t, str);
+            list[(*count)++] = t->str;
         else if (t->kind == RPAREN)
             return;
         else
@@ -18,13 +18,13 @@ static void ParseList(char **list, uint *count, TokenKind kind, Token *t, const 
     EOI(RPAREN);
 }
 
-static void ParseName(char **name, Token *t, const char *str) {
+static void ParseName(string *name, Token *t) {
     ExpectNext(t, ID);
-    WriteToken(name, t, str);
+    *name = t->str;
     ExpectNext(t, RPAREN);
 }
 
-static void ParseRequirements(char **list, uint *count, Token *t, const char *str) {
+static void ParseRequirements(string *list, uint *count, Token *t) {
     while (LexerNext(t)) {
         if (t->kind == RPAREN) return;
         bool is_requirement;
@@ -33,21 +33,21 @@ static void ParseRequirements(char **list, uint *count, Token *t, const char *st
         default: is_requirement = false; break;
         }
         if (!is_requirement) Expected("REQUIREMENT or RPAREN", t->kind);
-        WriteToken(&list[(*count)++], t, str);
+        list[(*count)++] = t->str;
     }
     EOI(RPAREN);
 }
 
-static void ParsePredicate(Predicate *predicate, Token *t, const char *str) {
+static void ParsePredicate(Predicate *predicate, Token *t) {
     ExpectNext(t, ID);
-    WriteToken(&predicate->name, t, str);
-    ParseList(predicate->vars, &predicate->var_count, VARIABLE, t, str);
+    predicate->name = t->str;
+    ParseList(predicate->vars, &predicate->var_count, VARIABLE, t);
 }
 
-static void ParsePredicates(Predicate *list, uint *count, Token *t, const char *str) {
+static void ParsePredicates(Predicate *list, uint *count, Token *t) {
     while (LexerNext(t)) {
         if (t->kind == LPAREN)
-            ParsePredicate(&(list[(*count)++]), t, str);
+            ParsePredicate(&(list[(*count)++]), t);
         else if (t->kind == RPAREN)
             return;
         else
@@ -56,7 +56,7 @@ static void ParsePredicates(Predicate *list, uint *count, Token *t, const char *
     EOI(RPAREN);
 }
 
-static void ParseExpression(Expression **exp, Token *t, const char *str) {
+static void ParseExpression(Expression **exp, Token *t) {
     if (!LexerNext(t)) EOI(RPAREN);
     if (t->kind == RPAREN) return;
     Expression *e = malloc(sizeof(Expression));
@@ -64,13 +64,13 @@ static void ParseExpression(Expression **exp, Token *t, const char *str) {
     switch (t->kind) {
     case ID:
         e->kind = E_ATOM;
-        WriteToken(&e->data.atom.predicate, t, str);
-        ParseList(e->data.atom.vars, &e->data.atom.var_count, VARIABLE, t, str);
+        e->data.atom.predicate = t->str;
+        ParseList(e->data.atom.vars, &e->data.atom.var_count, VARIABLE, t);
         break;
     case EXP_NOT:
         e->kind = E_NOT;
         ExpectNext(t, LPAREN);
-        ParseExpression(&e->data.unary, t, str);
+        ParseExpression(&e->data.unary, t);
         ExpectNext(t, RPAREN);
         break;
     case EXP_OR: e->kind = E_OR; goto C_NARY;
@@ -81,7 +81,7 @@ static void ParseExpression(Expression **exp, Token *t, const char *str) {
         while (LexerNext(t)) {
             if (t->kind == RPAREN) return;
             if (t->kind != LPAREN) Expected("LPAREN", t->kind);
-            ParseExpression(&e->data.nary.exps[e->data.nary.count++], t, str);
+            ParseExpression(&e->data.nary.exps[e->data.nary.count++], t);
         }
         ExpectNext(t, RPAREN);
         break;
@@ -89,22 +89,22 @@ static void ParseExpression(Expression **exp, Token *t, const char *str) {
     };
 }
 
-static void ParseAction(Action *action, Token *t, const char *str) {
+static void ParseAction(Action *action, Token *t) {
     ExpectNext(t, ID);
-    WriteToken(&action->name, t, str);
+    action->name = t->str;
     TRACE("Parsing action %s", action->name);
     ExpectNext(t, DEF_PARAMETERS);
     TRACE("Parsing parameters of %s", action->name);
     ExpectNext(t, LPAREN);
-    ParseList(action->vars, &action->var_count, VARIABLE, t, str);
+    ParseList(action->vars, &action->var_count, VARIABLE, t);
     ExpectNext(t, DEF_PRECONDITION);
     TRACE("Parsing precondition of %s", action->name);
     ExpectNext(t, LPAREN);
-    ParseExpression(&action->precondition, t, str);
+    ParseExpression(&action->precondition, t);
     ExpectNext(t, DEF_EFFECT);
     TRACE("Parsing effect of %s", action->name);
     ExpectNext(t, LPAREN);
-    ParseExpression(&action->effect, t, str);
+    ParseExpression(&action->effect, t);
     ExpectNext(t, RPAREN);
 }
 
@@ -121,14 +121,14 @@ Domain DomainParse(const char *str) {
         LexerNext(&t);
         TRACE("Parsing %s token in domain parsing", TOKEN_NAMES[t.kind]);
         switch (t.kind) {
-        case DEF_NAME: ParseName(&domain.name, &t, str); break;
+        case DEF_NAME: ParseName(&domain.name, &t); break;
         case DEF_REQUIREMENTS:
-            ParseRequirements(domain.requirements, &domain.requirement_count, &t, str);
+            ParseRequirements(domain.requirements, &domain.requirement_count, &t);
             break;
         case DEF_PREDICATES:
-            ParsePredicates(domain.predicates, &domain.predicate_count, &t, str);
+            ParsePredicates(domain.predicates, &domain.predicate_count, &t);
             break;
-        case DEF_ACTION: ParseAction(&domain.actions[domain.action_count++], &t, str); break;
+        case DEF_ACTION: ParseAction(&domain.actions[domain.action_count++], &t); break;
         default: ERROR("Unexpected token %s", TOKEN_NAMES[t.kind]); exit(1);
         }
     }
@@ -142,41 +142,4 @@ Domain DomainParse(const char *str) {
         WARN("Domain has %d actions, which is near maximum.", domain.action_count);
 
     return domain;
-}
-
-static void ExpressionDelete(Expression *exp) {
-    switch (exp->kind) {
-    case E_ATOM:
-        free(exp->data.atom.predicate);
-        for (uint i = 0; i < exp->data.atom.var_count; i++)
-            free(exp->data.atom.vars[i]);
-        break;
-    case E_NOT: ExpressionDelete(exp->data.unary); break;
-    case E_AND:
-    case E_OR:
-        for (uint i = 0; i < exp->data.nary.count; i++)
-            ExpressionDelete(exp->data.nary.exps[i]);
-        break;
-    }
-    free(exp);
-}
-
-void DomainDelete(Domain *domain) {
-    free(domain->name);
-    for (uint i = 0; i < domain->requirement_count; i++)
-        free(domain->requirements[i]);
-    for (uint i = 0; i < domain->predicate_count; i++) {
-        Predicate *p = &domain->predicates[i];
-        free(p->name);
-        for (uint t = 0; t < p->var_count; t++)
-            free(p->vars[t]);
-    }
-    for (uint i = 0; i < domain->action_count; i++) {
-        Action *a = &domain->actions[i];
-        free(a->name);
-        for (uint t = 0; t < a->var_count; t++)
-            free(a->vars[t]);
-        ExpressionDelete(a->precondition);
-        ExpressionDelete(a->effect);
-    }
 }

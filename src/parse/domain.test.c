@@ -7,10 +7,8 @@ Test(parse_domain, empty) {
 
     Domain domain = DomainParse(str);
 
-    cr_assert_eq(domain.name, NULL);
+    cr_assert_eq(domain.name.ptr, NULL);
     cr_assert_eq(domain.requirement_count, 0);
     cr_assert_eq(domain.predicate_count, 0);
     cr_assert_eq(domain.action_count, 0);
-
-    DomainDelete(&domain);
 }

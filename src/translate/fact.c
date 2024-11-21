@@ -12,20 +12,20 @@ bool FactEqual(const Fact *a, const Fact *b) {
 }
 
 static Fact TranslateFact(char **v_predicates, char **v_objects, SFact *init) {
-    int predicate = -1;
-    for (uint i = 0; i < arrlenu(v_predicates); i++)
-        if (strcmp(v_predicates[i], init->predicate) == 0) predicate = i;
-    if (predicate == -1) ERROR("Undeclared predicate %s in init", init->predicate);
-    uint *v_args = NULL;
-    for (uint i = 0; i < init->arg_count; i++) {
-        int arg = -1;
-        for (uint t = 0; t < arrlenu(v_objects); t++)
-            if (strcmp(v_objects[t], init->args[i]) == 0) arg = t;
-        if (arg == -1) ERROR("Undeclared object %s in init", init->args[i]);
-        arrpush(v_args, arg);
-    }
-    Fact fact = {.predicate = predicate, .v_args = v_args};
-    return fact;
+//    int predicate = -1;
+//    for (uint i = 0; i < arrlenu(v_predicates); i++)
+//        if (strcmp(v_predicates[i], init->predicate) == 0) predicate = i;
+//    if (predicate == -1) ERROR("Undeclared predicate %s in init", init->predicate);
+//    uint *v_args = NULL;
+//    for (uint i = 0; i < init->arg_count; i++) {
+//        int arg = -1;
+//        for (uint t = 0; t < arrlenu(v_objects); t++)
+//            if (strcmp(v_objects[t], init->args[i]) == 0) arg = t;
+//        if (arg == -1) ERROR("Undeclared object %s in init", init->args[i]);
+//        arrpush(v_args, arg);
+//    }
+//    Fact fact = {.predicate = predicate, .v_args = v_args};
+//    return fact;
 }
 
 Fact *TranslateFacts(char **v_predicates, char **v_objects, uint count, SFact *init) {

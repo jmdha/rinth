@@ -16,8 +16,8 @@ void LexerInit(const char *str) {
 
 void TokenAssign(Token *token, TokenKind kind, uint pos, uint len) {
     token->kind = kind;
-    token->pos  = pos;
-    token->len  = len;
+    token->str.ptr = &STR[pos];
+    token->str.len = len;
 }
 
 void LexID() {
@@ -26,43 +26,43 @@ void LexID() {
 }
 
 bool MatchDef(TokenKind *kind, const char *str, uint len) {
-    if (len == 13 && strncasecmp(":requirements", str, len) == 0)
+    if (len == 13 && strncmp(":requirements", str, len) == 0)
         *kind = DEF_REQUIREMENTS;
-    else if (len == 11 && strncasecmp(":predicates", str, len) == 0)
+    else if (len == 11 && strncmp(":predicates", str, len) == 0)
         *kind = DEF_PREDICATES;
-    else if (len == 7 && strncasecmp(":action", str, len) == 0)
+    else if (len == 7 && strncmp(":action", str, len) == 0)
         *kind = DEF_ACTION;
-    else if (len == 11 && strncasecmp(":parameters", str, len) == 0)
+    else if (len == 11 && strncmp(":parameters", str, len) == 0)
         *kind = DEF_PARAMETERS;
-    else if (len == 13 && strncasecmp(":precondition", str, len) == 0)
+    else if (len == 13 && strncmp(":precondition", str, len) == 0)
         *kind = DEF_PRECONDITION;
-    else if (len == 7 && strncasecmp(":effect", str, len) == 0)
+    else if (len == 7 && strncmp(":effect", str, len) == 0)
         *kind = DEF_EFFECT;
-    else if (len == 7 && strncasecmp(":domain", str, len) == 0)
+    else if (len == 7 && strncmp(":domain", str, len) == 0)
         *kind = DEF_DOMAIN;
-    else if (len == 8 && strncasecmp(":objects", str, len) == 0)
+    else if (len == 8 && strncmp(":objects", str, len) == 0)
         *kind = DEF_OBJECTS;
-    else if (len == 5 && strncasecmp(":init", str, len) == 0)
+    else if (len == 5 && strncmp(":init", str, len) == 0)
         *kind = DEF_INIT;
-    else if (len == 5 && strncasecmp(":goal", str, len) == 0)
+    else if (len == 5 && strncmp(":goal", str, len) == 0)
         *kind = DEF_GOAL;
-    else if (len == 7 && strncasecmp(":strips", str, len) == 0)
+    else if (len == 7 && strncmp(":strips", str, len) == 0)
         *kind = REQ_STRIPS;
     return true;
 }
 
 bool MatchKeyword(TokenKind *kind, const char *str, uint len) {
-    if (len == 6 && strncasecmp("define", str, len) == 0)
+    if (len == 6 && strncmp("define", str, len) == 0)
         *kind = DEF_DEFINE;
-    else if (len == 6 && strncasecmp("domain", str, len) == 0)
+    else if (len == 6 && strncmp("domain", str, len) == 0)
         *kind = DEF_NAME;
-    else if (len == 7 && strncasecmp("problem", str, len) == 0)
+    else if (len == 7 && strncmp("problem", str, len) == 0)
         *kind = DEF_NAME;
-    else if (len == 3 && strncasecmp("and", str, len) == 0)
+    else if (len == 3 && strncmp("and", str, len) == 0)
         *kind = EXP_AND;
-    else if (len == 3 && strncasecmp("not", str, len) == 0)
+    else if (len == 3 && strncmp("not", str, len) == 0)
         *kind = EXP_NOT;
-    else if (len == 2 && strncasecmp("or", str, len) == 0)
+    else if (len == 2 && strncmp("or", str, len) == 0)
         *kind = EXP_OR;
     else
         return false;
@@ -84,8 +84,8 @@ bool LexerNext(Token *token) {
         const int len = POS - pos;
         if (!MatchDef(&token->kind, &STR[pos], len))
             ERROR("Unknown definition \"%.*s\" found at position %d", len, &STR[pos], pos);
-        token->pos = pos;
-        token->len = len;
+        token->str.ptr = &STR[pos];
+        token->str.len = len;
         break;
     }
     default: {
@@ -98,8 +98,8 @@ bool LexerNext(Token *token) {
         LexID();
         const int len = POS - pos;
         MatchKeyword(&token->kind, &STR[pos], len);
-        token->pos = pos;
-        token->len = len;
+        token->str.ptr = &STR[pos];
+        token->str.len = len;
         break;
     }
     }
@@ -128,9 +128,3 @@ void ExpectNext(Token *t, TokenKind kind) {
 }
 
 void Expected(const char *str, TokenKind found) { ERROR("Expected %s found %s", str, TOKEN_NAMES[found]); }
-
-void WriteToken(char **id, Token *t, const char *str) {
-    *id           = malloc(t->len + 1);
-    *id           = strncpy(*id, &str[t->pos], t->len);
-    (*id)[t->len] = '\0';
-}

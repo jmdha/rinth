@@ -9,17 +9,17 @@
 #include "log.h"
 #include "problem.h"
 
-static void ParseName(char **name, Token *t, const char *str) {
+static void ParseName(string *name, Token *t) {
     ExpectNext(t, ID);
-    WriteToken(name, t, str);
+    *name = t->str;
     ExpectNext(t, RPAREN);
 }
 
-static void ParseList(char **list, uint *count, Token *t, const char *str) {
+static void ParseList(string *list, uint *count, Token *t) {
     *count = 0;
     while (LexerNext(t)) {
         if (t->kind == ID)
-            WriteToken(&list[(*count)++], t, str);
+            list[(*count)++] = t->str;
         else if (t->kind == RPAREN)
             return;
         else
@@ -28,16 +28,16 @@ static void ParseList(char **list, uint *count, Token *t, const char *str) {
     EOI(RPAREN);
 }
 
-static void ParseFact(SFact *fact, Token *t, const char *str) {
+static void ParseFact(SFact *fact, Token *t) {
     ExpectNext(t, ID);
-    WriteToken(&fact->predicate, t, str);
-    ParseList(fact->args, &fact->arg_count, t, str);
+    fact->predicate = t->str;
+    ParseList(fact->args, &fact->arg_count, t);
 }
 
-static void ParseFacts(SFact *fact_list, uint *count, Token *t, const char *str) {
+static void ParseFacts(SFact *fact_list, uint *count, Token *t) {
     while (LexerNext(t)) {
         if (t->kind == LPAREN)
-            ParseFact(&(fact_list[(*count)++]), t, str);
+            ParseFact(&(fact_list[(*count)++]), t);
         else if (t->kind == RPAREN)
             return;
         else
@@ -47,10 +47,10 @@ static void ParseFacts(SFact *fact_list, uint *count, Token *t, const char *str)
 }
 
 // TODO: Handle other things than AND
-static void ParseGoal(SFact *fact_list, uint *count, Token *t, const char *str) {
+static void ParseGoal(SFact *fact_list, uint *count, Token *t) {
     ExpectNext(t, LPAREN);
     ExpectNext(t, EXP_AND);
-    ParseFacts(fact_list, count, t, str);
+    ParseFacts(fact_list, count, t);
     ExpectNext(t, RPAREN);
 }
 
@@ -69,11 +69,11 @@ Problem ProblemParse(const char *str) {
         LexerNext(&t);
         TRACE("Parsing %s token in problem parsing", TOKEN_NAMES[t.kind]);
         switch (t.kind) {
-        case DEF_NAME: ParseName(&problem.name, &t, str); break;
-        case DEF_DOMAIN: ParseName(&problem.domain, &t, str); break;
-        case DEF_OBJECTS: ParseList(problem.objects, &problem.object_count, &t, str); break;
-        case DEF_INIT: ParseFacts(problem.inits, &problem.init_count, &t, str); break;
-        case DEF_GOAL: ParseGoal(problem.goals, &problem.goal_count, &t, str); break;
+        case DEF_NAME: ParseName(&problem.name, &t); break;
+        case DEF_DOMAIN: ParseName(&problem.domain, &t); break;
+        case DEF_OBJECTS: ParseList(problem.objects, &problem.object_count, &t); break;
+        case DEF_INIT: ParseFacts(problem.inits, &problem.init_count, &t); break;
+        case DEF_GOAL: ParseGoal(problem.goals, &problem.goal_count, &t); break;
         default: ERROR("Unexpected token %s", TOKEN_NAMES[t.kind]); exit(1);
         }
     }
@@ -92,44 +92,27 @@ Problem ProblemParse(const char *str) {
     return problem;
 }
 
-void ProblemDelete(Problem *problem) {
-    free(problem->domain);
-    free(problem->name);
-    for (uint i = 0; i < problem->object_count; i++)
-        free(problem->objects[i]);
-    for (uint i = 0; i < problem->init_count; i++) {
-        free(problem->inits[i].predicate);
-        for (uint t = 0; t < problem->inits[i].arg_count; t++)
-            free(problem->inits[i].args[t]);
-    }
-    for (uint i = 0; i < problem->goal_count; i++) {
-        free(problem->goals[i].predicate);
-        for (uint t = 0; t < problem->goals[i].arg_count; t++)
-            free(problem->goals[i].args[t]);
-    }
-}
-
 void ProblemPrint(Problem *problem) {
-    printf("Domain: %s\n", problem->domain);
-    printf("Name: %s\n", problem->domain);
-    printf("Object count: %d\n", problem->object_count);
-    printf("Objects:\n");
-    for (uint i = 0; i < problem->object_count; i++)
-        printf("\t%s\n", problem->objects[i]);
-    printf("Init count: %d\n", problem->init_count);
-    printf("Inits:\n");
-    for (uint i = 0; i < problem->init_count; i++) {
-        printf("\t%s", problem->inits[i].predicate);
-        for (uint t = 0; t < problem->inits[i].arg_count; t++)
-            printf(" %s", problem->inits[i].args[t]);
-        printf("\n");
-    }
-    printf("Goal count: %d\n", problem->goal_count);
-    printf("Goals:\n");
-    for (uint i = 0; i < problem->goal_count; i++) {
-        printf("\t%s", problem->goals[i].predicate);
-        for (uint t = 0; t < problem->goals[i].arg_count; t++)
-            printf(" %s", problem->goals[i].args[t]);
-        printf("\n");
-    }
+    //printf("Domain: %s\n", problem->domain);
+    //printf("Name: %s\n", problem->domain);
+    //printf("Object count: %d\n", problem->object_count);
+    //printf("Objects:\n");
+    //for (uint i = 0; i < problem->object_count; i++)
+    //    printf("\t%s\n", problem->objects[i]);
+    //printf("Init count: %d\n", problem->init_count);
+    //printf("Inits:\n");
+    //for (uint i = 0; i < problem->init_count; i++) {
+    //    printf("\t%s", problem->inits[i].predicate);
+    //    for (uint t = 0; t < problem->inits[i].arg_count; t++)
+    //        printf(" %s", problem->inits[i].args[t]);
+    //    printf("\n");
+    //}
+    //printf("Goal count: %d\n", problem->goal_count);
+    //printf("Goals:\n");
+    //for (uint i = 0; i < problem->goal_count; i++) {
+    //    printf("\t%s", problem->goals[i].predicate);
+    //    for (uint t = 0; t < problem->goals[i].arg_count; t++)
+    //        printf(" %s", problem->goals[i].args[t]);
+    //    printf("\n");
+    //}
 }
