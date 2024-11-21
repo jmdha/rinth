@@ -110,7 +110,7 @@ static void ParseAction(Action *action, Token *t) {
 
 Domain DomainParse(const char *str) {
     LexerInit(str);
-    Domain domain = {.name = NULL, .predicate_count = 0, .action_count = 0};
+    Domain domain = {0};
     Token t;
 
     ExpectNext(&t, LPAREN);
