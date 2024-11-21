@@ -3,3 +3,4 @@ compile_commands.json
 *.o
 rinth
 test_runner
+bench
