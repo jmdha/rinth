@@ -4,7 +4,7 @@ TEST_NAME  = test_runner
 SRC_DIR    = src
 BIN_DIR    = bin
 WFLAGS     = -Wall -Wextra -Wshadow
-CFLAGS     = -I$(SRC_DIR) -Ithird_party -g -O3 -flto -std=c17 -march=native 
+CFLAGS     = -I$(SRC_DIR) -Ithird_party -ggdb -O3 -flto -std=c17 -march=native 
 SRCS       = $(shell find src -type f -iname '*.c' ! -iname '*.test.c')
 SRCS_TEST  = $(shell find src -type f -iname '*.test.c')
 
