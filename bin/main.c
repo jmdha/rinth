@@ -1,6 +1,3 @@
-#define STB_DS_IMPLEMENTATION
-#include <stb_ds.h>
-
 #include "io.h"
 #include "log.h"
 #include "parse/domain.h"
@@ -20,20 +17,19 @@ int main(int argc, char **argv) {
     File domain_file = FileOpen(domain_path);
     INFO("Parsing domain");
     Domain domain = DomainParse(domain_file.buffer);
-    TRACE("Closing domain file");
-    FileClose(&domain_file);
     INFO("Opening problem file");
     File problem_file = FileOpen(problem_path);
     INFO("Parsing problem");
     Problem problem;
     ProblemParse(&problem, problem_file.buffer);
-    TRACE("Closing problem file");
-    FileClose(&problem_file);
     INFO("Parsing finished");
     INFO("Translating");
     Task task = Translate(&domain, &problem);
-    TRACE("Deleting task");
-    TaskDelete(&task);
+    INFO("Cleanup");
+    TRACE("Closing domain file");
+    FileClose(&domain_file);
+    TRACE("Closing problem file");
+    FileClose(&problem_file);
     INFO("Done");
     return 0;
 }

@@ -2,17 +2,21 @@
 
 #include "parse/domain.h"
 #include "parse/problem.h"
-#include "translate/fact.h"
-#include "translate/operator.h"
+#include "translate/scheme.h"
+
+#define MAX_SCHEMES 16
 
 typedef struct {
-    char **v_predicates;
-    char **v_objects;
-    Operator *v_operators;
-    Fact *v_facts;
-    uint *v_init;
-    uint *v_goal;
+    uint predicate_count;
+    string predicates[MAX_PREDICATES];
+    uint object_count;
+    string objects[MAX_OBJECTS];
+    uint scheme_count;
+    Scheme schemes[MAX_SCHEMES];
+    uint init_count;
+    uint inits[MAX_INITS];
+    uint goal_count;
+    uint goals[MAX_GOALS];
 } Task;
 
 Task Translate(Domain *domain, Problem *problem);
-void TaskDelete(Task *task);

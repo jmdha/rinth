@@ -5,18 +5,20 @@
 #include "misc.h"
 #include "parse/domain.h"
 
+#define MAX_PRECONDITIONS 16
+#define MAX_EFFECTS 16
+
 typedef struct {
     uint predicate;
-    uint *v_args;
+    uint arg_count;
+    uint args[MAX_ACTION_VARIABLES];
     bool val;
 } Atom;
 
 typedef struct {
-    char *name;
-    Atom *v_pre;
-    Atom *v_eff;
+    string name;
+    uint pre_count;
+    Atom pre[MAX_PRECONDITIONS];
+    uint eff_count;
+    Atom eff[MAX_EFFECTS];
 } Scheme;
-
-Scheme TranslateAction(char **v_predicates, Action *action);
-Scheme *TranslateActions(char **v_predicates, Action *actions, uint count);
-void SchemeFree(Scheme *scheme);
