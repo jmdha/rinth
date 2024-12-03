@@ -71,6 +71,7 @@ bool MatchKeyword(TokenKind *kind, const char *str, uint len) {
 bool LexerNext(Token *token) {
     int pos;
     char c;
+    // Skip white space
     while ((c = STR[pos = POS++]) < 33) {} 
 
     switch (c) {
@@ -90,8 +91,6 @@ bool LexerNext(Token *token) {
         token->kind = ID;
         if (c == '?')
             token->kind = VARIABLE;
-        else if (!isalpha(c))
-            ERROR("Unknown character '%c' at position %d", c, pos);
 
         LexID();
         const int len = POS - pos;
