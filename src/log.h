@@ -1,16 +1,18 @@
 #pragma once
 
-#define LOG_WARN_ENABLED 0
+#ifdef LOG_INFO
+#define LOG_INFO_ENABLED 1
+#else
 #define LOG_INFO_ENABLED 0
-
+#endif
 #ifdef LOG_DEBUG
 #define LOG_DEBUG_ENABLED 1
-#define LOG_TRACE_ENABLED 1
-#elif LOG_TRACE
-#define LOG_DEBUG_ENABLED 0
-#define LOG_TRACE_ENABLED 1
 #else
 #define LOG_DEBUG_ENABLED 0
+#endif
+#ifdef LOG_TRACE
+#define LOG_TRACE_ENABLED 1
+#else
 #define LOG_TRACE_ENABLED 0
 #endif
 
@@ -30,12 +32,7 @@ void _LogOutput(LogLevel level, const char *msg, ...);
 
 #define FATAL(msg, ...) _LogOutput(LOG_LEVEL_FATAL, msg, ##__VA_ARGS__);
 #define ERROR(msg, ...) _LogOutput(LOG_LEVEL_ERROR, msg, ##__VA_ARGS__);
-
-#if LOG_WARN_ENABLED
 #define WARN(msg, ...) _LogOutput(LOG_LEVEL_WARN, msg, ##__VA_ARGS__);
-#else
-#define WARN(msg, ...)
-#endif
 
 #if LOG_INFO_ENABLED
 #define INFO(msg, ...) _LogOutput(LOG_LEVEL_INFO, msg, ##__VA_ARGS__);

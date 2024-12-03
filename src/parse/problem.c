@@ -2,7 +2,6 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <strings.h>
 
 #include "lexer.h"
@@ -74,9 +73,9 @@ void ProblemParse(Problem *problem, const char *str) {
         }
     }
 
-    INFO("Objects: %d", problem.object_count);
-    INFO("Inits: %d", problem.init_count);
-    INFO("Goals: %d", problem.goal_count);
+    INFO("Objects: %d", problem->object_count);
+    INFO("Inits: %d", problem->init_count);
+    INFO("Goals: %d", problem->goal_count);
 
     if (problem->object_count > MAX_OBJECTS * 0.5)
         WARN("Problem has %d objects, which is near maximum.", problem->object_count);

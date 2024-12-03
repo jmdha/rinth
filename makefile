@@ -10,14 +10,15 @@ SRCS_TEST  = $(shell find src -type f -iname '*.test.c')
 
 .PHONY: all dbuild tbuild bench test
 
+for all: CFLAGS += -D LOG_INFO
 all: 
 	gcc $(WFLAGS) $(CFLAGS) -o $(EXE_NAME) $(BIN_DIR)/main.c $(SRCS)
 
-for dbuild: CFLAGS += -fsanitize=address -D LOG_DEBUG -O0
+for dbuild: CFLAGS += -fsanitize=address -D LOG_INFO -D LOG_DEBUG -D LOG_TRACE -O0
 dbuild:
 	gcc $(WFLAGS) $(CFLAGS) -o $(EXE_NAME) $(BIN_DIR)/main.c $(SRCS)
 
-for tbuild: CFLAGS += -fsanitize=address -D LOG_TRACE
+for tbuild: CFLAGS += -fsanitize=address -D LOG_INFO -D LOG_TRACE
 tbuild:
 	gcc $(WFLAGS) $(CFLAGS) -o $(EXE_NAME) $(BIN_DIR)/main.c $(SRCS)
 
