@@ -25,7 +25,8 @@ int main(int argc, char **argv) {
     INFO("Opening problem file");
     File problem_file = FileOpen(problem_path);
     INFO("Parsing problem");
-    Problem problem = ProblemParse(problem_file.buffer);
+    Problem problem;
+    ProblemParse(&problem, problem_file.buffer);
     TRACE("Closing problem file");
     FileClose(&problem_file);
     INFO("Parsing finished");
