@@ -1,5 +1,4 @@
 #include <ctype.h>
-#include <stdlib.h>
 #include <string.h>
 #include <strings.h>
 
@@ -70,10 +69,9 @@ bool MatchKeyword(TokenKind *kind, const char *str, uint len) {
 }
 
 bool LexerNext(Token *token) {
-    const int pos = POS++;
-    const char c  = STR[pos];
-
-    if (isspace(c)) return LexerNext(token);
+    int pos;
+    char c;
+    while (isspace(c = STR[pos = POS++])) {} 
 
     switch (c) {
     case '\0': return false;
