@@ -1,6 +1,8 @@
 #pragma once
 
+#include <stdbool.h>
 #include <stdint.h>
+#include <stddef.h>
 
 typedef unsigned int uint;
 typedef uint8_t u8;
@@ -17,3 +19,30 @@ typedef struct {
     const char *ptr;
     uint        len;
 } string;
+
+void memswap(void *restrict buffer, void *l, void *r, size_t size);
+
+#define swap(a, b)                                                                                 \
+    memswap(&(struct {                                                                             \
+        _Static_assert(sizeof *(a) == sizeof *(b), "arguments of swap must have same size");       \
+        char _[sizeof *(a)];                                                                       \
+    }){0},                                                                                         \
+            (a), (b), sizeof *(a))
+
+#define max(a, b)                                                                                  \
+    ({                                                                                             \
+        __typeof__(a) _a = (a);                                                                    \
+        __typeof__(b) _b = (b);                                                                    \
+        _a > _b ? _a : _b;                                                                         \
+    })
+
+#define min(a, b)                                                                                  \
+    ({                                                                                             \
+        __typeof__(a) _a = (a);                                                                    \
+        __typeof__(b) _b = (b);                                                                    \
+        _a < _b ? _a : _b;                                                                         \
+    })
+
+bool StringCmp(const void *a, const void *b);
+
+uint IndexOf(const void *list, uint len, const void *elem, size_t s, bool (*cmp)(const void*, const void*));
