@@ -24,6 +24,6 @@ typedef struct {
     SFact  goals[MAX_GOALS];
 } Problem;
 
-Problem ProblemParse(const char *str);
+void ProblemParse(Problem *problem, const char *str);
 
 void ProblemPrint(Problem *problem);

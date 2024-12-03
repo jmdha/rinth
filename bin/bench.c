@@ -17,8 +17,12 @@ int main(int argc, char **argv) {
     File problem_file = FileOpen(problem_path);
     printf("Bytes: %f MB\n", problem_file.len / (float) 1024 / 1024);
     clock_t start = clock();
+    Problem problem;
     for (int i = 0; i < 1000000; i++) {
-        ProblemParse(problem_file.buffer);
+        problem.init_count = 0;
+        problem.goal_count = 0;
+        problem.object_count = 0;
+        ProblemParse(&problem, problem_file.buffer);
     }
     clock_t end = clock();
     float secs = (float)(end - start) / CLOCKS_PER_SEC;

@@ -54,9 +54,8 @@ static void ParseGoal(SFact *fact_list, uint *count, Token *t) {
     ExpectNext(t, RPAREN);
 }
 
-Problem ProblemParse(const char *str) {
+void ProblemParse(Problem *problem, const char *str) {
     LexerInit(str);
-    Problem problem = {0}; 
     Token t;
     ExpectNext(&t, LPAREN);
     ExpectNext(&t, DEF_DEFINE);
@@ -66,11 +65,11 @@ Problem ProblemParse(const char *str) {
         LexerNext(&t);
         TRACE("Parsing %s token in problem parsing", TOKEN_NAMES[t.kind]);
         switch (t.kind) {
-        case DEF_NAME: ParseName(&problem.name, &t); break;
-        case DEF_DOMAIN: ParseName(&problem.domain, &t); break;
-        case DEF_OBJECTS: ParseList(problem.objects, &problem.object_count, &t); break;
-        case DEF_INIT: ParseFacts(problem.inits, &problem.init_count, &t); break;
-        case DEF_GOAL: ParseGoal(problem.goals, &problem.goal_count, &t); break;
+        case DEF_NAME: ParseName(&problem->name, &t); break;
+        case DEF_DOMAIN: ParseName(&problem->domain, &t); break;
+        case DEF_OBJECTS: ParseList(problem->objects, &problem->object_count, &t); break;
+        case DEF_INIT: ParseFacts(problem->inits, &problem->init_count, &t); break;
+        case DEF_GOAL: ParseGoal(problem->goals, &problem->goal_count, &t); break;
         default: ERROR("Unexpected token %s", TOKEN_NAMES[t.kind]); exit(1);
         }
     }
@@ -79,14 +78,12 @@ Problem ProblemParse(const char *str) {
     INFO("Inits: %d", problem.init_count);
     INFO("Goals: %d", problem.goal_count);
 
-    if (problem.object_count > MAX_OBJECTS * 0.5)
-        WARN("Problem has %d objects, which is near maximum.", problem.object_count);
-    if (problem.init_count > MAX_INITS * 0.5)
-        WARN("Problem has %d initial facts, which is near maximum.", problem.object_count);
-    if (problem.goal_count > MAX_GOALS * 0.5)
-        WARN("Problem has %d goal facts, which is near maximum.", problem.object_count);
-
-    return problem;
+    if (problem->object_count > MAX_OBJECTS * 0.5)
+        WARN("Problem has %d objects, which is near maximum.", problem->object_count);
+    if (problem->init_count > MAX_INITS * 0.5)
+        WARN("Problem has %d initial facts, which is near maximum.", problem->object_count);
+    if (problem->goal_count > MAX_GOALS * 0.5)
+        WARN("Problem has %d goal facts, which is near maximum.", problem->object_count);
 }
 
 void ProblemPrint(Problem *problem) {
