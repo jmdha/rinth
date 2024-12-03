@@ -71,7 +71,7 @@ bool MatchKeyword(TokenKind *kind, const char *str, uint len) {
 bool LexerNext(Token *token) {
     int pos;
     char c;
-    while (isspace(c = STR[pos = POS++])) {} 
+    while ((c = STR[pos = POS++]) < 33) {} 
 
     switch (c) {
     case '\0': return false;
