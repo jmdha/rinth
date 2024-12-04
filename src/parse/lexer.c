@@ -68,11 +68,13 @@ bool MatchKeyword(TokenKind *kind, const char *str, uint len) {
     return true;
 }
 
+bool IsSpace(char c) { return ((unsigned char)c) - 1 <= 32; }
+
 bool LexerNext(Token *token) {
     int pos;
     char c;
     // Skip white space
-    while ((c = STR[pos = POS++]) < 33) {} 
+    while (IsSpace(c = STR[pos = POS++])) {} 
 
     switch (c) {
     case '\0': return false;
