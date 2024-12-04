@@ -2,10 +2,10 @@
 
 #include "misc.h"
 
-#define MAX_OBJECTS 128
+#define MAX_OBJECTS 256
 #define MAX_ARGS 8
-#define MAX_INITS 128
-#define MAX_GOALS 128
+#define MAX_INITS 256
+#define MAX_GOALS 256
 
 typedef struct {
     string predicate;

@@ -23,3 +23,4 @@ UBENCH_EX(parsing, problem) {
         ProblemParse(&problem, BLOCKSWORLD);
     }
 }
+
