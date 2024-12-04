@@ -16,7 +16,8 @@ int main(int argc, char **argv) {
     INFO("Opening domain file");
     File domain_file = FileOpen(domain_path);
     INFO("Parsing domain");
-    Domain domain = DomainParse(domain_file.buffer);
+    Domain domain;
+    DomainParse(&domain, domain_file.buffer);
     INFO("Opening problem file");
     File problem_file = FileOpen(problem_path);
     INFO("Parsing problem");

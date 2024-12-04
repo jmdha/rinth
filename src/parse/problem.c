@@ -55,6 +55,13 @@ static void ParseGoal(SFact *fact_list, uint *count, Token *t) {
 
 void ProblemParse(Problem *problem, const char *str) {
     LexerInit(str);
+    problem->name.ptr     = NULL;
+    problem->name.len     = 0;
+    problem->domain.ptr   = NULL;
+    problem->domain.len   = 0;
+    problem->object_count = 0;
+    problem->goal_count   = 0;
+    problem->init_count   = 0;
     Token t;
     ExpectNext(&t, LPAREN);
     ExpectNext(&t, DEF_DEFINE);

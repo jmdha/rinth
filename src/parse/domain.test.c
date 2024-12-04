@@ -5,7 +5,8 @@
 Test(parse_domain, empty) {
     const char *str = "(define)";
 
-    Domain domain = DomainParse(str);
+    Domain domain; 
+    DomainParse(&domain, str);
 
     cr_assert_eq(domain.name.ptr, NULL);
     cr_assert_eq(domain.requirement_count, 0);

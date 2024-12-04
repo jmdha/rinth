@@ -25,5 +25,4 @@ typedef struct {
 } Problem;
 
 void ProblemParse(Problem *problem, const char *str);
-
 void ProblemPrint(Problem *problem);

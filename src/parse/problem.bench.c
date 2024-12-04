@@ -18,11 +18,8 @@ static const char *BLOCKSWORLD = "(define (problem blocksworld-01)"
                           ")))";
 
 UBENCH_EX(parsing, problem) {
-    Problem problem = {0};
+    Problem problem;
     UBENCH_DO_BENCHMARK() {
-        problem.init_count   = 0;
-        problem.goal_count   = 0;
-        problem.object_count = 0;
         ProblemParse(&problem, BLOCKSWORLD);
     }
 }

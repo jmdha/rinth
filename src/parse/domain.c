@@ -63,7 +63,7 @@ static void ParseExpression(Expression **exp, Token *t) {
     *exp          = e;
     switch (t->kind) {
     case ID:
-        e->kind = E_ATOM;
+        e->kind                = E_ATOM;
         e->data.atom.predicate = t->str;
         ParseList(e->data.atom.vars, &e->data.atom.var_count, VARIABLE, t);
         break;
@@ -108,9 +108,13 @@ static void ParseAction(Action *action, Token *t) {
     ExpectNext(t, RPAREN);
 }
 
-Domain DomainParse(const char *str) {
+void DomainParse(Domain *domain, const char *str) {
     LexerInit(str);
-    Domain domain = {0};
+    domain->name.ptr          = NULL;
+    domain->name.len          = 0;
+    domain->action_count      = 0;
+    domain->predicate_count   = 0;
+    domain->requirement_count = 0;
     Token t;
 
     ExpectNext(&t, LPAREN);
@@ -121,25 +125,19 @@ Domain DomainParse(const char *str) {
         LexerNext(&t);
         TRACE("Parsing %s token in domain parsing", TOKEN_NAMES[t.kind]);
         switch (t.kind) {
-        case DEF_NAME: ParseName(&domain.name, &t); break;
-        case DEF_REQUIREMENTS:
-            ParseRequirements(domain.requirements, &domain.requirement_count, &t);
-            break;
-        case DEF_PREDICATES:
-            ParsePredicates(domain.predicates, &domain.predicate_count, &t);
-            break;
-        case DEF_ACTION: ParseAction(&domain.actions[domain.action_count++], &t); break;
+        case DEF_NAME: ParseName(&domain->name, &t); break;
+        case DEF_REQUIREMENTS: ParseRequirements(domain->requirements, &domain->requirement_count, &t); break;
+        case DEF_PREDICATES: ParsePredicates(domain->predicates, &domain->predicate_count, &t); break;
+        case DEF_ACTION: ParseAction(&domain->actions[domain->action_count++], &t); break;
         default: ERROR("Unexpected token %s", TOKEN_NAMES[t.kind]); exit(1);
         }
     }
 
-    INFO("Predicates: %d", domain.predicate_count);
-    INFO("Actions: %d", domain.action_count);
+    INFO("Predicates: %d", domain->predicate_count);
+    INFO("Actions: %d", domain->action_count);
 
-    if (domain.predicate_count > MAX_PREDICATES * 0.5)
-        WARN("Domain has %d predicates, which is near maximum.", domain.predicate_count);
-    if (domain.action_count > MAX_ACTIONS * 0.5)
-        WARN("Domain has %d actions, which is near maximum.", domain.action_count);
-
-    return domain;
+    if (domain->predicate_count > MAX_PREDICATES * 0.5)
+        WARN("Domain has %d predicates, which is near maximum.", domain->predicate_count);
+    if (domain->action_count > MAX_ACTIONS * 0.5)
+        WARN("Domain has %d actions, which is near maximum.", domain->action_count);
 }
