@@ -5,7 +5,7 @@
 #define MAX_OBJECTS 128
 #define MAX_ARGS 8
 #define MAX_INITS 128
-#define MAX_GOALS 32
+#define MAX_GOALS 128
 
 typedef struct {
     string predicate;

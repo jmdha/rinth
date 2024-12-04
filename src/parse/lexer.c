@@ -1,4 +1,3 @@
-#include <ctype.h>
 #include <string.h>
 #include <strings.h>
 
@@ -20,7 +19,7 @@ void TokenAssign(Token *token, TokenKind kind, uint pos, uint len) {
 }
 
 void LexID() {
-    while (isalpha(STR[POS]) || isdigit(STR[POS]) || STR[POS] == '-' || STR[POS] == '_')
+    while (STR[POS] > 43)
         POS++;
 }
 
