@@ -1,33 +1,28 @@
 EXE_NAME   = rinth
 BENCH_NAME = bench
-TEST_NAME  = test_runner
+TEST_NAME  = test
 SRC_DIR    = src
+LIB_DIR    = third_party
 BIN_DIR    = bin
 WFLAGS     = -Wall -Wextra -Wshadow
-CFLAGS     = -I$(SRC_DIR) -Ithird_party -ggdb -O3 -flto -std=c17 -march=native 
-SRCS       = $(shell find src -type f -iname '*.c' ! -iname '*.test.c')
-SRCS_TEST  = $(shell find src -type f -iname '*.test.c')
+CFLAGS     = -I$(SRC_DIR) -I$(LIB_DIR) -ggdb -O3 -flto -std=gnu17 -march=native 
+SRCS       = $(shell find src -type f -iname '*.c' ! -iname '*test.c'  ! -iname '*bench.c')
+SRCS_TEST  = $(shell find src -type f -iname '*.c' ! -iname '*bench.c' ! -iname 'main.c')
+SRCS_BENCH = $(shell find src -type f -iname '*.c' ! -iname '*test.c'  ! -iname 'main.c')
 
-.PHONY: all dbuild tbuild bench test
+.PHONY: all bench test
 
 for all: CFLAGS += -D LOG_INFO
 all: 
-	gcc $(WFLAGS) $(CFLAGS) -o $(EXE_NAME) $(BIN_DIR)/main.c $(SRCS)
-
-for dbuild: CFLAGS += -fsanitize=address -D LOG_INFO -D LOG_DEBUG -D LOG_TRACE -O0
-dbuild:
-	gcc $(WFLAGS) $(CFLAGS) -o $(EXE_NAME) $(BIN_DIR)/main.c $(SRCS)
-
-for tbuild: CFLAGS += -fsanitize=address -D LOG_INFO -D LOG_TRACE
-tbuild:
-	gcc $(WFLAGS) $(CFLAGS) -o $(EXE_NAME) $(BIN_DIR)/main.c $(SRCS)
+	gcc $(WFLAGS) $(CFLAGS) -o $(EXE_NAME) $(SRCS)
 
 bench:
-	gcc $(WFLAGS) $(CFLAGS) -o $(BENCH_NAME) $(BIN_DIR)/bench.c $(SRCS) -lcriterion
+	gcc $(WFLAGS) $(CFLAGS) -o $(BENCH_NAME) $(SRCS_BENCH) -lm
+	./$(BENCH_NAME)
 
 for test: CFLAGS += -fsanitize=address -O0
 test:
-	gcc $(WFLAGS) $(CFLAGS) -o $(TEST_NAME) $(BIN_DIR)/test.c $(SRCS) $(SRCS_TEST) -lcriterion
+	gcc $(WFLAGS) $(CFLAGS) -o $(TEST_NAME) $(SRCS_TEST) -lcriterion
 	./$(TEST_NAME)
 
 clean:
