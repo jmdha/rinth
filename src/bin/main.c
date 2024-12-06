@@ -27,7 +27,7 @@ int main(int argc, char **argv) {
     INFO("Parsing finished");
     INFO("Doing verification of domain and problem");
     if (!Verify(&domain, &problem))
-        return 0;
+        return 1;
     INFO("Translating");
     Task task = Translate(&domain, &problem);
     INFO("Cleanup");

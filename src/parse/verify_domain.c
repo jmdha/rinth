@@ -1,4 +1,5 @@
 #include <limits.h>
+#include <stdlib.h>
 
 #include "log.h"
 #include "verify.h"
@@ -10,25 +11,28 @@ bool VerifyExpression(const Domain *domain, const Action *action, const Expressi
     case E_AND:
         for (uint i = 0; i < exp->data.nary.count; i++)
             if (!VerifyExpression(domain, action, exp->data.nary.exps[i])) return false;
-        return true;
+        break;
     case E_ATOM:
         if (DomainPredicateIndex(domain, &exp->data.atom.predicate) == UINT_MAX) {
-            ERROR(
-                "Action %s refers to undefined predicate %s.", StringAlloc(&action->name),
-                StringAlloc(&exp->data.atom.predicate)
-            );
+            char *action_name    = StringAlloc(&action->name);
+            char *predicate_name = StringAlloc(&exp->data.atom.predicate);
+            ERROR("Action %s refers to undefined predicate %s.", action_name, predicate_name);
+            free(action_name);
+            free(predicate_name);
             return false;
         }
         for (uint i = 0; i < exp->data.atom.var_count; i++)
             if (ActionVarIndex(action, &exp->data.atom.vars[i]) == UINT_MAX) {
-                ERROR(
-                    "Action %s refers to undefined variable %s.", StringAlloc(&action->name),
-                    StringAlloc(&exp->data.atom.vars[i])
-                );
+                char *action_name   = StringAlloc(&action->name);
+                char *variable_name = StringAlloc(&exp->data.atom.vars[i]);
+                ERROR("Action %s refers to undefined variable %s.", action_name, variable_name);
+                free(action_name);
+                free(variable_name);
                 return false;
             }
-        return true;
+        break;
     }
+    return true;
 }
 
 bool VerifyAction(const Domain *domain, const Action *action) {
