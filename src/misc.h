@@ -44,4 +44,5 @@ void memswap(void *restrict buffer, void *l, void *r, size_t size);
     })
 
 bool StringCmp(const string *a, const string *b);
+bool StringCmp_s(const string *a, const char *b);
 char* StringAlloc(const string *str);
