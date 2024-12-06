@@ -2,6 +2,7 @@
 #include "log.h"
 #include "parse/domain.h"
 #include "parse/problem.h"
+#include "parse/verify.h"
 #include "translate/task.h"
 
 int main(int argc, char **argv) {
@@ -24,6 +25,9 @@ int main(int argc, char **argv) {
     Problem problem;
     ProblemParse(&problem, problem_file.buffer);
     INFO("Parsing finished");
+    INFO("Doing verification of domain and problem");
+    if (!Verify(&domain, &problem))
+        return 0;
     INFO("Translating");
     Task task = Translate(&domain, &problem);
     INFO("Cleanup");

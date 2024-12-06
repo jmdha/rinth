@@ -43,6 +43,5 @@ void memswap(void *restrict buffer, void *l, void *r, size_t size);
         _a < _b ? _a : _b;                                                                         \
     })
 
-bool StringCmp(const void *a, const void *b);
-
-uint IndexOf(const void *list, uint len, const void *elem, size_t s, bool (*cmp)(const void*, const void*));
+bool StringCmp(const string *a, const string *b);
+char* StringAlloc(const string *str);

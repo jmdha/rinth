@@ -50,4 +50,6 @@ typedef struct {
 } Domain;
 
 void DomainParse(Domain *domain, const char *str);
-void DomainPrint(Domain *domain);
+
+uint DomainPredicateIndex(const Domain *domain, const string *str);
+uint ActionVarIndex(const Action *action, const string *str);

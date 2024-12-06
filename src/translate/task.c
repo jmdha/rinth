@@ -4,10 +4,10 @@
 
 static void TranslateInit(uint *count, Fact *facts, const Domain *domain, const Problem *problem) {
     *count = problem->init_count;
-    for (uint i = 0; i < *count; i++) {
-        const SFact *fact = &problem->inits[i];
-        facts[i].predicate = IndexOf(domain->predicates, domain->predicate_count, &fact->predicate, sizeof(string), StringCmp);
-    }
+    //for (uint i = 0; i < *count; i++) {
+    //    const SFact *fact = &problem->inits[i];
+    //    facts[i].predicate = IndexOf(domain->predicates, domain->predicate_count, &fact->predicate, sizeof(string), StringCmp);
+    //}
 }
 
 Task Translate(const Domain *domain, const Problem *problem) {
