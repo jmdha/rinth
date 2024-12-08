@@ -29,7 +29,7 @@ void LogStop(void) {
 }
 
 void _LogOutput(LogLevel level, const char *msg, ...) {
-    const char *LEVELS[6] = {"FATAL", "ERROR", "WARN", "INFO", "DEBUG", "TRACE"};
+    const char *LEVELS[3] = {"ERROR", "INFO", "TRACE"};
 
     bool is_error = level < 2;
 
@@ -46,9 +46,7 @@ void _LogOutput(LogLevel level, const char *msg, ...) {
     char out[33000];
     if (level == LOG_LEVEL_ERROR)
         sprintf(out, RED "[%-5s %8.4fs] %s\n" RESET, LEVELS[level], time_stamp, formatted);
-    else if (level == LOG_LEVEL_WARN)
-        sprintf(out, YELLOW "[%-5s %8.4fs] %s\n" RESET, LEVELS[level], time_stamp, formatted);
-    else if (level == LOG_LEVEL_TRACE || level == LOG_LEVEL_DEBUG)
+    else if (level == LOG_LEVEL_TRACE)
         sprintf(out, GRAY "[%-5s %8.4fs] %s\n" RESET, LEVELS[level], time_stamp, formatted);
     else
         sprintf(out, "[%-5s %8.4fs] %s\n", LEVELS[level], time_stamp, formatted);

@@ -135,9 +135,4 @@ void DomainParse(Domain *domain, const char *str) {
 
     INFO("Predicates: %d", domain->predicate_count);
     INFO("Actions: %d", domain->action_count);
-
-    if (domain->predicate_count > MAX_PREDICATES * 0.5)
-        WARN("Domain has %d predicates, which is near maximum.", domain->predicate_count);
-    if (domain->action_count > MAX_ACTIONS * 0.5)
-        WARN("Domain has %d actions, which is near maximum.", domain->action_count);
 }

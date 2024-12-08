@@ -83,13 +83,6 @@ void ProblemParse(Problem *problem, const char *str) {
     INFO("Objects: %d", problem->object_count);
     INFO("Inits: %d", problem->init_count);
     INFO("Goals: %d", problem->goal_count);
-
-    if (problem->object_count > MAX_OBJECTS * 0.5)
-        WARN("Problem has %d objects, which is near maximum.", problem->object_count);
-    if (problem->init_count > MAX_INITS * 0.5)
-        WARN("Problem has %d initial facts, which is near maximum.", problem->init_count);
-    if (problem->goal_count > MAX_GOALS * 0.5)
-        WARN("Problem has %d goal facts, which is near maximum.", problem->goal_count);
 }
 
 void ProblemPrint(Problem *problem) {

@@ -12,7 +12,7 @@ SRCS_BENCH = $(shell find src -type f -iname '*.c' ! -iname '*test.c'  ! -iname 
 
 .PHONY: all bench test
 
-for all: CFLAGS += -D LOG_INFO
+for all: CFLAGS += -D LOG_INFO -D LOG_ERROR
 all: 
 	gcc $(WFLAGS) $(CFLAGS) -o $(EXE_NAME) $(SRCS)
 
