@@ -1,32 +1,31 @@
 #pragma once
 
-typedef enum {
-    DEF_DEFINE,
-    DEF_NAME,
-    DEF_REQUIREMENTS,
-    DEF_PREDICATES,
-    DEF_ACTION,
-    DEF_PARAMETERS,
-    DEF_PRECONDITION,
-    DEF_EFFECT,
-    DEF_DOMAIN,
-    DEF_OBJECTS,
-    DEF_INIT,
-    DEF_GOAL,
-    REQ_STRIPS,
-    EXP_AND,
-    EXP_NOT,
-    EXP_OR,
-    LPAREN,
-    RPAREN,
-    VARIABLE,
-    ID,
-    MAX_TOKEN_KIND
-} TokenKind;
-
-static const char *TOKEN_NAMES[MAX_TOKEN_KIND] = {
-    "DEF_DEFINE",     "DEF_NAME",         "DEF_REQUIREMENTS", "DEF_PREDICATES", "DEF_ACTION",
-    "DEF_PARAMETERS", "DEF_PRECONDITION", "DEF_EFFECT",       "DEF_DOMAIN",     "DEF_OBJECTS",
-    "DEF_INIT",       "DEF_GOAL",         "REQ_STRIPS",       "EXP_AND",        "EXP_NOT",
-    "EXP_OR",         "LPAREN",           "RPAREN",           "VARIABLE",       "ID",
+enum kind { 
+    KIND_EOI,
+    KIND_LPAREN,
+    KIND_RPAREN,
+    KIND_ID,
+    MAX_KIND
 };
+
+enum keyword {
+    KEYWORD_DEFINE,
+    KEYWORD_NAME,
+    KEYWORD_DOMAIN,
+    KEYWORD_REQUIREMENTS,
+    KEYWORD_PREDICATES,
+    KEYWORD_ACTION,
+    KEYWORD_PARAMETERS,
+    KEYWORD_PRECONDITION,
+    KEYWORD_EFFECT,
+    KEYWORD_AND,
+    KEYWORD_OR,
+    KEYWORD_NOT,
+    KEYWORD_OBJECTS,
+    KEYWORD_INIT,
+    KEYWORD_GOAL,
+    MAX_KEYWORD
+};
+
+extern const char *KIND_NAMES[MAX_KIND + 1];
+extern const char *KEYWORD_NAMES[MAX_KEYWORD + 1];

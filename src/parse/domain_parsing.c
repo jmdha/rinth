@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <memory.h>
 #include <stdlib.h>
 
@@ -5,134 +6,106 @@
 #include "lexer.h"
 #include "log.h"
 
-static void ParseList(string *list, uint *count, TokenKind kind, Token *t) {
+static void parse_name(string *name) {
+    assert(lexer_next(name) == KIND_ID);
+    lexer_expect(KIND_RPAREN);
+}
+
+static void parse_requirements(string *requirements, uint *count) {
+    while (lexer_next(&requirements[*count]) == KIND_ID)
+        (*count)++;
+}
+
+static void parse_predicates(Predicate *predicates, uint *count) {
+    string tmp;
+    while (lexer_next(&tmp) == KIND_LPAREN) {
+        Predicate *predicate = &predicates[(*count)++];
+        assert(lexer_next(&predicate->name) == KIND_ID);
+        predicate->var_count = 0;
+        while (lexer_next(&predicate->vars[predicate->var_count]) == KIND_ID)
+            predicate->var_count++;
+    }
+}
+
+static void parse_parameters(string *vars, uint *count) {
     *count = 0;
-    while (LexerNext(t)) {
-        if (t->kind == kind)
-            list[(*count)++] = t->str;
-        else if (t->kind == RPAREN)
-            return;
-        else
-            ExpectEither(t->kind, kind, RPAREN);
-    }
-    EOI(RPAREN);
+    while (lexer_next(&vars[*count]) == KIND_ID)
+        (*count)++;
 }
 
-static void ParseName(string *name, Token *t) {
-    ExpectNext(t, ID);
-    *name = t->str;
-    ExpectNext(t, RPAREN);
-}
-
-static void ParseRequirements(string *list, uint *count, Token *t) {
-    while (LexerNext(t)) {
-        if (t->kind == RPAREN) return;
-        bool is_requirement;
-        switch (t->kind) {
-        case REQ_STRIPS: is_requirement = true; break;
-        default: is_requirement = false; break;
-        }
-        if (!is_requirement) Expected("REQUIREMENT or RPAREN", t->kind);
-        list[(*count)++] = t->str;
-    }
-    EOI(RPAREN);
-}
-
-static void ParsePredicate(Predicate *predicate, Token *t) {
-    ExpectNext(t, ID);
-    predicate->name = t->str;
-    ParseList(predicate->vars, &predicate->var_count, VARIABLE, t);
-}
-
-static void ParsePredicates(Predicate *list, uint *count, Token *t) {
-    while (LexerNext(t)) {
-        if (t->kind == LPAREN)
-            ParsePredicate(&(list[(*count)++]), t);
-        else if (t->kind == RPAREN)
-            return;
-        else
-            ExpectEither(t->kind, LPAREN, RPAREN);
-    }
-    EOI(RPAREN);
-}
-
-static void ParseExpression(Expression **exp, Token *t) {
-    if (!LexerNext(t)) EOI(RPAREN);
-    if (t->kind == RPAREN) return;
-    Expression *e = malloc(sizeof(Expression));
-    *exp          = e;
-    switch (t->kind) {
-    case ID:
-        e->kind                = E_ATOM;
-        e->data.atom.predicate = t->str;
-        ParseList(e->data.atom.vars, &e->data.atom.var_count, VARIABLE, t);
+static void parse_expression(Expression **exp) {
+    string tmp = {0};
+    enum kind kind = lexer_next(&tmp);
+    if (kind == KIND_RPAREN) return;
+    *exp = malloc(sizeof(Expression));
+    switch (keyword_match(&tmp)) {
+    case KEYWORD_NOT:
+        (*exp)->kind = E_NOT;
+        lexer_expect(KIND_LPAREN);
+        parse_expression(&(*exp)->data.unary);
+        lexer_expect(KIND_RPAREN);
         break;
-    case EXP_NOT:
-        e->kind = E_NOT;
-        ExpectNext(t, LPAREN);
-        ParseExpression(&e->data.unary, t);
-        ExpectNext(t, RPAREN);
+    case KEYWORD_AND:
+        (*exp)->kind = E_AND;
+        (*exp)->data.nary.count = 0;
+        while (lexer_next(&tmp) == KIND_LPAREN)
+            parse_expression(&(*exp)->data.nary.exps[(*exp)->data.nary.count++]);
         break;
-    case EXP_OR: e->kind = E_OR; goto C_NARY;
-    case EXP_AND:
-        e->kind = E_AND;
-    C_NARY:
-        e->data.nary.count = 0;
-        while (LexerNext(t)) {
-            if (t->kind == RPAREN) return;
-            if (t->kind != LPAREN) Expected("LPAREN", t->kind);
-            ParseExpression(&e->data.nary.exps[e->data.nary.count++], t);
-        }
-        ExpectNext(t, RPAREN);
+    case KEYWORD_OR:
+        (*exp)->kind = E_OR;
+        (*exp)->data.nary.count = 0;
+        while (lexer_next(&tmp) == KIND_LPAREN)
+            parse_expression(&(*exp)->data.nary.exps[(*exp)->data.nary.count++]);
         break;
-    default: free(e); Expected("EXPRESSION or RPAREN", t->kind);
-    };
+    default:
+        (*exp)->kind = E_ATOM;
+        (*exp)->data.atom.predicate = tmp;
+        (*exp)->data.atom.var_count = 0;
+        while (lexer_next(&(*exp)->data.atom.vars[(*exp)->data.atom.var_count]) == KIND_ID)
+            (*exp)->data.atom.var_count++;
+        break;
+    }
 }
 
-static void ParseAction(Action *action, Token *t) {
-    ExpectNext(t, ID);
-    action->name = t->str;
-    TRACE("Parsing action %s", action->name);
-    ExpectNext(t, DEF_PARAMETERS);
-    TRACE("Parsing parameters of %s", action->name);
-    ExpectNext(t, LPAREN);
-    ParseList(action->vars, &action->var_count, VARIABLE, t);
-    ExpectNext(t, DEF_PRECONDITION);
-    TRACE("Parsing precondition of %s", action->name);
-    ExpectNext(t, LPAREN);
-    ParseExpression(&action->precondition, t);
-    ExpectNext(t, DEF_EFFECT);
-    TRACE("Parsing effect of %s", action->name);
-    ExpectNext(t, LPAREN);
-    ParseExpression(&action->effect, t);
-    ExpectNext(t, RPAREN);
+static void parse_action(Action *action) {
+    assert(lexer_next(&action->name) == KIND_ID);
+    lexer_expect_def(KEYWORD_PARAMETERS);
+    lexer_expect(KIND_LPAREN);
+    parse_parameters(action->vars, &action->var_count);
+    lexer_expect_def(KEYWORD_PRECONDITION);
+    lexer_expect(KIND_LPAREN);
+    parse_expression(&action->precondition);
+    lexer_expect_def(KEYWORD_EFFECT);
+    lexer_expect(KIND_LPAREN);
+    parse_expression(&action->effect);
+    lexer_expect(KIND_RPAREN);
 }
 
 void DomainParse(Domain *domain, const char *str) {
-    LexerInit(str);
-    domain->name.ptr          = NULL;
     domain->name.len          = 0;
-    domain->action_count      = 0;
-    domain->predicate_count   = 0;
     domain->requirement_count = 0;
-    Token t;
-
-    ExpectNext(&t, LPAREN);
-    ExpectNext(&t, DEF_DEFINE);
-    while (LexerNext(&t)) {
-        if (t.kind == RPAREN) break;
-        Expect(t.kind, LPAREN);
-        LexerNext(&t);
-        TRACE("Parsing %s token in domain parsing", TOKEN_NAMES[t.kind]);
-        switch (t.kind) {
-        case DEF_NAME: ParseName(&domain->name, &t); break;
-        case DEF_REQUIREMENTS: ParseRequirements(domain->requirements, &domain->requirement_count, &t); break;
-        case DEF_PREDICATES: ParsePredicates(domain->predicates, &domain->predicate_count, &t); break;
-        case DEF_ACTION: ParseAction(&domain->actions[domain->action_count++], &t); break;
-        default: ERROR("Unexpected token %s", TOKEN_NAMES[t.kind]); exit(1);
+    domain->predicate_count   = 0;
+    domain->action_count      = 0;
+    lexer_init(str);
+    lexer_expect(KIND_LPAREN);
+    lexer_expect_def(KEYWORD_DEFINE);
+    string tmp = {0};
+    enum kind kind;
+    while ((kind = lexer_next(&tmp)) != KIND_EOI) {
+        if (kind == KIND_RPAREN) break;
+        assert(kind == KIND_LPAREN);
+        lexer_next(&tmp);
+        enum keyword keyword;
+        switch ((keyword = keyword_match(&tmp))) {
+        case KEYWORD_NAME: parse_name(&domain->name); break;
+        case KEYWORD_REQUIREMENTS:
+            parse_requirements(domain->requirements, &domain->requirement_count);
+            break;
+        case KEYWORD_PREDICATES:
+            parse_predicates(domain->predicates, &domain->predicate_count);
+            break;
+        case KEYWORD_ACTION: parse_action(&domain->actions[domain->action_count++]); break;
+        default: ERROR("Unexpected top level keyword %s", KEYWORD_NAMES[keyword]); abort();
         }
     }
-
-    INFO("Predicates: %d", domain->predicate_count);
-    INFO("Actions: %d", domain->action_count);
 }

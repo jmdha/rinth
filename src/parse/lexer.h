@@ -2,20 +2,12 @@
 
 #include <stdbool.h>
 
-#include "token.h"
 #include "misc.h"
+#include "token.h"
 
-typedef struct {
-    TokenKind kind;
-    string str;
-} Token;
+void      lexer_init(const char *str);       // Initialise lexer
+enum kind lexer_next(string *str);           // Find next token in stream
+void      lexer_expect(enum kind kind);      // Execute lexer_next and abort if not correct token kind
+void      lexer_expect_def(enum keyword kw); // Execute lexer_next and abort if not correct token kind
 
-void LexerInit(const char *str);
-
-bool LexerNext(Token *token);
-
-void EOI(TokenKind expected);
-void Expect(TokenKind actual, TokenKind expected);
-void ExpectEither(TokenKind actual, TokenKind e1, TokenKind e2);
-void ExpectNext(Token *t, TokenKind kind);
-void Expected(const char *str, TokenKind found);
+enum keyword keyword_match(const string *str); // Matches string to keyword
