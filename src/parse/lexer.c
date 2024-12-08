@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <string.h>
 #include <strings.h>
 
@@ -7,116 +8,95 @@
 const char *STR;
 uint POS;
 
-void LexerInit(const char *str) {
+static bool is_whitespace(char c) { return ((unsigned char)c) - 1 <= 32; }
+
+static bool is_text(char c) { return c > 41; }
+
+static void skip_whitespace() {
+    while (is_whitespace(STR[POS]))
+        POS++;
+}
+
+static void skip_text() {
+    while (is_text(STR[POS]))
+        POS++;
+}
+
+void lexer_init(const char *str) {
     STR = str;
     POS = 0;
 }
 
-void LexID() {
-    while (STR[POS] > 43)
-        POS++;
-}
-
-bool MatchDef(TokenKind *kind, const char *str, uint len) {
-    if (len == 13 && strncmp(":requirements", str, len) == 0)
-        *kind = DEF_REQUIREMENTS;
-    else if (len == 11 && strncmp(":predicates", str, len) == 0)
-        *kind = DEF_PREDICATES;
-    else if (len == 7 && strncmp(":action", str, len) == 0)
-        *kind = DEF_ACTION;
-    else if (len == 11 && strncmp(":parameters", str, len) == 0)
-        *kind = DEF_PARAMETERS;
-    else if (len == 13 && strncmp(":precondition", str, len) == 0)
-        *kind = DEF_PRECONDITION;
-    else if (len == 7 && strncmp(":effect", str, len) == 0)
-        *kind = DEF_EFFECT;
-    else if (len == 7 && strncmp(":domain", str, len) == 0)
-        *kind = DEF_DOMAIN;
-    else if (len == 8 && strncmp(":objects", str, len) == 0)
-        *kind = DEF_OBJECTS;
-    else if (len == 5 && strncmp(":init", str, len) == 0)
-        *kind = DEF_INIT;
-    else if (len == 5 && strncmp(":goal", str, len) == 0)
-        *kind = DEF_GOAL;
-    else if (len == 7 && strncmp(":strips", str, len) == 0)
-        *kind = REQ_STRIPS;
-    return true;
-}
-
-bool MatchKeyword(TokenKind *kind, const char *str, uint len) {
-    if (len == 6 && strncmp("define", str, len) == 0)
-        *kind = DEF_DEFINE;
-    else if (len == 6 && strncmp("domain", str, len) == 0)
-        *kind = DEF_NAME;
-    else if (len == 7 && strncmp("problem", str, len) == 0)
-        *kind = DEF_NAME;
-    else if (len == 3 && strncmp("and", str, len) == 0)
-        *kind = EXP_AND;
-    else if (len == 3 && strncmp("not", str, len) == 0)
-        *kind = EXP_NOT;
-    else if (len == 2 && strncmp("or", str, len) == 0)
-        *kind = EXP_OR;
-    else
-        return false;
-    return true;
-}
-
-bool IsSpace(char c) { return ((unsigned char)c) - 1 <= 32; }
-
-bool LexerNext(Token *token) {
-    int pos;
-    char c;
-    // Skip white space
-    while (IsSpace(c = STR[pos = POS++])) {} 
-
-    switch (c) {
-    case '\0': return false;
-    case '(': token->kind = LPAREN; break;
-    case ')': token->kind = RPAREN; break;
-    case ':': {
-        LexID();
-        const int len = POS - pos;
-        if (!MatchDef(&token->kind, &STR[pos], len))
-            ERROR("Unknown definition \"%.*s\" found at position %d", len, &STR[pos], pos);
-        token->str.ptr = &STR[pos];
-        token->str.len = len;
-        break;
-    }
-    default: {
-        token->kind = ID;
-        if (c == '?')
-            token->kind = VARIABLE;
-
-        LexID();
-        const int len = POS - pos;
-        MatchKeyword(&token->kind, &STR[pos], len);
-        token->str.ptr = &STR[pos];
-        token->str.len = len;
-        break;
-    }
-    }
-
-    return true;
-}
-
-void EOI(TokenKind expected) { ERROR("Unexpected end of input. Expected %s", TOKEN_NAMES[expected]); }
-
-void Expect(TokenKind actual, TokenKind expected) {
-    if (actual != expected)
-        ERROR("Found unexpected token %s while expecting %s", TOKEN_NAMES[actual], TOKEN_NAMES[expected]);
-}
-
-void ExpectEither(TokenKind actual, TokenKind e1, TokenKind e2) {
-    if (actual != e1 && actual != e2) {
-        ERROR(
-            "Found unexpected token %s while expecting %s or %s", TOKEN_NAMES[actual], TOKEN_NAMES[e1], TOKEN_NAMES[e2]
-        );
+enum kind lexer_next(string *str) {
+    skip_whitespace();
+    const uint pos = POS;
+    str->ptr       = &STR[POS];
+    switch (STR[POS++]) {
+    case '\0': return KIND_EOI;
+    case '(': return KIND_LPAREN;
+    case ')': return KIND_RPAREN;
+    default:
+        skip_text();
+        str->len = POS - pos;
+        return KIND_ID;
     }
 }
 
-void ExpectNext(Token *t, TokenKind kind) {
-    if (!LexerNext(t)) EOI(kind);
-    Expect(t->kind, kind);
+void lexer_expect(enum kind kind) {
+    enum kind actual;
+    string tmp;
+    if ((actual = lexer_next(&tmp)) != kind) {
+        ERROR("Expected token %s found %s", KIND_NAMES[kind], KIND_NAMES[actual]);
+        abort();
+    }
 }
 
-void Expected(const char *str, TokenKind found) { ERROR("Expected %s found %s", str, TOKEN_NAMES[found]); }
+void lexer_expect_def(enum keyword kw) {
+    enum kind kind;
+    string tmp;
+    if ((kind = lexer_next(&tmp)) != KIND_ID) {
+        ERROR("Expected keyword %s found token %s", KEYWORD_NAMES[kw], KIND_NAMES[kind]);
+        abort();
+    }
+    enum keyword actual;
+    if ((actual = keyword_match(&tmp)) != kw) {
+        ERROR("Expected keyword %s found %s", KEYWORD_NAMES[kw], KEYWORD_NAMES[actual]);
+        abort();
+    }
+}
+
+enum keyword keyword_match(const string *str) {
+    if (str->len == 6 && strncmp("define", str->ptr, str->len) == 0)
+        return KEYWORD_DEFINE;
+    else if (str->len == 6 && strncmp("domain", str->ptr, str->len) == 0)
+        return KEYWORD_NAME;
+    else if (str->len == 7 && strncmp("problem", str->ptr, str->len) == 0)
+        return KEYWORD_NAME;
+    else if (str->len == 3 && strncmp("and", str->ptr, str->len) == 0)
+        return KEYWORD_AND;
+    else if (str->len == 2 && strncmp("or", str->ptr, str->len) == 0)
+        return KEYWORD_OR;
+    else if (str->len == 3 && strncmp("not", str->ptr, str->len) == 0)
+        return KEYWORD_NOT;
+    else if (str->len == 13 && strncmp(":requirements", str->ptr, str->len) == 0)
+        return KEYWORD_REQUIREMENTS;
+    else if (str->len == 11 && strncmp(":predicates", str->ptr, str->len) == 0)
+        return KEYWORD_PREDICATES;
+    else if (str->len == 7 && strncmp(":action", str->ptr, str->len) == 0)
+        return KEYWORD_ACTION;
+    else if (str->len == 11 && strncmp(":parameters", str->ptr, str->len) == 0)
+        return KEYWORD_PARAMETERS;
+    else if (str->len == 13 && strncmp(":precondition", str->ptr, str->len) == 0)
+        return KEYWORD_PRECONDITION;
+    else if (str->len == 7 && strncmp(":effect", str->ptr, str->len) == 0)
+        return KEYWORD_EFFECT;
+    else if (str->len == 7 && strncmp(":domain", str->ptr, str->len) == 0)
+        return KEYWORD_DOMAIN;
+    else if (str->len == 8 && strncmp(":objects", str->ptr, str->len) == 0)
+        return KEYWORD_OBJECTS;
+    else if (str->len == 5 && strncmp(":init", str->ptr, str->len) == 0)
+        return KEYWORD_INIT;
+    else if (str->len == 5 && strncmp(":goal", str->ptr, str->len) == 0)
+        return KEYWORD_GOAL;
+    return MAX_KEYWORD;
+}

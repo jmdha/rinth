@@ -77,6 +77,7 @@ static const char *BLOCKSWORLD = "(define"
 UBENCH_EX(parsing, domain) {
     Domain domain;
     UBENCH_DO_BENCHMARK() {
-        DomainParse(&domain, BLOCKSWORLD);
+        for (uint i = 0; i < 100; i++)
+            DomainParse(&domain, BLOCKSWORLD);
     }
 }

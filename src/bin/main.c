@@ -24,6 +24,7 @@ int main(int argc, char **argv) {
     INFO("Parsing problem");
     Problem problem;
     ProblemParse(&problem, problem_file.buffer);
+    ProblemPrint(&problem);
     INFO("Parsing finished");
     INFO("Doing verification of domain and problem");
     if (!Verify(&domain, &problem))

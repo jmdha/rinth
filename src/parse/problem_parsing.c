@@ -8,81 +8,63 @@
 #include "log.h"
 #include "problem.h"
 
-static void ParseName(string *name, Token *t) {
-    ExpectNext(t, ID);
-    *name = t->str;
-    ExpectNext(t, RPAREN);
+static void parse_name(string *name) {
+    lexer_next(name);
+    lexer_expect(KIND_RPAREN);
 }
 
-static void ParseList(string *list, uint *count, Token *t) {
-    *count = 0;
-    while (LexerNext(t)) {
-        if (t->kind == ID)
-            list[(*count)++] = t->str;
-        else if (t->kind == RPAREN)
-            return;
-        else
-            ExpectEither(t->kind, ID, RPAREN);
+static void parse_objects(string *objects, uint *count) {
+    while (lexer_next(&objects[*count]) != KIND_RPAREN)
+        (*count)++;
+}
+
+static void parse_facts(SFact *facts, uint *count) {
+    enum kind kind;
+    string tmp;
+    while ((kind = lexer_next(&tmp)) == KIND_LPAREN) {
+        SFact *fact = &facts[(*count)++];
+        if ((kind = lexer_next(&fact->predicate)) != KIND_ID) {
+            ERROR("Expected predicate name in fact found %s", KIND_NAMES[kind]);
+            abort();
+        }
+        while ((kind = lexer_next(&fact->args[fact->arg_count])) != KIND_RPAREN)
+            fact->arg_count++;
     }
-    EOI(RPAREN);
 }
 
-static void ParseFact(SFact *fact, Token *t) {
-    ExpectNext(t, ID);
-    fact->predicate = t->str;
-    ParseList(fact->args, &fact->arg_count, t);
-}
+static void parse_init(SFact *facts, uint *count) { parse_facts(facts, count); }
 
-static void ParseFacts(SFact *fact_list, uint *count, Token *t) {
-    while (LexerNext(t)) {
-        if (t->kind == LPAREN)
-            ParseFact(&(fact_list[(*count)++]), t);
-        else if (t->kind == RPAREN)
-            return;
-        else
-            ExpectEither(t->kind, LPAREN, RPAREN);
-    }
-    EOI(RPAREN);
-}
-
-// TODO: Handle other things than AND
-static void ParseGoal(SFact *fact_list, uint *count, Token *t) {
-    ExpectNext(t, LPAREN);
-    ExpectNext(t, EXP_AND);
-    ParseFacts(fact_list, count, t);
-    ExpectNext(t, RPAREN);
+static void parse_goal(SFact *facts, uint *count) {
+    lexer_expect(KIND_LPAREN);
+    lexer_expect_def(KEYWORD_AND);
+    parse_facts(facts, count);
+    lexer_expect(KIND_RPAREN);
 }
 
 void ProblemParse(Problem *problem, const char *str) {
-    LexerInit(str);
-    problem->name.ptr     = NULL;
-    problem->name.len     = 0;
-    problem->domain.ptr   = NULL;
-    problem->domain.len   = 0;
-    problem->object_count = 0;
-    problem->goal_count   = 0;
-    problem->init_count   = 0;
-    Token t;
-    ExpectNext(&t, LPAREN);
-    ExpectNext(&t, DEF_DEFINE);
-    while (LexerNext(&t)) {
-        if (t.kind == RPAREN) break;
-        Expect(t.kind, LPAREN);
-        LexerNext(&t);
-        TRACE("Parsing %s token in problem parsing", TOKEN_NAMES[t.kind]);
-        switch (t.kind) {
-        case DEF_NAME: ParseName(&problem->name, &t); break;
-        case DEF_DOMAIN: ParseName(&problem->domain, &t); break;
-        case DEF_OBJECTS: ParseList(problem->objects, &problem->object_count, &t); break;
-        case DEF_INIT: ParseFacts(problem->inits, &problem->init_count, &t); break;
-        case DEF_GOAL: ParseGoal(problem->goals, &problem->goal_count, &t); break;
-        default: ERROR("Unexpected token %s", TOKEN_NAMES[t.kind]); exit(1);
+    memset(problem, 0, sizeof(Problem));
+    lexer_init(str);
+    lexer_expect(KIND_LPAREN);
+    lexer_expect_def(KEYWORD_DEFINE);
+    string tmp;
+    enum kind kind;
+    while ((kind = lexer_next(&tmp)) != KIND_EOI) {
+        if (kind == KIND_RPAREN) break;
+        if (kind != KIND_LPAREN) {
+            ERROR("Expected top level L paren, found %s", KIND_NAMES[kind]);
+            abort();
+        }
+        lexer_next(&tmp);
+        enum keyword keyword;
+        switch ((keyword = keyword_match(&tmp))) {
+        case KEYWORD_NAME: parse_name(&problem->name); break;
+        case KEYWORD_DOMAIN: parse_name(&problem->domain); break;
+        case KEYWORD_OBJECTS: parse_objects(problem->objects, &problem->object_count); break;
+        case KEYWORD_INIT: parse_init(problem->inits, &problem->init_count); break;
+        case KEYWORD_GOAL: parse_goal(problem->goals, &problem->goal_count); break;
+        default: ERROR("Unexpected token %s", KEYWORD_NAMES[keyword]); abort();
         }
     }
-
-    INFO("Objects: %d", problem->object_count);
-    INFO("Inits: %d", problem->init_count);
-    INFO("Goals: %d", problem->goal_count);
 }
 
 void ProblemPrint(Problem *problem) {
