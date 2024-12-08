@@ -12,10 +12,6 @@ typedef struct {
 
 void LexerInit(const char *str);
 
-void TokenAssign(Token *token, TokenKind kind, uint pos, uint len);
-
-bool MatchDef(TokenKind *kind, const char *str, uint len);
-void LexID();
 bool LexerNext(Token *token);
 
 void EOI(TokenKind expected);

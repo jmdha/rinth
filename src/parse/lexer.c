@@ -12,12 +12,6 @@ void LexerInit(const char *str) {
     POS = 0;
 }
 
-void TokenAssign(Token *token, TokenKind kind, uint pos, uint len) {
-    token->kind = kind;
-    token->str.ptr = &STR[pos];
-    token->str.len = len;
-}
-
 void LexID() {
     while (STR[POS] > 43)
         POS++;
@@ -77,8 +71,8 @@ bool LexerNext(Token *token) {
 
     switch (c) {
     case '\0': return false;
-    case '(': TokenAssign(token, LPAREN, pos, 1); break;
-    case ')': TokenAssign(token, RPAREN, pos, 1); break;
+    case '(': token->kind = LPAREN; break;
+    case ')': token->kind = RPAREN; break;
     case ':': {
         LexID();
         const int len = POS - pos;
