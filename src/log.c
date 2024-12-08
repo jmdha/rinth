@@ -45,9 +45,9 @@ void _LogOutput(LogLevel level, const char *msg, ...) {
 
     char out[33000];
     if (level == LOG_LEVEL_ERROR)
-        sprintf(out, RED "[%-5s %8.4fs] %s\n" RESET, LEVELS[level], time_stamp, formatted);
+        sprintf(out, RED "[%-5s %8.4fs] %s%s\n", LEVELS[level], time_stamp, formatted, RESET);
     else if (level == LOG_LEVEL_TRACE)
-        sprintf(out, GRAY "[%-5s %8.4fs] %s\n" RESET, LEVELS[level], time_stamp, formatted);
+        sprintf(out, GRAY "[%-5s %8.4fs] %s%s\n", LEVELS[level], time_stamp, formatted, RESET);
     else
         sprintf(out, "[%-5s %8.4fs] %s\n", LEVELS[level], time_stamp, formatted);
 
