@@ -1,5 +1,6 @@
-#include "problem.h"
 #include <ubench/ubench.h>
+
+#include "problem.h"
 
 static const char *BLOCKSWORLD = "(define (problem blocksworld-01)"
                                  " (:domain blocksworld)"
