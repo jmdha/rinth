@@ -12,8 +12,8 @@ int main(int, char **argv) {
     char** fbuf_problem = f_open(path_problem);
     const Domain domain = domain_parse(*fbuf_domain);
     const Problem problem = problem_parse(*fbuf_problem);
+    const struct task task = translate(&domain, &problem);
     f_close(fbuf_domain);
     f_close(fbuf_problem);
-    const struct task task = translate(&domain, &problem);
     return 0;
 }
