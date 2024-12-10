@@ -4,7 +4,33 @@
 #include <strings.h>
 
 #include "lexer.h"
-#include "log.h"
+
+const char *KIND_NAMES[MAX_KIND + 1] = {
+    "EOI",
+    "LPAREN",
+    "RPAREN",
+    "ID",
+    "UNDEFINED"
+};
+
+const char *KEYWORD_NAMES[MAX_KEYWORD + 1] = {
+    "KEYWORD_DEFINE",
+    "KEYWORD_NAME",
+    "KEYWORD_DOMAIN",
+    "KEYWORD_REQUIREMENTS",
+    "KEYWORD_PREDICATES",
+    "KEYWORD_ACTION",
+    "KEYWORD_PARAMETERS",
+    "KEYWORD_PRECONDITION",
+    "KEYWORD_EFFECT",
+    "KEYWORD_AND",
+    "KEYWORD_OR",
+    "KEYWORD_NOT",
+    "KEYWORD_OBJECTS",
+    "KEYWORD_INIT",
+    "KEYWORD_GOAL",
+    "UNDEFINED"
+};
 
 const char *STR;
 uint POS;
