@@ -95,8 +95,9 @@ void DomainParse(Domain *domain, const char *str) {
         if (kind == KIND_RPAREN) break;
         assert(kind == KIND_LPAREN);
         lexer_next(&tmp);
-        enum keyword keyword;
-        switch ((keyword = keyword_match(&tmp))) {
+        enum keyword keyword = keyword_match(&tmp);
+        TRACE("Parsing %s", KEYWORD_NAMES[keyword]);
+        switch (keyword) {
         case KEYWORD_NAME: parse_name(&domain->name); break;
         case KEYWORD_REQUIREMENTS:
             parse_requirements(domain->requirements, &domain->requirement_count);

@@ -53,8 +53,9 @@ void ProblemParse(Problem *problem, const char *str) {
         if (kind == KIND_RPAREN) break;
         assert(kind == KIND_LPAREN);
         lexer_next(&tmp);
-        enum keyword keyword;
-        switch ((keyword = keyword_match(&tmp))) {
+        enum keyword keyword = keyword_match(&tmp);
+        TRACE("Parsing %s", KEYWORD_NAMES[keyword]);
+        switch (keyword) {
         case KEYWORD_NAME: parse_name(&problem->name); break;
         case KEYWORD_DOMAIN: parse_name(&problem->domain); break;
         case KEYWORD_OBJECTS: parse_objects(problem->objects, &problem->object_count); break;
