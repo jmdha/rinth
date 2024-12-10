@@ -1,10 +1,14 @@
 #include <assert.h>
-#include <stdlib.h>
+#include <memory.h>
 
 #include "fact.h"
 
-struct fact fact() {
-    abort();
+struct fact fact(u8 predicate, u8 len, u8* args) {
+    struct fact fact;
+    fact.predicate = predicate;
+    fact.len = len;
+    memcpy(fact.args, args, len);
+    return fact;
 }
 
 bool fact_equal(const struct fact *a, const struct fact *b) {

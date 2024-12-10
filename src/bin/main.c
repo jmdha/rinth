@@ -2,39 +2,86 @@
 #include "log.h"
 #include "parse/domain.h"
 #include "parse/problem.h"
-#include "parse/verify.h"
 #include "translate/task.h"
+#include "path.h"
 
-int main(int argc, char **argv) {
+int init(
+    char **path_domain,
+    char **path_problem,
+    int argc,
+    char **argv
+) {
     log_init();
     INFO("Reading args");
     if (argc < 3) {
         ERROR("Requires at least 2 args: domain path and problem path.");
         return 1;
     }
-    const char *domain_path  = argv[1];
-    const char *problem_path = argv[2];
-    INFO("Opening domain file");
-    fbuf fb_domain = f_open(domain_path);
+    *path_domain  = argv[1];
+    *path_problem = argv[2];
+    return 0;
+}
+
+int parse(
+    Domain*     domain,
+    Problem*    problem,
+    const char* path_domain,
+    const char* path_problem
+) {
+    int status;
+    char** fbuf_domain  = NULL;
+    char** fbuf_problem = NULL;
+    INFO("Mapping domain file");
+    if ((status = f_open(&fbuf_domain, path_domain))) {
+        ERROR("Failed to map domain file");
+        return status;
+    }
     INFO("Parsing domain");
-    Domain domain;
-    DomainParse(&domain, *fb_domain);
-    INFO("Opening problem file");
-    fbuf fb_problem = f_open(problem_path);
+    DomainParse(domain, *fbuf_domain);
+    TRACE("Unmapping domain file");
+    f_close(fbuf_domain);
+    INFO("Mapping problem file");
+    if ((status = f_open(&fbuf_problem, path_problem))) {
+        ERROR("Failed to map problem file");
+        return status;
+    }
     INFO("Parsing problem");
+    ProblemParse(problem, *fbuf_problem);
+    TRACE("Unmapping problem file");
+    f_close(fbuf_problem);
+    return 0;
+}
+
+int solve(
+    struct path*       path,
+    const struct task* task
+) {
+    return 1;
+}
+
+int main(int argc, char **argv) {
+    int status;
+    char* path_domain;
+    char* path_problem;
+    if ((status = init(&path_domain, &path_problem, argc, argv))) {
+        ERROR("Failed init");
+        return status;
+    }
+    Domain  domain;
     Problem problem;
-    ProblemParse(&problem, *fb_problem);
-    INFO("Parsing finished");
-    INFO("Doing verification of domain and problem");
-    if (!Verify(&domain, &problem))
-        return 1;
-    INFO("Translating");
-    Task task = Translate(&domain, &problem);
-    INFO("Cleanup");
-    TRACE("Closing domain file");
-    f_close(fb_domain);
-    TRACE("Closing problem file");
-    f_close(fb_problem);
-    INFO("Done");
+    if ((status = parse(&domain, &problem, path_domain, path_problem))) {
+        ERROR("Failed parse");
+        return status;
+    }
+    struct task task;
+    if ((status = translate(&task, &domain, &problem))) {
+        ERROR("Failed translate");
+        return status;
+    }
+    struct path path;
+    if ((status = solve(&path, &task))) {
+        ERROR("Failed solve");
+        return status;
+    }   
     return 0;
 }
