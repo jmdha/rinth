@@ -1,18 +1,12 @@
 #pragma once
 
 #include "misc.h"
-
-#define MAX_REQUIREMENTS         8
-#define MAX_PREDICATE_VARIABLES  4
-#define MAX_PREDICATES           16
-#define MAX_ACTION_VARIABLES     8
-#define MAX_ACTIONS              8
-#define MAX_EXPRESSION_BRANCHING 16
+#include "bounds.h"
 
 typedef struct {
     string name;
     uint   var_count;
-    string vars[MAX_PREDICATE_VARIABLES];
+    string vars[MAX_VARIABLES];
 } Predicate;
 
 typedef struct Expression {
@@ -21,12 +15,12 @@ typedef struct Expression {
         struct {
             string predicate;
             uint   var_count;
-            string vars[MAX_PREDICATE_VARIABLES];
+            string vars[MAX_VARIABLES];
         } atom;
         struct Expression *unary;
         struct {
             uint count;
-            struct Expression *exps[MAX_EXPRESSION_BRANCHING];
+            struct Expression *exps[MAX_BRANCHING];
         } nary;
     } data;
 } Expression;
@@ -34,7 +28,7 @@ typedef struct Expression {
 typedef struct {
     string name;
     uint   var_count;
-    string  vars[MAX_ACTION_VARIABLES];
+    string  vars[MAX_VARIABLES];
     Expression *precondition;
     Expression *effect;
 } Action;

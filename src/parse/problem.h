@@ -1,16 +1,12 @@
 #pragma once
 
+#include "bounds.h"
 #include "misc.h"
-
-#define MAX_OBJECTS 1024
-#define MAX_ARGS 8
-#define MAX_INITS 1024
-#define MAX_GOALS 1024
 
 typedef struct {
     string predicate;
     uint arg_count;
-    string args[MAX_ARGS];
+    string args[MAX_VARIABLES];
 } SFact;
 
 typedef struct {
