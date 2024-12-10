@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <strings.h>
@@ -46,8 +47,8 @@ void lexer_expect(enum kind kind) {
     enum kind actual;
     string tmp;
     if ((actual = lexer_next(&tmp)) != kind) {
-        ERROR("Expected token %s found %s", KIND_NAMES[kind], KIND_NAMES[actual]);
-        abort();
+        fprintf(stderr, "%s: Unexpected token kind\n", KIND_NAMES[kind]);
+        exit(1);
     }
 }
 
@@ -55,13 +56,13 @@ void lexer_expect_def(enum keyword kw) {
     enum kind kind;
     string tmp;
     if ((kind = lexer_next(&tmp)) != KIND_ID) {
-        ERROR("Expected keyword %s found token %s", KEYWORD_NAMES[kw], KIND_NAMES[kind]);
-        abort();
+        fprintf(stderr, "%s: Unexpected token kind\n", KIND_NAMES[kind]);
+        exit(1);
     }
     enum keyword actual;
     if ((actual = keyword_match(&tmp)) != kw) {
-        ERROR("Expected keyword %s found %s", KEYWORD_NAMES[kw], KEYWORD_NAMES[actual]);
-        abort();
+        fprintf(stderr, "%s: Unexpected keyword\n", KEYWORD_NAMES[kind]);
+        exit(1);
     }
 }
 

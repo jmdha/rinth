@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <memory.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "domain.h"
@@ -106,7 +107,9 @@ void DomainParse(Domain *domain, const char *str) {
             parse_predicates(domain->predicates, &domain->predicate_count);
             break;
         case KEYWORD_ACTION: parse_action(&domain->actions[domain->action_count++]); break;
-        default: ERROR("Unexpected top level keyword %s", KEYWORD_NAMES[keyword]); abort();
+        default: 
+            fprintf(stderr, "%s: Unexpected keyword\n", KEYWORD_NAMES[keyword]);
+            exit(1);
         }
     }
 }

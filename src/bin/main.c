@@ -3,7 +3,6 @@
 #include "parse/domain.h"
 #include "parse/problem.h"
 #include "translate/task.h"
-#include "path.h"
 
 int init(
     char **path_domain,
@@ -14,7 +13,6 @@ int init(
     log_init();
     INFO("Reading args");
     if (argc < 3) {
-        ERROR("Requires at least 2 args: domain path and problem path.");
         return 1;
     }
     *path_domain  = argv[1];
@@ -37,36 +35,21 @@ int parse(
     return 0;
 }
 
-int solve(
-    struct path*       path,
-    const struct task* task
-) {
-    return 1;
-}
-
 int main(int argc, char **argv) {
     int status;
     char* path_domain;
     char* path_problem;
     if ((status = init(&path_domain, &path_problem, argc, argv))) {
-        ERROR("Failed init");
         return status;
     }
     Domain  domain;
     Problem problem;
     if ((status = parse(&domain, &problem, path_domain, path_problem))) {
-        ERROR("Failed parse");
         return status;
     }
     struct task task;
     if ((status = translate(&task, &domain, &problem))) {
-        ERROR("Failed translate");
         return status;
     }
-    struct path path;
-    if ((status = solve(&path, &task))) {
-        ERROR("Failed solve");
-        return status;
-    }   
     return 0;
 }

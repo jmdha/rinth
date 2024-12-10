@@ -1,5 +1,6 @@
 #include <memory.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <strings.h>
 #include <assert.h>
@@ -61,7 +62,9 @@ void ProblemParse(Problem *problem, const char *str) {
         case KEYWORD_OBJECTS: parse_objects(problem->objects, &problem->object_count); break;
         case KEYWORD_INIT: parse_init(problem->inits, &problem->init_count); break;
         case KEYWORD_GOAL: parse_goal(problem->goals, &problem->goal_count); break;
-        default: ERROR("Unexpected top level keyword %s", KEYWORD_NAMES[keyword]); abort();
+        default:
+            fprintf(stderr, "%s: Unexpected keyword\n", KEYWORD_NAMES[keyword]);
+            exit(1);
         }
     }
 }

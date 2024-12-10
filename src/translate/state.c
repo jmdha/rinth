@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "log.h"
@@ -49,8 +50,8 @@ void state_insert(struct state *s, struct fact *f) {
     const uint count = s->count + 1;
     s->facts         = realloc(s->facts, count * sizeof(struct fact));
     if (!s->facts) {
-        ERROR("Failed to allocate memory for state insertion");
-        abort();
+        perror("Failed to allocate memory for state insertion");
+        exit(1);
     }
     s->facts[s->count] = *f;
     s->count           = count;
@@ -67,8 +68,8 @@ void state_remove(struct state *s, struct fact *f) {
             } else {
                 s->facts = realloc(s->facts, s->count * sizeof(struct fact));
                 if (!s->facts) {
-                    ERROR("Failed to allocate memory on fact removal");
-                    abort();
+                    perror("Failed to allocate memory on fact removal");
+                    exit(1);
                 }
             }
             break;
