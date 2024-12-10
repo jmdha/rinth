@@ -6,8 +6,7 @@ UTEST(parse_problem, empty) {
     const char *str = "(define"
                       ")";
 
-    Problem problem = {0};
-    ProblemParse(&problem, str);
+    Problem problem = problem_parse(str);
 
     ASSERT_EQ(problem.name.ptr, NULL);
     ASSERT_EQ(problem.domain.ptr, NULL);
@@ -21,8 +20,7 @@ UTEST(parse_problem, name) {
                       "    (problem a)"
                       ")";
 
-    Problem problem = {0};
-    ProblemParse(&problem, str);
+    Problem problem = problem_parse(str);
 
     ASSERT_TRUE(strncmp(problem.name.ptr, "a", problem.name.len) == 0);
     ASSERT_EQ(problem.domain.ptr, NULL);
@@ -36,8 +34,7 @@ UTEST(parse_problem, domain) {
                       "    (:domain a)"
                       ")";
 
-    Problem problem = {0};
-    ProblemParse(&problem, str);
+    Problem problem = problem_parse(str);
 
     ASSERT_EQ(problem.name.ptr, NULL);
     ASSERT_TRUE(strncmp(problem.domain.ptr, "a", problem.domain.len) == 0);
@@ -51,8 +48,7 @@ UTEST(parse_problem, objects) {
                       "    (:objects a bb c-_)"
                       ")";
 
-    Problem problem = {0};
-    ProblemParse(&problem, str);
+    Problem problem = problem_parse(str);
 
     ASSERT_EQ(problem.name.ptr, NULL);
     ASSERT_EQ(problem.domain.ptr, NULL);

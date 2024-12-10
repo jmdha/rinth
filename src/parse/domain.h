@@ -43,7 +43,4 @@ typedef struct {
     Action    actions[MAX_ACTIONS];
 } Domain;
 
-void DomainParse(Domain *domain, const char *str);
-
-uint DomainPredicateIndex(const Domain *domain, const string *str);
-uint ActionVarIndex(const Action *action, const string *str);
+Domain domain_parse(const char *str);

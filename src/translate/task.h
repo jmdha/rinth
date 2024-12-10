@@ -20,4 +20,4 @@ struct task {
     struct fact goals[MAX_INITS];               // Facts of the goal state
 };
 
-int translate(struct task* task, const Domain* domain, const Problem* problem);
+struct task translate(const Domain* domain, const Problem* problem);

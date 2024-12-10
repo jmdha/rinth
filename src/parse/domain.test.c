@@ -5,8 +5,7 @@
 UTEST(parse_domain, empty) {
     const char *str = "(define)";
 
-    Domain domain; 
-    DomainParse(&domain, str);
+    Domain domain = domain_parse(str); 
 
     ASSERT_EQ(domain.requirement_count, 0u);
     ASSERT_EQ(domain.predicate_count, 0u);
@@ -16,8 +15,7 @@ UTEST(parse_domain, empty) {
 UTEST(parse_domain, name) {
     const char *str = "(define (domain abc))";
 
-    Domain domain;
-    DomainParse(&domain, str);
+    Domain domain = domain_parse(str);
 
     ASSERT_TRUE(str_cmp_s(&domain.name, "abc"));
 }
@@ -25,8 +23,7 @@ UTEST(parse_domain, name) {
 UTEST(parse_domain, predicates) {
     const char *str = "(define (:predicates (a) (b ?x) (c ?x ?y)))";
 
-    Domain domain;
-    DomainParse(&domain, str);
+    Domain domain = domain_parse(str);
 
     ASSERT_EQ(domain.predicate_count, 3u);
     ASSERT_TRUE(str_cmp_s(&domain.predicates[0].name, "a"));
