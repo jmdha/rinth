@@ -15,15 +15,15 @@ int main(int argc, char **argv) {
     const char *domain_path  = argv[1];
     const char *problem_path = argv[2];
     INFO("Opening domain file");
-    File domain_file = FileOpen(domain_path);
+    fbuf fb_domain = f_open(domain_path);
     INFO("Parsing domain");
     Domain domain;
-    DomainParse(&domain, domain_file.buffer);
+    DomainParse(&domain, *fb_domain);
     INFO("Opening problem file");
-    File problem_file = FileOpen(problem_path);
+    fbuf fb_problem = f_open(problem_path);
     INFO("Parsing problem");
     Problem problem;
-    ProblemParse(&problem, problem_file.buffer);
+    ProblemParse(&problem, *fb_problem);
     INFO("Parsing finished");
     INFO("Doing verification of domain and problem");
     if (!Verify(&domain, &problem))
@@ -32,9 +32,9 @@ int main(int argc, char **argv) {
     Task task = Translate(&domain, &problem);
     INFO("Cleanup");
     TRACE("Closing domain file");
-    FileClose(&domain_file);
+    f_close(fb_domain);
     TRACE("Closing problem file");
-    FileClose(&problem_file);
+    f_close(fb_problem);
     INFO("Done");
     return 0;
 }

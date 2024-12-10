@@ -1,5 +1,3 @@
-#include "io.h"
-#include "log.h"
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,33 +5,52 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <stddef.h>
 
-File FileOpen(const char *path) {
-    File file = {.fd = -1, .buffer = NULL, .len = -1};
-    file.fd   = open(path, O_RDONLY);
-    if (file.fd == -1) {
+#include "io.h"
+#include "log.h"
+
+struct file_buffer {
+    int    fd;
+    size_t len;
+    char*  buf;
+};
+
+fbuf f_open(const char *path) {
+    int    fd;
+    size_t len;
+    char*  buf;
+
+    fd = open(path, O_RDONLY);
+    if (fd == -1) {
         ERROR("Failed to open file \"%s\"", path);
-        exit(1);
+        return NULL;
     }
 
     struct stat sb;
-    if (fstat(file.fd, &sb) == -1) {
+    if (fstat(fd, &sb) == -1) {
         ERROR("Failed to retrieve size of file \"%s\"", path);
-        close(file.fd);
-        exit(1);
+        close(fd);
+        return NULL;
     }
-    file.len    = sb.st_size;
-    file.buffer = mmap(NULL, file.len, PROT_READ, MAP_PRIVATE, file.fd, 0);
-    if (file.buffer == MAP_FAILED) {
+    len = sb.st_size;
+    buf = mmap(NULL, len, PROT_READ, MAP_PRIVATE, fd, 0);
+    if (buf == MAP_FAILED) {
         ERROR("Failed to map file content of \"%s\"", path);
-        close(file.fd);
-        exit(1);
+        close(fd);
+        return NULL;
     }
 
-    return file;
+    struct file_buffer* fb = malloc(sizeof(struct file_buffer));
+    fb->fd  = fd;
+    fb->len = len;
+    fb->buf = buf;
+    return &fb->buf;
 }
 
-void FileClose(File *file) {
-    munmap(file->buffer, file->len);
-    close(file->fd);
+void f_close(fbuf buf) {
+    struct file_buffer *fb = (struct file_buffer*)((char*)buf - offsetof(struct file_buffer, buf));
+    munmap(fb->buf, fb->len);
+    close(fb->fd);
+    free(fb);
 }

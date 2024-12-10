@@ -2,12 +2,7 @@
 
 #include <sys/stat.h>
 
-typedef struct {
-    int fd, len;
-    char *buffer;
-} File;
+typedef char** fbuf;
 
-// Opens file and directs buffer to file content
-// Remember to call close file!
-File FileOpen(const char *path);
-void FileClose(File *file);
+fbuf f_open(const char *path);
+void f_close(fbuf buf);
