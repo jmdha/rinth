@@ -19,16 +19,11 @@
 
 clock_t program_start;
 
-void LogInit(void) {
+void log_init(void) {
     program_start = clock();
-    // TODO: Create log file
 }
 
-void LogStop(void) {
-    // TODO: Perform any cleanup
-}
-
-void _LogOutput(LogLevel level, const char *msg, ...) {
+void log_out(int level, const char *msg, ...) {
     const char *LEVELS[3] = {"ERROR", "INFO", "TRACE"};
 
     bool is_error = level < 2;

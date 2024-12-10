@@ -16,31 +16,27 @@
 #define LOG_TRACE_ENABLED 0
 #endif
 
-typedef enum LogLevel {
-    LOG_LEVEL_ERROR = 0,
-    LOG_LEVEL_INFO  = 1,
-    LOG_LEVEL_TRACE = 2
-} LogLevel;
+#define LOG_LEVEL_ERROR 0
+#define LOG_LEVEL_INFO  1
+#define LOG_LEVEL_TRACE 2
 
-void LogInit(void);
-void LogStop(void);
-
-void _LogOutput(LogLevel level, const char *msg, ...);
+void log_init(void);
+void log_out(int level, const char *msg, ...);
 
 #if LOG_ERROR_ENABLED
-#define ERROR(msg, ...) _LogOutput(LOG_LEVEL_ERROR, msg, ##__VA_ARGS__);
+#define ERROR(msg, ...) log_out(LOG_LEVEL_ERROR, msg, ##__VA_ARGS__);
 #else
 #define ERROR(msg, ...)
 #endif
 
 #if LOG_INFO_ENABLED
-#define INFO(msg, ...) _LogOutput(LOG_LEVEL_INFO, msg, ##__VA_ARGS__);
+#define INFO(msg, ...) log_out(LOG_LEVEL_INFO, msg, ##__VA_ARGS__);
 #else
 #define INFO(msg, ...)
 #endif
 
 #if LOG_TRACE_ENABLED
-#define TRACE(msg, ...) _LogOutput(LOG_LEVEL_TRACE, msg, ##__VA_ARGS__);
+#define TRACE(msg, ...) log_out(LOG_LEVEL_TRACE, msg, ##__VA_ARGS__);
 #else
 #define TRACE(msg, ...)
 #endif

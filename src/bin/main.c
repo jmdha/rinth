@@ -6,7 +6,7 @@
 #include "translate/task.h"
 
 int main(int argc, char **argv) {
-    LogInit();
+    log_init();
     INFO("Reading args");
     if (argc < 3) {
         ERROR("Requires at least 2 args: domain path and problem path.");
