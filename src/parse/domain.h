@@ -43,4 +43,5 @@ typedef struct {
     Action    actions[MAX_ACTIONS];
 } Domain;
 
+void domain_parse_(Domain *domain, const char *str);
 Domain domain_parse(const char *str);

@@ -82,8 +82,11 @@ static void parse_action(Action *action) {
     lexer_expect(KIND_RPAREN);
 }
 
-Domain domain_parse(const char *str) {
-    Domain domain = {0};
+void domain_parse_(Domain *domain, const char *str) {
+    domain->name.ptr          = NULL;
+    domain->requirement_count = 0;
+    domain->predicate_count   = 0;
+    domain->action_count      = 0;
     lexer_init(str);
     lexer_expect(KIND_LPAREN);
     lexer_expect_def(KEYWORD_DEFINE);
@@ -96,18 +99,24 @@ Domain domain_parse(const char *str) {
         enum keyword keyword = keyword_match(&tmp);
         TRACE("Parsing %s", KEYWORD_NAMES[keyword]);
         switch (keyword) {
-        case KEYWORD_NAME: parse_name(&domain.name); break;
+        case KEYWORD_NAME: parse_name(&domain->name); break;
         case KEYWORD_REQUIREMENTS:
-            parse_requirements(domain.requirements, &domain.requirement_count);
+            parse_requirements(domain->requirements, &domain->requirement_count);
             break;
         case KEYWORD_PREDICATES:
-            parse_predicates(domain.predicates, &domain.predicate_count);
+            parse_predicates(domain->predicates, &domain->predicate_count);
             break;
-        case KEYWORD_ACTION: parse_action(&domain.actions[domain.action_count++]); break;
+        case KEYWORD_ACTION: parse_action(&domain->actions[domain->action_count++]); break;
         default: 
             fprintf(stderr, "%s: Unexpected keyword\n", KEYWORD_NAMES[keyword]);
             exit(1);
         }
     }
+
+}
+
+Domain domain_parse(const char *str) {
+    Domain domain;
+    domain_parse_(&domain, str);
     return domain;
 }

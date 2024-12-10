@@ -5,7 +5,7 @@ SRC_DIR    = src
 LIB_DIR    = third_party
 BIN_DIR    = bin
 WFLAGS     = -Wall -Wextra -Wshadow
-CFLAGS     = -I$(SRC_DIR) -I$(LIB_DIR) -ggdb -O0 -flto -std=gnu17 -march=native 
+CFLAGS     = -I$(SRC_DIR) -I$(LIB_DIR) -ggdb -O3 -flto -std=gnu17 -march=native 
 SRCS       = $(shell find src -type f -iname '*.c' ! -iname '*test.c'  ! -iname '*bench.c')
 SRCS_TEST  = $(shell find src -type f -iname '*.c' ! -iname '*bench.c' ! -iname 'main.c')
 SRCS_BENCH = $(shell find src -type f -iname '*.c' ! -iname '*test.c'  ! -iname 'main.c')

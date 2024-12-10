@@ -18,6 +18,10 @@ static const char *BLOCKSWORLD = "(define (problem blocksworld-01)"
                                  "    (on-table b2)"
                                  ")))";
 
-UBENCH(parsing, problem) {
-    problem_parse(BLOCKSWORLD);
+UBENCH_EX(parsing, problem) {
+    Problem problem;
+    UBENCH_DO_BENCHMARK() {
+        for (uint i = 0; i < 1000; i++)
+            problem_parse_(&problem, BLOCKSWORLD);
+    }
 }

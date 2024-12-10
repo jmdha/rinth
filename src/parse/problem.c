@@ -39,8 +39,12 @@ static void parse_goal(SFact *facts, uint *count) {
     lexer_expect(KIND_RPAREN);
 }
 
-Problem problem_parse(const char *str) {
-    Problem problem = {0};
+void problem_parse_(Problem *problem, const char *str) {
+    problem->name.ptr     = NULL;
+    problem->domain.ptr   = NULL;
+    problem->object_count = 0;
+    problem->init_count   = 0;
+    problem->goal_count   = 0;
     lexer_init(str);
     lexer_expect(KIND_LPAREN);
     lexer_expect_def(KEYWORD_DEFINE);
@@ -53,15 +57,21 @@ Problem problem_parse(const char *str) {
         enum keyword keyword = keyword_match(&tmp);
         TRACE("Parsing %s", KEYWORD_NAMES[keyword]);
         switch (keyword) {
-        case KEYWORD_NAME: parse_name(&problem.name); break;
-        case KEYWORD_DOMAIN: parse_name(&problem.domain); break;
-        case KEYWORD_OBJECTS: parse_objects(problem.objects, &problem.object_count); break;
-        case KEYWORD_INIT: parse_init(problem.inits, &problem.init_count); break;
-        case KEYWORD_GOAL: parse_goal(problem.goals, &problem.goal_count); break;
+        case KEYWORD_NAME: parse_name(&problem->name); break;
+        case KEYWORD_DOMAIN: parse_name(&problem->domain); break;
+        case KEYWORD_OBJECTS: parse_objects(problem->objects, &problem->object_count); break;
+        case KEYWORD_INIT: parse_init(problem->inits, &problem->init_count); break;
+        case KEYWORD_GOAL: parse_goal(problem->goals, &problem->goal_count); break;
         default:
             fprintf(stderr, "%s: Unexpected keyword\n", KEYWORD_NAMES[keyword]);
             exit(1);
         }
     }
+
+}
+
+Problem problem_parse(const char *str) {
+    Problem problem;
+    problem_parse_(&problem, str);
     return problem;
 }
