@@ -1,4 +1,5 @@
 #include <fcntl.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
@@ -14,33 +15,36 @@ struct file_buffer {
     char*  buf;
 };
 
-int f_open(char*** ptr, const char *path) {
+char** f_open(const char *path) {
     int    fd;
     size_t len;
     char*  buf;
 
     fd = open(path, O_RDONLY);
-    if (fd == -1)
-        return 1;
+    if (fd == -1) {
+        perror(path);
+        exit(1);
+    }
 
     struct stat sb;
     if (fstat(fd, &sb) == -1) {
+        perror(path);
         close(fd);
-        return 2;
+        exit(1);
     }
     len = sb.st_size;
     buf = mmap(NULL, len, PROT_READ, MAP_PRIVATE, fd, 0);
     if (buf == MAP_FAILED) {
+        perror(path);
         close(fd);
-        return 3;
+        exit(1);
     }
 
     struct file_buffer* fb = malloc(sizeof(struct file_buffer));
     fb->fd  = fd;
     fb->len = len;
     fb->buf = buf;
-    *ptr = &fb->buf;
-    return 0;
+    return &fb->buf;
 }
 
 void f_close(char** buf) {

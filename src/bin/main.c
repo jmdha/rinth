@@ -28,26 +28,11 @@ int parse(
     const char* path_domain,
     const char* path_problem
 ) {
-    int status;
-    char** fbuf_domain  = NULL;
-    char** fbuf_problem = NULL;
-    INFO("Mapping domain file");
-    if ((status = f_open(&fbuf_domain, path_domain))) {
-        ERROR("Failed to map domain file");
-        return status;
-    }
-    INFO("Parsing domain");
+    char** fbuf_domain  = f_open(path_domain);
+    char** fbuf_problem = f_open(path_problem);
     DomainParse(domain, *fbuf_domain);
-    TRACE("Unmapping domain file");
-    f_close(fbuf_domain);
-    INFO("Mapping problem file");
-    if ((status = f_open(&fbuf_problem, path_problem))) {
-        ERROR("Failed to map problem file");
-        return status;
-    }
-    INFO("Parsing problem");
     ProblemParse(problem, *fbuf_problem);
-    TRACE("Unmapping problem file");
+    f_close(fbuf_domain);
     f_close(fbuf_problem);
     return 0;
 }
