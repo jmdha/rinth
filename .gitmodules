@@ -1,3 +1,6 @@
 [submodule "third_party/ubench"]
 	path = third_party/ubench
 	url = https://github.com/sheredom/ubench.h
+[submodule "third_party/utest.h"]
+	path = third_party/utest.h
+	url = https://github.com/sheredom/utest.h

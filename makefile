@@ -22,7 +22,7 @@ bench:
 
 for test: CFLAGS += -fsanitize=address -O0
 test:
-	gcc $(WFLAGS) $(CFLAGS) -o $(TEST_NAME) $(SRCS_TEST) -lcriterion
+	gcc $(WFLAGS) $(CFLAGS) -o $(TEST_NAME) $(SRCS_TEST)
 	./$(TEST_NAME)
 
 clean:
