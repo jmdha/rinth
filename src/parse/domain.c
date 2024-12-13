@@ -97,7 +97,7 @@ void domain_parse_(Domain *domain, const char *str) {
         assert(kind == KIND_LPAREN);
         lexer_next(&tmp);
         enum keyword keyword = keyword_match(&tmp);
-        TRACE("Parsing %s", KEYWORD_NAMES[keyword]);
+        TRACE("Parse %s", KEYWORD_NAMES[keyword]);
         switch (keyword) {
         case KEYWORD_NAME: parse_name(&domain->name); break;
         case KEYWORD_REQUIREMENTS:

@@ -55,7 +55,7 @@ void problem_parse_(Problem *problem, const char *str) {
         assert(kind == KIND_LPAREN);
         lexer_next(&tmp);
         enum keyword keyword = keyword_match(&tmp);
-        TRACE("Parsing %s", KEYWORD_NAMES[keyword]);
+        TRACE("Parse %s", KEYWORD_NAMES[keyword]);
         switch (keyword) {
         case KEYWORD_NAME: parse_name(&problem->name); break;
         case KEYWORD_DOMAIN: parse_name(&problem->domain); break;
