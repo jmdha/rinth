@@ -12,3 +12,4 @@
 #define MAX_GOALS        1024
 // TASK
 #define MAX_ATOMS        64
+#define MAX_SCHEMES      128

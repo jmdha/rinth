@@ -43,14 +43,14 @@ bool state_empty(const struct state *s) { return s->count == 0; }
 
 uint state_count(const struct state *s) { return s->count; }
 
-uint state_size(const struct state *s) { return sizeof(uint) + s->count * sizeof(fact); }
+uint state_size(const struct state *s) { return sizeof(uint) + s->count * sizeof(struct fact); }
 
 void state_insert(struct state *s, struct fact *f) {
     if (state_contains(s, f)) return;
     const uint count = s->count + 1;
     s->facts         = realloc(s->facts, count * sizeof(struct fact));
     if (!s->facts) {
-        perror("Failed to allocate memory for state insertion");
+        perror("Could not insert fact into state");
         exit(1);
     }
     s->facts[s->count] = *f;
@@ -68,7 +68,7 @@ void state_remove(struct state *s, struct fact *f) {
             } else {
                 s->facts = realloc(s->facts, s->count * sizeof(struct fact));
                 if (!s->facts) {
-                    perror("Failed to allocate memory on fact removal");
+                    perror("Could not remove fact from state");
                     exit(1);
                 }
             }

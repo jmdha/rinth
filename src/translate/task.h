@@ -5,6 +5,7 @@
 #include "parse/domain.h"
 #include "parse/problem.h"
 #include "fact.h"
+#include "scheme.h"
 
 struct task {
     string      domain_name;                    // Name of domain
@@ -18,6 +19,8 @@ struct task {
     struct fact inits[MAX_INITS];               // Facts of the initial state
     uint        goal_count;                     // How many facts the goal state contains
     struct fact goals[MAX_INITS];               // Facts of the goal state
+    uint        scheme_count;                   // How many schemes exist
+    Scheme      schemes[MAX_SCHEMES];
 };
 
 struct task translate(const Domain* domain, const Problem* problem);

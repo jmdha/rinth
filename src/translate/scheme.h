@@ -14,6 +14,7 @@ typedef struct {
 
 typedef struct {
     string name;
+    uint vars;
     uint pre_count;
     Atom pre[MAX_ATOMS];
     uint eff_count;
