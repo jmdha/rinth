@@ -8,6 +8,7 @@
 #include <stddef.h>
 
 #include "io.h"
+#include "log.h"
 
 struct file_buffer {
     int    fd;
@@ -20,6 +21,7 @@ char** f_open(const char *path) {
     size_t len;
     char*  buf;
 
+    TRACE("Open %s", path);
     fd = open(path, O_RDONLY);
     if (fd == -1) {
         perror(path);

@@ -33,12 +33,20 @@ void log_out(int level, const char *msg, ...) {
     va_end(arg_ptr);
 
     double time_stamp = (double)(clock() - program_start) / CLOCKS_PER_SEC;
+    char out_time[33000];
+    if (time_stamp >= 1)
+        sprintf(out_time, "[%9.1fs]", time_stamp);
+    else if (time_stamp * 1000 >= 1)
+        sprintf(out_time, "[%8.1fms]", time_stamp * 1000);
+    else
+        sprintf(out_time, "[%8.0fus]", time_stamp * 1000000);
+
 
     char out[33000];
     if (level == LOG_LEVEL_TRACE)
-        sprintf(out, GRAY "[%8.4fs] %s%s\n", time_stamp, formatted, RESET);
+        sprintf(out, GRAY "%s %s%s\n", out_time, formatted, RESET);
     else
-        sprintf(out, "[%8.4fs] %s\n", time_stamp, formatted);
+        sprintf(out, "%s %s\n", out_time, formatted);
 
     fprintf(stdout, "%s", out);
 }
