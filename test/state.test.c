@@ -1,6 +1,6 @@
 #include <utest.h/utest.h>
 
-#include "translate/state.h"
+#include "state.h"
 
 UTEST(state, empty) {
     struct state *s = state();

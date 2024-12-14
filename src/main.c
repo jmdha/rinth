@@ -1,8 +1,8 @@
 #include "io.h"
 #include "log.h"
-#include "parse/domain.h"
-#include "parse/problem.h"
-#include "translate/task.h"
+#include "domain.h"
+#include "problem.h"
+#include "task.h"
 
 int main(int, char **argv) {
     log_init();

@@ -1,6 +1,6 @@
 #include <utest.h/utest.h>
 
-#include "parse/domain.h"
+#include "domain.h"
 
 UTEST(parse_domain, empty) {
     const char *str = "(define)";

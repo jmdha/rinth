@@ -1,6 +1,6 @@
 #include <utest.h/utest.h>
 
-#include "parse/problem.h"
+#include "problem.h"
 
 UTEST(parse_problem, empty) {
     const char *str = "(define"

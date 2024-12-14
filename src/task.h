@@ -2,8 +2,8 @@
 
 #include "misc.h"
 #include "bounds.h"
-#include "parse/domain.h"
-#include "parse/problem.h"
+#include "domain.h"
+#include "problem.h"
 #include "fact.h"
 #include "scheme.h"
 
