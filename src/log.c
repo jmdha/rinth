@@ -33,7 +33,7 @@ void log_out(int level, const char *msg, ...) {
     va_end(arg_ptr);
 
     double time_stamp = (double)(clock() - program_start) / CLOCKS_PER_SEC;
-    char out_time[33000];
+    char out_time[100];
     if (time_stamp >= 1)
         sprintf(out_time, "[%9.1fs]", time_stamp);
     else if (time_stamp * 1000 >= 1)

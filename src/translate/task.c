@@ -205,6 +205,10 @@ static void convert_action(
             memcpy(scheme->eff, eff_atoms, eff_atom_count * sizeof(Atom));
         }
     }
+    INFO(
+        "Action %.*s translated to %d schemes",
+        action->name.len, action->name.ptr, pre_exp_count * eff_exp_count
+    );
 }
 
 struct task translate(const Domain* domain, const Problem* problem) {
@@ -213,12 +217,14 @@ struct task translate(const Domain* domain, const Problem* problem) {
     task.domain_name  = domain->name;
     task.problem_name = problem->name;
 
+    TRACE("Translate predicates");
     task.predicate_count = domain->predicate_count;
     for (uint i = 0; i < domain->predicate_count; i++) {
         task.predicate_vars[i] = domain->predicates[i].var_count;
         task.predicates[i]     = domain->predicates[i].name;
     }
 
+    TRACE("Translate objects");
     task.object_count = problem->object_count;
     for (uint i = 0; i < problem->object_count; i++)
         task.objects[i] = problem->objects[i];
@@ -247,6 +253,8 @@ struct task translate(const Domain* domain, const Problem* problem) {
             domain->predicates, domain->predicate_count
         );
     }
-
+    INFO("Facts init: %d", task.init_count);
+    INFO("Facts goal: %d", task.goal_count);
+    INFO("Schemes:    %d", task.scheme_count);
     return task;
 }

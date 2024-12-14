@@ -67,7 +67,10 @@ void problem_parse_(Problem *problem, const char *str) {
             exit(1);
         }
     }
-
+    INFO("Problem: %.*s", problem->name.len, problem->name.ptr);
+    INFO("Objects: %d", problem->object_count);
+    INFO("Inits:   %d", problem->init_count);
+    INFO("Goals:   %d", problem->goal_count);
 }
 
 Problem problem_parse(const char *str) {

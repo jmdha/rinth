@@ -46,6 +46,7 @@ char** f_open(const char *path) {
     fb->fd  = fd;
     fb->len = len;
     fb->buf = buf;
+    INFO("Buffer size %d of %s", len, path);
     return &fb->buf;
 }
 

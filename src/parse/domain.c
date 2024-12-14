@@ -112,7 +112,9 @@ void domain_parse_(Domain *domain, const char *str) {
             exit(1);
         }
     }
-
+    INFO("Domain:     %.*s", domain->name.len, domain->name.ptr);
+    INFO("Predicates: %d", domain->predicate_count);
+    INFO("Actions:    %d", domain->action_count);
 }
 
 Domain domain_parse(const char *str) {
