@@ -2,18 +2,18 @@
 
 #include <stdbool.h>
 
-#include "fact.h"
 #include "misc.h"
 
-struct state; // A set of facts
+typedef struct state state; // A set of facts
 
-struct state *state();                                               // Create an empty state
-void state_free(struct state *s);                                    // Frees state allocation
-bool state_contains(const struct state *s, struct fact *f);          // Does state contain fact
-bool state_equal(const struct state *a, const struct state *b);      // Are states equal
-bool state_empty(const struct state *s);                             // Is state empty
-uint state_count(const struct state *s);                             // How many facts in state
-uint state_size(const struct state *s);                              // Size of state in bytes
-void state_insert(struct state *s, struct fact *f);                  // Inserts fact into state
-void state_remove(struct state *s, struct fact *f);                  // Removes fact from state
-void state_iterate(const struct state *s, void (*f)(struct fact *)); // Call on each fact
+state* state_new();                                              // Create an empty state
+bool   state_contains(const struct state*, uint, u16*);          // Does state contain fact
+bool   state_equal   (const struct state*, const struct state*); // Are states equal
+bool   state_covers  (const struct state*, const struct state*); // Is the latter state a subset
+bool   state_empty   (const struct state*);                      // Is state empty
+uint   state_count   (const struct state*);                      // How many facts in state
+uint   state_size    (const struct state*);                      // Size of state in bytes
+u64    state_hash    (const struct state*);                      // Generate a hash of state
+void   state_free  (struct state*);                              // Frees state allocation
+void   state_insert(struct state*, uint, u16*);                   // Inserts fact into state
+void   state_remove(struct state*, uint, u16*);                   // Removes fact from state

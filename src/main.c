@@ -1,7 +1,6 @@
 #include "io.h"
 #include "log.h"
-#include "domain.h"
-#include "problem.h"
+#include "parse.h"
 #include "task.h"
 
 int main(int, char **argv) {
@@ -10,9 +9,9 @@ int main(int, char **argv) {
     const char* path_problem = argv[2];
     char** fbuf_domain = f_open(path_domain);
     char** fbuf_problem = f_open(path_problem);
-    const Domain domain = domain_parse(*fbuf_domain);
-    const Problem problem = problem_parse(*fbuf_problem);
-    const struct task task = translate(&domain, &problem);
+    struct domain domain = parse_domain(*fbuf_domain);
+    struct problem problem = parse_problem(*fbuf_problem);
+    struct task task = translate(&domain, &problem);
     f_close(fbuf_domain);
     f_close(fbuf_problem);
     return 0;

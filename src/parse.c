@@ -217,7 +217,7 @@ static void parse_action(lexer* l, struct action* action) {
     action->effect       = NULL;
     action->var_count    = 0;
     lexer_next(l, &action->name);
-    string tmp;
+    string tmp = {0};
     while ((lexer_next(l, &tmp)) != RPAREN) {
         enum keyword keyword = keyword_match(&tmp);
         TRACE("Parse %s of action %.*s", KEYWORD_NAMES[keyword], action->name.len, action->name.ptr);
@@ -241,7 +241,7 @@ void parse_domain_(struct domain* d, const char* str) {
     d->action_count      = 0;
     lexer_expect(&l, LPAREN);
     lexer_expect_def(&l, KEYWORD_DEFINE);
-    string tmp;
+    string tmp = {0};
     enum kind kind;
     while ((kind = lexer_next(&l, &tmp)) != EOI) {
         if (kind == RPAREN) break;
@@ -288,7 +288,7 @@ void parse_problem_(struct problem* p, const char* str) {
     p->goal_count   = 0;
     lexer_expect(&l, LPAREN);
     lexer_expect_def(&l, KEYWORD_DEFINE);
-    string tmp;
+    string tmp = {0};
     enum kind kind;
     while ((kind = lexer_next(&l, &tmp)) != EOI) {
         if (kind == RPAREN) break;

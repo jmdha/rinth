@@ -7,11 +7,12 @@
 
 #include "task.h"
 #include "log.h"
+#include "state.h"
 
-uint predicate_index(
-    const string*    str,
-    const Predicate* predicates,
-    const uint       count
+u16 predicate_index(
+    const string*           str,
+    const struct predicate* predicates,
+    const uint              count
 ) {
     uint pred_index = UINT_MAX;
     for (uint t = 0; t < count; t++) {
@@ -31,7 +32,7 @@ uint predicate_index(
     return pred_index;
 }
 
-uint object_index(
+u16 object_index(
     const string* str,
     const string* objects,
     const uint    count
@@ -78,64 +79,56 @@ static uint var_index(
 
 }
 
-static void convert_fact(
-    struct fact*     fact,
-    const SFact*     sfact,
-    const Predicate* predicates,
-    const uint       predicate_count,
-    const string*    objects,
-    const uint       object_count
-) {
-    fact->predicate = predicate_index(&sfact->predicate, predicates, predicate_count);
-    for (uint t = 0; t < sfact->arg_count; t++)
-        fact->args[t] = object_index(&sfact->args[t], objects, object_count);
-}
-
 static void convert_facts(
-    struct fact*     facts,
-    const SFact*     sfacts,
-    const uint       len,
-    const Predicate* predicates,
-    const uint       predicate_count,
-    const string*    objects,
-    const uint       object_count
+    state*                  s,
+    const struct fact*      facts,
+    const uint              len,
+    const struct predicate* predicates,
+    const uint              predicate_count,
+    const string*           objects,
+    const uint              object_count
 ) {
-    for (uint i = 0; i < len; i++)
-        convert_fact(&facts[i], &sfacts[i], predicates, predicate_count, objects, object_count);
+    for (uint i = 0; i < len; i++) {
+        u16 args[1 + facts[i].arg_count];
+        args[0] = predicate_index(&facts[i].predicate, predicates, predicate_count);
+        for (uint t = 0; t < facts[i].arg_count; i++)
+            args[t] = object_index(&facts[i].args[t], objects, object_count);
+        state_insert(s, 1 + facts[i].arg_count, args);
+    }
 }
 
 // Converts an expressions into multiple expressions which consist only of a conjuction of atoms
 // I.e. Remove or which might lead to multiple expressions
 static uint flatten_expression(
-    Expression*       exps,
-    const Expression* exp
+    struct expression*       exps,
+    const struct expression* exp
 ) {
-    memcpy(&exps[0], exp, sizeof(Expression));
+    memcpy(&exps[0], exp, sizeof(struct expression));
     return 1;
 }
 
 
 typedef struct {
-    const Expression* exp;
-    bool              val;
+    const struct expression* exp;
+    bool                     val;
 } ExpVal;
 
 // Converts an expression which may only be a conjunction of atoms (or nots)
 // Should generally call flatten_expression first
 static uint convert_expression(
-    Atom*             atoms,
-    const Expression* exp,
-    const string*     vars,
-    const uint        var_count,
-    const Predicate*  predicates,
-    const uint        predicate_count
+    Atom*                    atoms,
+    const struct expression* exp,
+    const string*            vars,
+    const uint               var_count,
+    const struct predicate*  predicates,
+    const uint               predicate_count
 ) {
     uint count = 0;
     ExpVal queue[256];
     uint   queue_len  = 0;
     assert(exp->kind == E_AND);
-    for (uint i = 0; i < exp->data.nary.count; i++) {
-        queue[queue_len].exp = exp->data.nary.exps[i]; 
+    for (uint i = 0; i < exp->nary.count; i++) {
+        queue[queue_len].exp = exp->nary.exps[i]; 
         queue[queue_len].val = true;
         queue_len++;
     }
@@ -145,16 +138,16 @@ static uint convert_expression(
             case E_ATOM:
                 atoms[count].val       = e_val.val;
                 atoms[count].predicate = predicate_index(
-                    &e_val.exp->data.atom.predicate, 
+                    &e_val.exp->atom.predicate, 
                     predicates, predicate_count
                 );
-                atoms[count].arg_count = e_val.exp->data.atom.var_count;
-                for (uint i = 0; i < e_val.exp->data.atom.var_count; i++)
-                    atoms[count].args[i] = var_index(e_val.exp->data.atom.vars, vars, var_count);
+                atoms[count].arg_count = e_val.exp->atom.arg_count;
+                for (uint i = 0; i < e_val.exp->atom.arg_count; i++)
+                    atoms[count].args[i] = var_index(e_val.exp->atom.args, vars, var_count);
                 count++;
                 break;
             case E_NOT:
-                queue[queue_len].exp = e_val.exp->data.unary;
+                queue[queue_len].exp = e_val.exp->unary;
                 queue[queue_len].val = !e_val.val;
                 queue_len++;
                 break;
@@ -171,14 +164,14 @@ static uint convert_expression(
 // This occurs in the case of OR expressions (only possible in precondition)
 // Each sub-expression will lead to a differing scheme, and even more in the case of multiple OR's
 static void convert_action(
-    Scheme*          schemes,
-    uint*            count,
-    const Action*    action,
-    const Predicate* predicates,
-    const uint       predicate_count
+    Scheme*                 schemes,
+    uint*                   count,
+    const struct action*    action,
+    const struct predicate* predicates,
+    const uint              predicate_count
 ) {
-    Expression pre_exps[MAX_SCHEMES];
-    Expression eff_exps[MAX_SCHEMES];
+    struct expression pre_exps[MAX_SCHEMES];
+    struct expression eff_exps[MAX_SCHEMES];
     uint pre_exp_count = flatten_expression(pre_exps, action->precondition);
     uint eff_exp_count = flatten_expression(eff_exps, action->effect);
     for (uint i = 0; i < pre_exp_count; i++) {
@@ -211,7 +204,7 @@ static void convert_action(
     );
 }
 
-struct task translate(const Domain* domain, const Problem* problem) {
+struct task translate(const struct domain* domain, const struct problem* problem) {
     struct task task = {0};
 
     task.domain_name  = domain->name;
@@ -229,18 +222,18 @@ struct task translate(const Domain* domain, const Problem* problem) {
     for (uint i = 0; i < problem->object_count; i++)
         task.objects[i] = problem->objects[i];
 
-    task.init_count = problem->init_count;
-    task.goal_count = problem->goal_count;
+    task.init = state_new();
+    task.goal = state_new();
 
     TRACE("Translate init");
     convert_facts(
-        task.inits, problem->inits, problem->init_count,
+        task.init, problem->inits, problem->init_count,
         domain->predicates, domain->predicate_count,
         problem->objects, problem->object_count
     );
     TRACE("Translate goal");
     convert_facts(
-        task.goals, problem->goals, problem->goal_count,
+        task.goal, problem->goals, problem->goal_count,
         domain->predicates, domain->predicate_count,
         problem->objects, problem->object_count
     );
@@ -253,8 +246,9 @@ struct task translate(const Domain* domain, const Problem* problem) {
             domain->predicates, domain->predicate_count
         );
     }
-    INFO("Facts init: %d", task.init_count);
-    INFO("Facts goal: %d", task.goal_count);
+    INFO("Facts init: %d", state_count(task.init));
+    INFO("Facts goal: %d", state_count(task.goal));
     INFO("Schemes:    %d", task.scheme_count);
     return task;
+
 }

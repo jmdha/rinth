@@ -1,83 +1,105 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <limits.h>
+#include <assert.h>
+#include <memory.h>
 
-#include "log.h"
 #include "state.h"
 
-// TODO: Implement tree type state
-// I'm thinking where leaf nodes are buckets with start and end range of objects
+static u64 create_fact(uint len, u16* args) {
+    u64 fact = 0;
+    for (uint i = 0; i < len; i++)
+        fact |= (u64) args[i] << 16 * i;
+    return fact;
+}
 
-// HACK: This is slow
 struct state {
     uint count;
-    struct fact *facts;
+    u64* facts;
 };
 
-struct state *state() {
-    struct state *s = (struct state *)malloc(sizeof(struct state));
-    s->count        = 0;
-    s->facts        = NULL;
+state* state_new() {
+    state* s = malloc(sizeof(state));
+    s->count = 0;
+    s->facts = NULL;
     return s;
 }
 
-void state_free(struct state *s) {
+static bool state_contains_(const struct state* s, u64 fact) {
+    for (uint i = 0; i < s->count; i++)
+        if (fact == s->facts[i])
+            return true;
+    return false;
+}
+
+bool state_contains(const struct state* s, uint len, u16* args) {
+    return state_contains_(s, create_fact(len, args));
+}
+
+bool state_equal(const struct state* a, const struct state* b) {
+    if (a->count != b->count) return false;
+    for (uint i = 0; i < a->count; i++)
+        if (a->facts[i] != b->facts[i])
+            return false;
+    return true;
+}
+
+bool state_covers(const struct state* a, const struct state* b) {
+    for (uint i = 0; i < b->count; i++)
+        if (state_contains_(a, b->facts[i]))
+            return false;
+    return true;
+}
+
+bool state_empty(const struct state* s) {
+    return s->count == 0;
+}
+
+uint state_count(const struct state* s) {
+    return s->count;
+}
+
+uint state_size(const struct state* s) {
+    return sizeof(s->count) + s->count * sizeof(u64);
+}
+
+u64 state_hash(const struct state* s) {
+    u64 hash = 0;
+    for (uint i = 0; i < s->count; i++)
+        hash ^= s->facts[i] * s->facts[i];
+    return hash;
+}
+
+void state_free(struct state* s) {
     free(s->facts);
     free(s);
 }
 
-bool state_contains(const struct state *s, struct fact *f) {
-    for (uint i = 0; i < s->count; i++)
-        if (fact_equal(f, &s->facts[i])) return true;
-    return false;
-}
-
-bool state_equal(const struct state *a, const struct state *b) {
-    for (uint i = 0; i < a->count; i++)
-        if (!state_contains(b, &a->facts[i])) return false;
-    for (uint i = 0; i < b->count; i++)
-        if (!state_contains(a, &b->facts[i])) return false;
-    return true;
-}
-
-bool state_empty(const struct state *s) { return s->count == 0; }
-
-uint state_count(const struct state *s) { return s->count; }
-
-uint state_size(const struct state *s) { return sizeof(uint) + s->count * sizeof(struct fact); }
-
-void state_insert(struct state *s, struct fact *f) {
-    if (state_contains(s, f)) return;
-    const uint count = s->count + 1;
-    s->facts         = realloc(s->facts, count * sizeof(struct fact));
-    if (!s->facts) {
-        perror("Could not insert fact into state");
-        exit(1);
-    }
-    s->facts[s->count] = *f;
-    s->count           = count;
-}
-
-void state_remove(struct state *s, struct fact *f) {
+void state_insert(struct state* s, uint len, u16* args) {
+    const u64 fact = create_fact(len, args);
     for (uint i = 0; i < s->count; i++) {
-        if (fact_equal(&s->facts[i], f)) {
-            s->facts[i] = s->facts[s->count - 1];
-            s->count    = s->count - 1;
-            if (!s->count) {
-                free(s->facts);
-                s->facts = NULL;
-            } else {
-                s->facts = realloc(s->facts, s->count * sizeof(struct fact));
-                if (!s->facts) {
-                    perror("Could not remove fact from state");
-                    exit(1);
-                }
-            }
-            break;
+        if (s->facts[i] == fact) {
+            return; // Already contains fact
+        } else if (s->facts[i] > fact) {
+            s->facts = realloc(s->facts, sizeof(u64) * ++s->count);
+            memmove(&s->facts[i + 1], &s->facts[i], sizeof(u64) * (s->count - i));
+            s->facts[i] = fact;
+            return; // Inserted fact in sorted list
         }
     }
+    s->facts = realloc(s->facts, sizeof(u64) * ++s->count);
+    s->facts[s->count - 1] = fact;
 }
 
-void state_iterate(const struct state *s, void (*f)(struct fact *)) {
-    for (uint i = 0; i < s->count; i++)
-        f(&s->facts[i]);
+void state_remove(struct state* s, uint len, u16* args) {
+    const u64 fact = create_fact(len, args);
+    for (uint i = 0; i < s->count; i++) {
+        if (s->facts[i] == fact) {
+            memmove(&s->facts[i], &s->facts[i + 1], sizeof(u64) * (s->count - i - 1));
+            s->facts = realloc(s->facts, sizeof(u64) * --s->count);
+            return;
+        } else if (s->facts[i] > fact) {
+            return;
+        }
+    }
 }
