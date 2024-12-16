@@ -122,13 +122,13 @@ static void skip_text(lexer* l) {
 enum kind lexer_next(lexer* l, string *str) {
     skip_whitespace(l);
     const uint pos = l->pos;
-    str->ptr       = &l->str[l->pos];
     switch (l->str[l->pos++]) {
     case '\0': return EOI;
     case '(':  return LPAREN;
     case ')':  return RPAREN;
     default:
         skip_text(l);
+        str->ptr       = &l->str[pos];
         str->len = l->pos - pos;
         return ID;
     }
