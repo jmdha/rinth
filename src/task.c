@@ -89,10 +89,10 @@ static void convert_facts(
     const uint              object_count
 ) {
     for (uint i = 0; i < len; i++) {
-        u16 args[1 + facts[i].arg_count];
+        u16 args[16];
         args[0] = predicate_index(&facts[i].predicate, predicates, predicate_count);
-        for (uint t = 0; t < facts[i].arg_count; i++)
-            args[t] = object_index(&facts[i].args[t], objects, object_count);
+        for (uint t = 0; t < facts[i].arg_count; t++)
+            args[1 + t] = object_index(&facts[i].args[t], objects, object_count);
         state_insert(s, 1 + facts[i].arg_count, args);
     }
 }
