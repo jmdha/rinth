@@ -71,7 +71,8 @@ u64 state_hash(const struct state* s) {
 }
 
 void state_free(struct state* s) {
-    free(s->facts);
+    if (s->facts)
+        free(s->facts);
     free(s);
 }
 
@@ -82,7 +83,7 @@ void state_insert(struct state* s, uint len, u16* args) {
             return; // Already contains fact
         } else if (s->facts[i] > fact) {
             s->facts = realloc(s->facts, sizeof(u64) * ++s->count);
-            memmove(&s->facts[i + 1], &s->facts[i], sizeof(u64) * (s->count - i));
+            memmove(&s->facts[i + 1], &s->facts[i], sizeof(u64) * (s->count - i - 1));
             s->facts[i] = fact;
             return; // Inserted fact in sorted list
         }
@@ -96,7 +97,13 @@ void state_remove(struct state* s, uint len, u16* args) {
     for (uint i = 0; i < s->count; i++) {
         if (s->facts[i] == fact) {
             memmove(&s->facts[i], &s->facts[i + 1], sizeof(u64) * (s->count - i - 1));
-            s->facts = realloc(s->facts, sizeof(u64) * --s->count);
+            if (s->count == 1) {
+                free(s->facts);
+                s->facts = NULL;
+                s->count = 0;
+            } else {
+                s->facts = realloc(s->facts, sizeof(u64) * --s->count);
+            }
             return;
         } else if (s->facts[i] > fact) {
             return;
