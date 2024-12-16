@@ -17,6 +17,20 @@ UTEST(state, empty_equal_empty) {
     state_free(s2);
 }
 
+UTEST(state, covers) {
+    struct state *s1 = state_new();
+    struct state *s2 = state_new();
+    u16 a[] = {1};
+    u16 b[] = {2};
+    state_insert(s1, 1, a);
+    state_insert(s1, 1, b);
+    state_insert(s2, 1, a);
+    ASSERT_TRUE(state_covers(s1, s2));
+    ASSERT_TRUE(!state_covers(s2, s1));
+    state_free(s1);
+    state_free(s2);
+}
+
 UTEST(state, insert_contains) {
     struct state *s = state_new();
     u16 fact[] = {1};

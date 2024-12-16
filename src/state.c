@@ -46,7 +46,7 @@ bool state_equal(const struct state* a, const struct state* b) {
 
 bool state_covers(const struct state* a, const struct state* b) {
     for (uint i = 0; i < b->count; i++)
-        if (state_contains_(a, b->facts[i]))
+        if (!state_contains_(a, b->facts[i]))
             return false;
     return true;
 }
