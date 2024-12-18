@@ -8,7 +8,8 @@ LIB_DIR    = third_party
 BIN_DIR    = bin
 WFLAGS     = -Wall -Wextra -Wshadow
 LIBS       = -lm
-CFLAGS     = -I$(SRC_DIR) -I$(LIB_DIR) -ggdb -O3 -flto -std=gnu17 -march=native 
+CFLAGS     = -I$(SRC_DIR) -I$(LIB_DIR) -ggdb -O2 -flto -std=gnu17 -march=native
+SAFETY    += -fstack-protector-strong -fstack-clash-protection -fcf-protection -fsanitize=address -fno-omit-frame-pointer -fno-semantic-interposition
 SRCS       = $(shell find $(SRC_DIR) -type f -iname '*.c' ! -iname 'main.c')
 BENCHS     = $(shell find $(BENCH_DIR) -type f -iname '*.c' ! -iname 'main.c')
 TESTS      = $(shell find $(TEST_DIR) -type f -iname '*.c' ! -iname 'main.c')
@@ -17,15 +18,14 @@ TESTS      = $(shell find $(TEST_DIR) -type f -iname '*.c' ! -iname 'main.c')
 
 for all: CFLAGS += -D LOG_INFO -D LOG_TRACE
 all: 
-	gcc $(WFLAGS) $(CFLAGS) -o $(EXE_NAME) $(SRCS) $(SRC_DIR)/main.c $(LIBS)
+	gcc $(WFLAGS) $(CFLAGS) $(SAFETY) -o $(EXE_NAME) $(SRCS) $(SRC_DIR)/main.c $(LIBS)
 
 bench:
 	gcc $(WFLAGS) $(CFLAGS) -o $(BENCH_NAME) $(SRCS) $(BENCHS) $(BENCH_DIR)/main.c $(LIBS)
 	./$(BENCH_NAME)
 
-for test: CFLAGS += -fsanitize=address -O0
 test:
-	gcc $(WFLAGS) $(CFLAGS) -o $(TEST_NAME) $(SRCS) $(TESTS) $(TEST_DIR)/main.c $(LIBS)
+	gcc $(WFLAGS) $(CFLAGS) $(SAFETY) -o $(TEST_NAME) $(SRCS) $(TESTS) $(TEST_DIR)/main.c $(LIBS)
 	./$(TEST_NAME)
 
 clean:
