@@ -2,6 +2,7 @@
 
 // DOMAIN
 #define MAX_REQUIREMENTS 32
+#define MAX_TYPES        32
 #define MAX_PREDICATES   32
 #define MAX_ACTIONS      64
 #define MAX_VARIABLES    4

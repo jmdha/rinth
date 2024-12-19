@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 
 #include "parse.h"
 #include "log.h"
@@ -10,6 +11,7 @@ enum kind {
     EOI,
     LPAREN,
     RPAREN,
+    DASH,
     ID,
     MAX_KIND
 };
@@ -19,6 +21,7 @@ enum keyword {
     KEYWORD_NAME,
     KEYWORD_DOMAIN,
     KEYWORD_REQUIREMENTS,
+    KEYWORD_TYPES,
     KEYWORD_PREDICATES,
     KEYWORD_ACTION,
     KEYWORD_PARAMETERS,
@@ -46,6 +49,7 @@ const char *KEYWORD_NAMES[MAX_KEYWORD + 1] = {
     "KEYWORD_NAME",
     "KEYWORD_DOMAIN",
     "KEYWORD_REQUIREMENTS",
+    "KEYWORD_TYPES",
     "KEYWORD_PREDICATES",
     "KEYWORD_ACTION",
     "KEYWORD_PARAMETERS",
@@ -80,6 +84,8 @@ enum keyword keyword_match(const string *str) {
         return KEYWORD_NOT;
     else if (str->len == 13 && strncmp(":requirements", str->ptr, str->len) == 0)
         return KEYWORD_REQUIREMENTS;
+    else if (str->len == 6 && strncmp(":types", str->ptr, str->len) == 0)
+        return KEYWORD_TYPES;
     else if (str->len == 11 && strncmp(":predicates", str->ptr, str->len) == 0)
         return KEYWORD_PREDICATES;
     else if (str->len == 7 && strncmp(":action", str->ptr, str->len) == 0)
@@ -126,6 +132,7 @@ enum kind lexer_next(lexer* l, string *str) {
     case '\0': return EOI;
     case '(':  return LPAREN;
     case ')':  return RPAREN;
+    case '-':  return DASH;
     default:
         skip_text(l);
         str->ptr       = &l->str[pos];
@@ -171,6 +178,31 @@ static void parse_ids(lexer* l, string *ids, uint *count) {
 static void parse_argged(lexer* l, string* id, string* args, uint* count) {
     lexer_next(l, id);
     parse_ids(l, args, count);
+}
+
+static void parse_types(lexer* l, uint* count, string* parents, string* types) {
+    *count = 0;
+    enum kind kind;
+    bool parent  = false;
+    uint p_index = UINT_MAX;
+    while ((kind = lexer_next(l, &types[*count])) != RPAREN) {
+        if (kind == ID) {
+            if (parent) {
+                for (uint i = p_index; i < *count; i++)
+                    parents[i] = types[*count];
+                p_index = UINT_MAX;
+            }
+            if (!str_contains(&types[*count], types, *count)) {
+                parents[*count].ptr = NULL;
+                parents[*count].len = 0u;
+                (*count)++;
+            }
+            if (!parent && p_index >= *count)
+                p_index = *count - 1;
+            parent = false;
+        } else if (kind == DASH)
+            parent = true;
+    }
 }
 
 static void parse_predicates(lexer* l, struct predicate* predicates, uint* count) {
@@ -252,6 +284,7 @@ void parse_domain_(struct domain* d, const char* str) {
         switch (keyword) {
         case KEYWORD_NAME:         parse_id(&l, &d->name); break;
         case KEYWORD_REQUIREMENTS: parse_ids(&l, d->requirements, &d->requirement_count); break;
+        case KEYWORD_TYPES:        parse_types(&l, &d->type_count, d->type_parents, d->types); break;
         case KEYWORD_PREDICATES:   parse_predicates(&l, d->predicates, &d->predicate_count); break;
         case KEYWORD_ACTION:       parse_action(&l, &d->actions[d->action_count++]); break;
         default:
@@ -260,6 +293,7 @@ void parse_domain_(struct domain* d, const char* str) {
         }
     }
     INFO("Domain:     %.*s", d->name.len, d->name.ptr);
+    INFO("Types:      %d", d->type_count);
     INFO("Predicates: %d", d->predicate_count);
     INFO("Actions:    %d", d->action_count);
 }
@@ -323,4 +357,28 @@ struct problem parse_problem(const char* str) {
     struct problem problem;
     parse_problem_(&problem, str);
     return problem;
+}
+
+static void expression_free(struct expression* exp) {
+    switch (exp->kind) {
+        case E_ATOM: break;
+        case E_NOT:
+            expression_free(exp->unary);
+            break;
+        case E_AND:
+        case E_OR:
+            for (uint i = 0; i < exp->nary.count; i++)
+                expression_free(exp->nary.exps[i]);
+            break;
+    }
+    free(exp);
+}
+
+void domain_free(struct domain* domain) {
+    for (uint i = 0; i < domain->action_count; i++) {
+        if (domain->actions[i].precondition)
+            expression_free(domain->actions[i].precondition);
+        if (domain->actions[i].effect)
+            expression_free(domain->actions[i].effect);
+    }
 }

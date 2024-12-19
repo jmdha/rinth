@@ -20,5 +20,6 @@ typedef struct {
     uint        len;
 } string;
 
+bool str_contains(const string* str, const string* list, uint count);
 bool str_cmp(const string* a, const string* b);
 bool str_cmp_s(const string* a, const char* b);

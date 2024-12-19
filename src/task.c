@@ -252,3 +252,8 @@ struct task translate(const struct domain* domain, const struct problem* problem
     return task;
 
 }
+
+void task_free(struct task* task) {
+    state_free(task->init);
+    state_free(task->goal);
+}

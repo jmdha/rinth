@@ -6,6 +6,7 @@
 struct predicate {
     string name;
     uint   var_count;
+    string var_types[MAX_VARIABLES];
     string vars[MAX_VARIABLES];
 };
 
@@ -28,6 +29,7 @@ struct expression {
 struct action {
            string      name;
            uint        var_count;
+           string      var_types[MAX_VARIABLES];
            string      vars[MAX_VARIABLES];
     struct expression* precondition;
     struct expression* effect;
@@ -37,6 +39,9 @@ struct domain {
            string    name;
            uint      requirement_count;
            string    requirements[MAX_REQUIREMENTS];
+           uint      type_count;
+           string    type_parents[MAX_TYPES];
+           string    types[MAX_TYPES];
            uint      predicate_count;
     struct predicate predicates[MAX_PREDICATES];
            uint      action_count;
@@ -64,3 +69,4 @@ void           parse_domain_(struct domain*, const char*);
 void           parse_problem_(struct problem*, const char*);
 struct domain  parse_domain(const char*);
 struct problem parse_problem(const char*);
+void           domain_free(struct domain*);

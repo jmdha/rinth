@@ -21,3 +21,4 @@ struct task {
 };
 
 struct task translate(const struct domain*, const struct problem*);
+void task_free(struct task*);

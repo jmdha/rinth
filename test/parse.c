@@ -20,6 +20,123 @@ UTEST(parse, domain_name) {
     ASSERT_TRUE(str_cmp_s(&domain.name, "abc"));
 }
 
+UTEST(parse, domain_types_untyped) {
+    const char *str = "(define)";
+
+    struct domain domain = parse_domain(str);
+
+    ASSERT_EQ(domain.type_count, 0u);
+}
+
+UTEST(parse, domain_types_empty) {
+    const char *str = "(define (:types))";
+
+    struct domain domain = parse_domain(str);
+
+    ASSERT_EQ(domain.type_count, 0u);
+}
+
+UTEST(parse, domain_types_single) {
+    const char *str = "(define (:types object))";
+
+    struct domain domain = parse_domain(str);
+
+    ASSERT_EQ(domain.type_count, 1u);
+    ASSERT_TRUE(str_cmp_s(&domain.types[0], "object"));
+    ASSERT_EQ(domain.type_parents[0].len, 0u);
+    ASSERT_EQ(domain.type_parents[0].ptr, NULL);
+}
+
+UTEST(parse, domain_types_parent) {
+    const char *str = "(define (:types a - b))";
+
+    struct domain domain = parse_domain(str);
+
+    ASSERT_EQ(domain.type_count, 2u);
+    ASSERT_TRUE(str_cmp_s(&domain.types[0], "a"));
+    ASSERT_TRUE(str_cmp_s(&domain.types[1], "b"));
+    ASSERT_TRUE(str_cmp_s(&domain.type_parents[0], "b"));
+    ASSERT_EQ(domain.type_parents[1].len, 0u);
+    ASSERT_EQ(domain.type_parents[1].ptr, NULL);
+}
+
+UTEST(parse, domain_types_multichild) {
+    const char *str = "(define (:types a b - c))";
+
+    struct domain domain = parse_domain(str);
+
+    ASSERT_EQ(domain.type_count, 3u);
+    ASSERT_TRUE(str_cmp_s(&domain.types[0], "a"));
+    ASSERT_TRUE(str_cmp_s(&domain.types[1], "b"));
+    ASSERT_TRUE(str_cmp_s(&domain.types[2], "c"));
+    ASSERT_TRUE(str_cmp_s(&domain.type_parents[0], "c"));
+    ASSERT_TRUE(str_cmp_s(&domain.type_parents[1], "c"));
+    ASSERT_EQ(domain.type_parents[2].len, 0u);
+    ASSERT_EQ(domain.type_parents[2].ptr, NULL);
+}
+
+UTEST(parse, domain_types_multiparent) {
+    const char *str = "(define (:types a - b c - d))";
+
+    struct domain domain = parse_domain(str);
+
+    ASSERT_EQ(domain.type_count, 4u);
+    ASSERT_TRUE(str_cmp_s(&domain.types[0], "a"));
+    ASSERT_TRUE(str_cmp_s(&domain.types[1], "b"));
+    ASSERT_TRUE(str_cmp_s(&domain.types[2], "c"));
+    ASSERT_TRUE(str_cmp_s(&domain.types[3], "d"));
+    ASSERT_TRUE(str_cmp_s(&domain.type_parents[0], "b"));
+    ASSERT_TRUE(str_cmp_s(&domain.type_parents[2], "d"));
+    ASSERT_EQ(domain.type_parents[3].len, 0u);
+    ASSERT_EQ(domain.type_parents[3].ptr, NULL);
+}
+
+UTEST(parse, domain_types_orphan) {
+    const char *str = "(define (:types a - b c))";
+
+    struct domain domain = parse_domain(str);
+
+    ASSERT_EQ(domain.type_count, 3u);
+    ASSERT_TRUE(str_cmp_s(&domain.types[0], "a"));
+    ASSERT_TRUE(str_cmp_s(&domain.types[1], "b"));
+    ASSERT_TRUE(str_cmp_s(&domain.types[2], "c"));
+    ASSERT_TRUE(str_cmp_s(&domain.type_parents[0], "b"));
+    ASSERT_EQ(domain.type_parents[2].len, 0u);
+    ASSERT_EQ(domain.type_parents[2].ptr, NULL);
+}
+
+UTEST(parse, domain_types_grandparents) {
+    const char *str = "(define (:types a - b b - c))";
+
+    struct domain domain = parse_domain(str);
+
+    ASSERT_EQ(domain.type_count, 3u);
+    ASSERT_TRUE(str_cmp_s(&domain.types[0], "a"));
+    ASSERT_TRUE(str_cmp_s(&domain.types[1], "b"));
+    ASSERT_TRUE(str_cmp_s(&domain.types[2], "c"));
+    ASSERT_TRUE(str_cmp_s(&domain.type_parents[0], "b"));
+    ASSERT_TRUE(str_cmp_s(&domain.type_parents[1], "c"));
+    ASSERT_EQ(domain.type_parents[2].len, 0u);
+    ASSERT_EQ(domain.type_parents[2].ptr, NULL);
+}
+
+UTEST(parse, domain_types_grandchildren) {
+    const char *str = "(define (:types a - b b c - d))";
+
+    struct domain domain = parse_domain(str);
+
+    ASSERT_EQ(domain.type_count, 4u);
+    ASSERT_TRUE(str_cmp_s(&domain.types[0], "a"));
+    ASSERT_TRUE(str_cmp_s(&domain.types[1], "b"));
+    ASSERT_TRUE(str_cmp_s(&domain.types[2], "c"));
+    ASSERT_TRUE(str_cmp_s(&domain.types[3], "d"));
+    ASSERT_TRUE(str_cmp_s(&domain.type_parents[0], "b"));
+    ASSERT_TRUE(str_cmp_s(&domain.type_parents[1], "d"));
+    ASSERT_TRUE(str_cmp_s(&domain.type_parents[2], "d"));
+    ASSERT_EQ(domain.type_parents[3].len, 0u);
+    ASSERT_EQ(domain.type_parents[3].ptr, NULL);
+}
+
 UTEST(parse, domain_predicates) {
     const char *str = "(define (:predicates (a) (b ?x) (c ?x ?y)))";
 
