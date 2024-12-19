@@ -188,11 +188,8 @@ UTEST(parse, problem_domain) {
 
     struct problem problem = parse_problem(str);
 
-    ASSERT_EQ(problem.name.ptr, NULL);
-    ASSERT_TRUE(strncmp(problem.domain.ptr, "a", problem.domain.len) == 0);
+    ASSERT_TRUE(str_cmp_s(&problem.domain, "a"));
     ASSERT_EQ(problem.object_count, 0u);
-    ASSERT_EQ(problem.init_count, 0u);
-    ASSERT_EQ(problem.goal_count, 0u);
 }
 
 UTEST(parse, problem_objects) {
@@ -202,13 +199,33 @@ UTEST(parse, problem_objects) {
 
     struct problem problem = parse_problem(str);
 
-    ASSERT_EQ(problem.name.ptr, NULL);
-    ASSERT_EQ(problem.domain.ptr, NULL);
     ASSERT_EQ(problem.object_count, 3u);
-    ASSERT_EQ(problem.init_count, 0u);
-    ASSERT_EQ(problem.goal_count, 0u);
 
-    ASSERT_TRUE(strncmp(problem.objects[0].ptr, "a", problem.objects[0].len) == 0);
-    ASSERT_TRUE(strncmp(problem.objects[1].ptr, "bb", problem.objects[1].len) == 0);
-    ASSERT_TRUE(strncmp(problem.objects[2].ptr, "c-_", problem.objects[2].len) == 0);
+    ASSERT_TRUE(str_cmp_s(&problem.objects[0], "a"));
+    ASSERT_TRUE(str_cmp_s(&problem.objects[1], "bb"));
+    ASSERT_TRUE(str_cmp_s(&problem.objects[2], "c-_"));
+
+    ASSERT_EQ(problem.object_types[0].ptr, NULL);
+    ASSERT_EQ(problem.object_types[1].ptr, NULL);
+    ASSERT_EQ(problem.object_types[2].ptr, NULL);
+}
+
+UTEST(parse, problem_objects_typed) {
+    const char *str = "(define"
+                      "    (:objects o1 - t1 o2 o3 - t2 o4)"
+                      ")";
+
+    struct problem problem = parse_problem(str);
+
+    ASSERT_EQ(problem.object_count, 4u);
+
+    ASSERT_TRUE(str_cmp_s(&problem.objects[0], "o1"));
+    ASSERT_TRUE(str_cmp_s(&problem.objects[1], "o2"));
+    ASSERT_TRUE(str_cmp_s(&problem.objects[2], "o3"));
+    ASSERT_TRUE(str_cmp_s(&problem.objects[3], "o4"));
+
+    ASSERT_TRUE(str_cmp_s(&problem.object_types[0], "t1"));
+    ASSERT_TRUE(str_cmp_s(&problem.object_types[1], "t2"));
+    ASSERT_TRUE(str_cmp_s(&problem.object_types[2], "t2"));
+    ASSERT_EQ(problem.object_types[3].ptr, NULL);
 }

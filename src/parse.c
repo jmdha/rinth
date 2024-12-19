@@ -180,21 +180,21 @@ static void parse_argged(lexer* l, string* id, string* args, uint* count) {
     parse_ids(l, args, count);
 }
 
-static void parse_types(lexer* l, uint* count, string* parents, string* types) {
+static void parse_typed(lexer* l, uint* count, string* names, string* types, bool save) {
     *count = 0;
     enum kind kind;
     bool parent  = false;
     uint p_index = UINT_MAX;
-    while ((kind = lexer_next(l, &types[*count])) != RPAREN) {
+    while ((kind = lexer_next(l, &names[*count])) != RPAREN) {
         if (kind == ID) {
             if (parent) {
                 for (uint i = p_index; i < *count; i++)
-                    parents[i] = types[*count];
+                    types[i] = names[*count];
                 p_index = UINT_MAX;
             }
-            if (!str_contains(&types[*count], types, *count)) {
-                parents[*count].ptr = NULL;
-                parents[*count].len = 0u;
+            if ((save || !parent) && !str_contains(&names[*count], names, *count)) {
+                types[*count].ptr = NULL;
+                types[*count].len = 0u;
                 (*count)++;
             }
             if (!parent && p_index >= *count)
@@ -284,7 +284,7 @@ void parse_domain_(struct domain* d, const char* str) {
         switch (keyword) {
         case KEYWORD_NAME:         parse_id(&l, &d->name); break;
         case KEYWORD_REQUIREMENTS: parse_ids(&l, d->requirements, &d->requirement_count); break;
-        case KEYWORD_TYPES:        parse_types(&l, &d->type_count, d->type_parents, d->types); break;
+        case KEYWORD_TYPES:        parse_typed(&l, &d->type_count, d->types, d->type_parents, true); break;
         case KEYWORD_PREDICATES:   parse_predicates(&l, d->predicates, &d->predicate_count); break;
         case KEYWORD_ACTION:       parse_action(&l, &d->actions[d->action_count++]); break;
         default:
@@ -333,7 +333,7 @@ void parse_problem_(struct problem* p, const char* str) {
         switch (keyword) {
         case KEYWORD_NAME:    parse_id(&l, &p->name); break;
         case KEYWORD_DOMAIN:  parse_id(&l, &p->domain); break;
-        case KEYWORD_OBJECTS: parse_ids(&l, p->objects, &p->object_count); break;
+        case KEYWORD_OBJECTS: parse_typed(&l, &p->object_count, p->objects, p->object_types, false); break;
         case KEYWORD_INIT:    parse_facts(&l, p->inits, &p->init_count); break;
         case KEYWORD_GOAL:    parse_goal(&l, p->goals, &p->goal_count); break;
         default:

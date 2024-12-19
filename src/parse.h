@@ -58,6 +58,7 @@ struct problem {
            string domain;
            string name;
            uint   object_count;
+           string object_types[MAX_OBJECTS];
            string objects[MAX_OBJECTS];
            uint   init_count;
     struct fact   inits[MAX_INITS];
