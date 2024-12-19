@@ -209,7 +209,8 @@ static void parse_predicates(lexer* l, struct predicate* predicates, uint* count
     *count = 0;
     while(lexer_next(l, NULL) == LPAREN) {
         struct predicate* predicate = &predicates[(*count)++];
-        parse_argged(l, &predicate->name, predicate->vars, &predicate->var_count);
+        lexer_next(l, &predicate->name);
+        parse_typed(l, &predicate->var_count, predicate->vars, predicate->var_types, false);
     }
 }
 
@@ -255,7 +256,8 @@ static void parse_action(lexer* l, struct action* action) {
         TRACE("Parse %s of action %.*s", KEYWORD_NAMES[keyword], action->name.len, action->name.ptr);
         lexer_expect(l, LPAREN);
         switch (keyword) {
-        case KEYWORD_PARAMETERS:   parse_ids(l, action->vars, &action->var_count); break;
+        case KEYWORD_PARAMETERS:   
+                parse_typed(l, &action->var_count, action->vars, action->var_types, false); break;
         case KEYWORD_PRECONDITION: parse_expression(l, &action->precondition); break;
         case KEYWORD_EFFECT:       parse_expression(l, &action->effect); break;
         default:

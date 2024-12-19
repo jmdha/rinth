@@ -154,6 +154,26 @@ UTEST(parse, domain_predicates) {
     ASSERT_TRUE(str_cmp_s(&domain.predicates[2].vars[1], "?y"));
 }
 
+UTEST(parse, domain_predicates_typed) {
+    const char *str = "(define (:predicates (a ?a - t1) (b ?a ?b - t2 ?c)))";
+
+    struct domain domain = parse_domain(str);
+
+    ASSERT_EQ(domain.predicate_count, 2u);
+    ASSERT_TRUE(str_cmp_s(&domain.predicates[0].name, "a"));
+    ASSERT_EQ(domain.predicates[0].var_count, 1u);
+    ASSERT_TRUE(str_cmp_s(&domain.predicates[0].vars[0], "?a"));
+    ASSERT_TRUE(str_cmp_s(&domain.predicates[0].var_types[0], "t1"));
+    ASSERT_TRUE(str_cmp_s(&domain.predicates[1].name, "b"));
+    ASSERT_EQ(domain.predicates[1].var_count, 3u);
+    ASSERT_TRUE(str_cmp_s(&domain.predicates[1].vars[0], "?a"));
+    ASSERT_TRUE(str_cmp_s(&domain.predicates[1].vars[1], "?b"));
+    ASSERT_TRUE(str_cmp_s(&domain.predicates[1].vars[2], "?c"));
+    ASSERT_TRUE(str_cmp_s(&domain.predicates[1].var_types[0], "t2"));
+    ASSERT_TRUE(str_cmp_s(&domain.predicates[1].var_types[1], "t2"));
+    ASSERT_TRUE(!domain.predicates[1].var_types[2].ptr);
+}
+
 UTEST(parse, problem_empty) {
     const char *str = "(define"
                       ")";
