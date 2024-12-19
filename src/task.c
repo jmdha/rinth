@@ -32,53 +32,6 @@ u16 predicate_index(
     return pred_index;
 }
 
-u16 object_index(
-    const string* str,
-    const string* objects,
-    const uint    count
-) {
-    uint pred_index = UINT_MAX;
-    for (uint t = 0; t < count; t++) {
-        if (str_cmp(str, &objects[t])) {
-            pred_index = t;
-            break;
-        }
-    }
-    if (pred_index == UINT_MAX) {
-        fprintf(
-            stderr, "%.*s: Undefined object referenced\n", 
-            str->len, 
-            str->ptr
-        );
-        exit(1);
-    }
-    return pred_index;
-}
-
-static uint var_index(
-    const string* str,
-    const string* vars,
-    const uint    var_count
-) {
-    uint index = UINT_MAX;
-    for (uint t = 0; t < var_count; t++) {
-        if (str_cmp(str, &vars[t])) {
-            index = t;
-            break;
-        }
-    }
-    if (index == UINT_MAX) {
-        fprintf(
-            stderr, "%.*s: Undefined variable\n", 
-            str->len, 
-            str->ptr
-        );
-        exit(1);
-    }
-    return index;
-
-}
-
 static void convert_facts(
     state*                  s,
     const struct fact*      facts,
@@ -92,7 +45,7 @@ static void convert_facts(
         u16 args[16];
         args[0] = predicate_index(&facts[i].predicate, predicates, predicate_count);
         for (uint t = 0; t < facts[i].arg_count; t++)
-            args[1 + t] = object_index(&facts[i].args[t], objects, object_count);
+            args[1 + t] = str_index(&facts[i].args[t], objects, object_count);
         state_insert(s, 1 + facts[i].arg_count, args);
     }
 }
@@ -143,7 +96,7 @@ static uint convert_expression(
                 );
                 atoms[count].arg_count = e_val.exp->atom.arg_count;
                 for (uint i = 0; i < e_val.exp->atom.arg_count; i++)
-                    atoms[count].args[i] = var_index(e_val.exp->atom.args, vars, var_count);
+                    atoms[count].args[i] = str_index(&e_val.exp->atom.args[i], vars, var_count);
                 count++;
                 break;
             case E_NOT:

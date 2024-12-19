@@ -1,12 +1,17 @@
 #include <string.h>
+#include <limits.h>
 
 #include "misc.h"
 
-bool str_contains(const string* str, const string* list, uint count) {
+uint str_index(const string* str, const string* list, uint count) {
     for (uint i = 0; i < count; i++)
         if (str_cmp(str, &list[i]))
-            return true;
-    return false;
+            return i;
+    return UINT_MAX;
+}
+
+bool str_contains(const string* str, const string* list, uint count) {
+    return str_index(str, list, count) != UINT_MAX;
 }
 
 bool str_cmp(const string *a, const string *b) {
