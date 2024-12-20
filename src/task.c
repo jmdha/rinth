@@ -32,6 +32,27 @@ u16 predicate_index(
     return pred_index;
 }
 
+static void convert_types_to_facts(
+    state*        s,
+    const uint    type_count,
+    const string* type_parents,
+    const string* types,
+    const uint    object_count,
+    const string* object_types
+) {
+    u16 args[16];
+    for (uint i = 0; i < object_count; i++) {
+        const string* type = &object_types[i];
+        while (type->ptr) {
+            const uint type_index = str_index(type, types, type_count);
+            args[0] = type_index;
+            args[1] = i;
+            state_insert(s, 2, args);
+            type = &type_parents[type_index];
+        }
+    }
+}
+
 static void convert_facts(
     state*                  s,
     const struct fact*      facts,
@@ -41,8 +62,8 @@ static void convert_facts(
     const string*           objects,
     const uint              object_count
 ) {
+    u16 args[16];
     for (uint i = 0; i < len; i++) {
-        u16 args[16];
         args[0] = predicate_index(&facts[i].predicate, predicates, predicate_count);
         for (uint t = 0; t < facts[i].arg_count; t++)
             args[1 + t] = str_index(&facts[i].args[t], objects, object_count);
@@ -159,25 +180,45 @@ static void convert_action(
 
 struct task translate(const struct domain* domain, const struct problem* problem) {
     struct task task = {0};
+    uint offset;
 
     task.domain_name  = domain->name;
     task.problem_name = problem->name;
 
-    TRACE("Translate predicates");
-    task.predicate_count = domain->predicate_count;
-    for (uint i = 0; i < domain->predicate_count; i++) {
-        task.predicate_vars[i] = domain->predicates[i].var_count;
-        task.predicates[i]     = domain->predicates[i].name;
+    TRACE("Translate types");
+    task.predicate_count = 0;
+    for (uint i = 0; i < domain->type_count; i++) {
+        task.predicates[i]     = domain->types[i];
+        task.predicate_vars[i] = 1;
+        task.predicate_count++;
     }
 
+    TRACE("Translate predicates");
+    offset = task.predicate_count;
+    for (uint i = 0; i < domain->predicate_count; i++) {
+        task.predicates[offset + i]     = domain->predicates[i].name;
+        task.predicate_vars[offset + i] = domain->predicates[i].var_count;
+        task.predicate_count++;
+    }
+    INFO("Predicates: %d", task.predicate_count);
+
     TRACE("Translate objects");
-    task.object_count = problem->object_count;
-    for (uint i = 0; i < problem->object_count; i++)
+    task.object_count   = 0;
+    for (uint i = 0; i < problem->object_count; i++) {
         task.objects[i] = problem->objects[i];
+        task.object_count++;
+    }
+    INFO("Objects: %d", task.object_count);
 
     task.init = state_new();
     task.goal = state_new();
 
+    TRACE("Translate type facts");
+    convert_types_to_facts(
+        task.init,
+        domain->type_count, domain->type_parents, domain->types,
+        problem->object_count, problem->object_types
+    );
     TRACE("Translate init");
     convert_facts(
         task.init, problem->inits, problem->init_count,
