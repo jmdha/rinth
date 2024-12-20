@@ -15,5 +15,5 @@ uint   state_count   (const struct state*);                      // How many fac
 uint   state_size    (const struct state*);                      // Size of state in bytes
 u64    state_hash    (const struct state*);                      // Generate a hash of state
 void   state_free  (struct state*);                              // Frees state allocation
-void   state_insert(struct state*, uint, u16*);                   // Inserts fact into state
-void   state_remove(struct state*, uint, u16*);                   // Removes fact from state
+void   state_insert(struct state*, uint, u16*);                  // Inserts fact into state
+void   state_remove(struct state*, uint, u16*);                  // Removes fact from state

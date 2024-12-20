@@ -12,7 +12,9 @@ int main(int, char **argv) {
     struct domain domain = parse_domain(*fbuf_domain);
     struct problem problem = parse_problem(*fbuf_problem);
     struct task task = translate(&domain, &problem);
+    domain_free(&domain);
     f_close(fbuf_domain);
     f_close(fbuf_problem);
+    task_free(&task);
     return 0;
 }
