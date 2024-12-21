@@ -10,6 +10,7 @@ UTEST(parse, domain_empty) {
     ASSERT_EQ(domain.requirement_count, 0u);
     ASSERT_EQ(domain.predicate_count, 0u);
     ASSERT_EQ(domain.action_count, 0u);
+    domain_free(&domain);
 }
 
 UTEST(parse, domain_name) {
@@ -18,6 +19,7 @@ UTEST(parse, domain_name) {
     struct domain domain = parse_domain(str);
 
     ASSERT_TRUE(str_cmp_s(&domain.name, "abc"));
+    domain_free(&domain);
 }
 
 UTEST(parse, domain_types_untyped) {
@@ -26,6 +28,7 @@ UTEST(parse, domain_types_untyped) {
     struct domain domain = parse_domain(str);
 
     ASSERT_EQ(domain.type_count, 0u);
+    domain_free(&domain);
 }
 
 UTEST(parse, domain_types_empty) {
@@ -34,6 +37,7 @@ UTEST(parse, domain_types_empty) {
     struct domain domain = parse_domain(str);
 
     ASSERT_EQ(domain.type_count, 0u);
+    domain_free(&domain);
 }
 
 UTEST(parse, domain_types_single) {
@@ -45,6 +49,7 @@ UTEST(parse, domain_types_single) {
     ASSERT_TRUE(str_cmp_s(&domain.types[0], "object"));
     ASSERT_EQ(domain.type_parents[0].len, 0u);
     ASSERT_EQ(domain.type_parents[0].ptr, NULL);
+    domain_free(&domain);
 }
 
 UTEST(parse, domain_types_parent) {
@@ -58,6 +63,7 @@ UTEST(parse, domain_types_parent) {
     ASSERT_TRUE(str_cmp_s(&domain.type_parents[0], "b"));
     ASSERT_EQ(domain.type_parents[1].len, 0u);
     ASSERT_EQ(domain.type_parents[1].ptr, NULL);
+    domain_free(&domain);
 }
 
 UTEST(parse, domain_types_multichild) {
@@ -73,6 +79,7 @@ UTEST(parse, domain_types_multichild) {
     ASSERT_TRUE(str_cmp_s(&domain.type_parents[1], "c"));
     ASSERT_EQ(domain.type_parents[2].len, 0u);
     ASSERT_EQ(domain.type_parents[2].ptr, NULL);
+    domain_free(&domain);
 }
 
 UTEST(parse, domain_types_multiparent) {
@@ -89,6 +96,7 @@ UTEST(parse, domain_types_multiparent) {
     ASSERT_TRUE(str_cmp_s(&domain.type_parents[2], "d"));
     ASSERT_EQ(domain.type_parents[3].len, 0u);
     ASSERT_EQ(domain.type_parents[3].ptr, NULL);
+    domain_free(&domain);
 }
 
 UTEST(parse, domain_types_orphan) {
@@ -103,6 +111,7 @@ UTEST(parse, domain_types_orphan) {
     ASSERT_TRUE(str_cmp_s(&domain.type_parents[0], "b"));
     ASSERT_EQ(domain.type_parents[2].len, 0u);
     ASSERT_EQ(domain.type_parents[2].ptr, NULL);
+    domain_free(&domain);
 }
 
 UTEST(parse, domain_types_grandparents) {
@@ -118,6 +127,7 @@ UTEST(parse, domain_types_grandparents) {
     ASSERT_TRUE(str_cmp_s(&domain.type_parents[1], "c"));
     ASSERT_EQ(domain.type_parents[2].len, 0u);
     ASSERT_EQ(domain.type_parents[2].ptr, NULL);
+    domain_free(&domain);
 }
 
 UTEST(parse, domain_types_grandchildren) {
@@ -135,6 +145,7 @@ UTEST(parse, domain_types_grandchildren) {
     ASSERT_TRUE(str_cmp_s(&domain.type_parents[2], "d"));
     ASSERT_EQ(domain.type_parents[3].len, 0u);
     ASSERT_EQ(domain.type_parents[3].ptr, NULL);
+    domain_free(&domain);
 }
 
 UTEST(parse, domain_predicates) {
@@ -152,6 +163,7 @@ UTEST(parse, domain_predicates) {
     ASSERT_TRUE(str_cmp_s(&domain.predicates[1].vars[0], "?x"));
     ASSERT_TRUE(str_cmp_s(&domain.predicates[2].vars[0], "?x"));
     ASSERT_TRUE(str_cmp_s(&domain.predicates[2].vars[1], "?y"));
+    domain_free(&domain);
 }
 
 UTEST(parse, domain_predicates_typed) {
@@ -172,6 +184,7 @@ UTEST(parse, domain_predicates_typed) {
     ASSERT_TRUE(str_cmp_s(&domain.predicates[1].var_types[0], "t2"));
     ASSERT_TRUE(str_cmp_s(&domain.predicates[1].var_types[1], "t2"));
     ASSERT_TRUE(!domain.predicates[1].var_types[2].ptr);
+    domain_free(&domain);
 }
 
 UTEST(parse, problem_empty) {

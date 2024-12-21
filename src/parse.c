@@ -7,6 +7,8 @@
 #include "parse.h"
 #include "log.h"
 
+// TODO: Parses (:predicates (conn ? ?)) as if conn has one parameter
+
 enum kind { 
     EOI,
     LPAREN,

@@ -17,3 +17,5 @@ u64    state_hash    (const struct state*);                      // Generate a h
 void   state_free  (struct state*);                              // Frees state allocation
 void   state_insert(struct state*, uint, u16*);                  // Inserts fact into state
 void   state_remove(struct state*, uint, u16*);                  // Removes fact from state
+void   state_step_reset(struct state*);                          // Resets state_step
+bool   state_step(struct state*, uint*, u16*);                   // Set parameters to next fact

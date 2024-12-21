@@ -14,6 +14,7 @@ static u64 create_fact(uint len, u16* args) {
 }
 
 struct state {
+    uint step;
     uint count;
     u64* facts;
 };
@@ -109,4 +110,16 @@ void state_remove(struct state* s, uint len, u16* args) {
             return;
         }
     }
+}
+
+void state_step_reset(struct state* s) {
+    s->step = 0;
+}
+
+bool state_step(struct state* s, uint* predicate, u16* args) {
+    if (s->step >= state_count(s))
+        return false;
+    *predicate = (u16) s->facts[s->step];
+    s->step++;
+    return true;
 }
