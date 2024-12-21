@@ -11,7 +11,7 @@ struct task {
     string problem_name;                   // Name of problem
     uint   predicate_count;                // How many predicates exist
     uint   predicate_vars[MAX_PREDICATES]; // How many variables each predicate has
-    string predicates[MAX_PREDICATES];     // The name of each variable
+    string predicates[MAX_PREDICATES];     // The name of each predicate
     uint   object_count;                   // How many objects exist
     string objects[MAX_OBJECTS];           // The name of each object
     state* init;                           // The initial state
