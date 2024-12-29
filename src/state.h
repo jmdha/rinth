@@ -8,6 +8,7 @@ typedef struct state state; // A set of facts
 typedef struct state_iter state_iter; // An iterator of facts
 
 state* state_new();                                              // Create an empty state
+state* state_clone(const state*);                                // Clone a state
 bool   state_contains(const struct state*, u16, uint, u16*);     // Does state contain fact
 bool   state_equal   (const struct state*, const struct state*); // Are states equal
 bool   state_covers  (const struct state*, const struct state*); // Is the latter state a subset

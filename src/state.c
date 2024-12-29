@@ -25,6 +25,14 @@ state* state_new() {
     return s;
 }
 
+state* state_clone(const state* old) {
+    state* new = malloc(sizeof(state));
+    new->count = old->count;
+    new->facts = malloc(new->count * sizeof(u64));
+    memcpy(new->facts, old->facts, new->count * sizeof(u64));
+    return new;
+}
+
 static bool state_contains_(const struct state* s, u64 fact) {
     for (uint i = 0; i < s->count; i++)
         if (fact == s->facts[i])

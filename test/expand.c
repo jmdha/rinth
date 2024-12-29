@@ -32,6 +32,21 @@ const char* CELLS_PROBLEM_0 =
     "))"
     ")";
 
+const char* CELLS_PROBLEM_1 = 
+    "(define"
+    "(:objects c0 c1 c2 c3 c4)"
+    "(:init"
+    "    (conn c0 c1)"
+    "    (conn c0 c2)"
+    "    (conn c0 c3)"
+    "    (conn c0 c4)"
+    "    (on c0)"
+    ")"
+    "(:goal (and"
+    "    (on c1)"
+    "))"
+    ")";
+
 UTEST(expand, cells_0) {
     struct domain domain   = parse_domain(CELLS_DOMAIN);
     struct problem problem = parse_problem(CELLS_PROBLEM_0);
@@ -39,7 +54,19 @@ UTEST(expand, cells_0) {
     expand_init(&task);
 
     expand(task.init);
-    ASSERT_EQ(expand_count(), 1u);
+    ASSERT_EQ(expand_count(task.init), 1u);
+    domain_free(&domain);
+    task_free(&task);
+}
+
+UTEST(expand, cells_1) {
+    struct domain domain   = parse_domain(CELLS_DOMAIN);
+    struct problem problem = parse_problem(CELLS_PROBLEM_1);
+    struct task task       = translate(&domain, &problem);
+    expand_init(&task);
+
+    expand(task.init);
+    ASSERT_EQ(expand_count(task.init), 4u);
     domain_free(&domain);
     task_free(&task);
 }

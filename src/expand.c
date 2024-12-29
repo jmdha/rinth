@@ -2,14 +2,19 @@
 #include <stdlib.h>
 #include <sqlite3.h>
 #include <assert.h>
+#include <string.h>
 
 #include "bounds.h"
 #include "expand.h"
 #include "log.h"
+#include "scheme.h"
 #include "state.h"
 
 sqlite3*      DB                        = NULL;
+uint          CLEAR_COUNT               = 0;
+sqlite3_stmt* CLEARS[MAX_PREDICATES]    = {NULL};
 uint          ACTION_COUNT              = 0;
+Scheme        SCHEMES[MAX_SCHEMES];
 char*         ACTION_NAMES[MAX_ACTIONS] = {NULL};
 sqlite3_stmt* ACTIONS[MAX_ACTIONS]      = {NULL};
 uint          ACTIVE                    = 0;
@@ -40,6 +45,21 @@ static void exec_sql(char* sql) {
         fprintf(stderr, "%s\n", error);
         fprintf(stderr, "%s\n", sql);
         exit(1);
+    }
+}
+
+static void create_clear(const struct task* task) {
+    assert(DB);
+    char buffer[10000];
+    for (uint i = 0; i < task->predicate_count; i++) {
+        sprintf(buffer, "DELETE FROM \"%.*s\";", 
+                task->predicates[i].len, task->predicates[i].ptr);
+        const int rc = sqlite3_prepare_v2(DB, buffer, 32000, &CLEARS[CLEAR_COUNT++], NULL);
+        if (rc) {
+            fprintf(stderr, "%s\n", sqlite3_errmsg(DB));
+            fprintf(stderr, "%s\n", buffer);
+            exit(1);
+        }
     }
 }
 
@@ -134,8 +154,7 @@ static void create_inserts(const struct task* task) {
     assert(DB);
     for (uint i = 0; i < task->predicate_count; i++) {
         char* sql = insert_sql(&task->predicates[i], task->predicate_vars[i]);
-        const int rc = sqlite3_prepare_v2(DB, sql, 32000, &INSERTS[INSERT_COUNT++], NULL);
-        if (rc) {
+        if (sqlite3_prepare_v2(DB, sql, 32000, &INSERTS[INSERT_COUNT++], NULL)) {
             fprintf(stderr, "%s\n", sqlite3_errmsg(DB));
             fprintf(stderr, "%s\n", sql);
             exit(1);
@@ -161,31 +180,51 @@ static void populate(const state* s) {
 }
 
 void expand(const state* s) {
+    for (uint i = 0; i < CLEAR_COUNT; i++)
+        sqlite3_step(CLEARS[i]);
     populate(s);
     ACTIVE = 0;
     for (uint i = 0; i < ACTION_COUNT; i++)
         sqlite3_reset(ACTIONS[i]);
 }
 
-bool expand_step(uint* action, uint* len, uint* vals) {
+bool expand_step(const state* old, uint* action, state** new) {
     if (ACTIVE >= ACTION_COUNT) return false;
+    const uint index = ACTIVE;
     int code;
     if ((code = sqlite3_step(ACTIONS[ACTIVE])) != SQLITE_ROW) {
         if (code == SQLITE_DONE) {
             ACTIVE++;
-            return expand_step(action, len, vals);
+            return expand_step(old, action, new);
         } else {
             printf("%d\n", code);
             exit(1);
         }
     }
+    *action = index;
+    const uint len = sqlite3_column_count(ACTIONS[ACTIVE]);
+    u16 vals[16];
+    for (uint i = 0; i < len; i++)
+        vals[i] = sqlite3_column_int(ACTIONS[index], i);
+    *new = state_clone(old);
+    for (uint i = 0; i < SCHEMES[index].eff_count; i++) {
+        const Atom* atom = &SCHEMES[index].eff[i];
+        u16 args[16];
+        for (uint t = 0; t < atom->arg_count; t++)
+            args[t] = vals[atom->args[t]];
+        if (atom->val)
+            state_insert(*new, atom->predicate, atom->arg_count, args);
+        else
+            state_remove(*new, atom->predicate, atom->arg_count, args);
+    }
     return true;
 }
 
-uint expand_count() {
-    uint action, len, vals[100];
+uint expand_count(const state* old) {
+    uint action;
+    state* s;
     uint count = 0;
-    while (expand_step(&action, &len, vals))
+    while (expand_step(old, &action, &s))
         count++;
     return count;
 }
@@ -201,7 +240,14 @@ static void expand_fini() {
         ACTION_NAMES[i] = NULL;
         ACTIONS[i]      = NULL;
     }
+    memset(SCHEMES, 0, ACTION_COUNT * sizeof(Scheme));
     ACTION_COUNT = 0;
+    for (uint i = 0; i < INSERT_COUNT; i++) {
+        sqlite3_finalize(INSERTS[i]);
+        INSERTS[i]      = NULL;
+    }
+    INSERT_COUNT = 0;
+
 }
 
 void expand_init(const struct task* task) {
@@ -209,10 +255,14 @@ void expand_init(const struct task* task) {
     // In case of this being called multiple times
     // Prior instances are cleared first
     expand_fini();
+    for (uint i = 0; i < task->scheme_count; i++)
+        memcpy(&SCHEMES[i], &task->schemes[i], sizeof(Scheme));
     TRACE("Open SQL connection");
     sqlite3_open(":memory:", &DB);
     TRACE("Create SQL tables");
     create_tables(task);
+    TRACE("Prepare clear statement");
+    create_clear(task);
     TRACE("Prepare action statements");
     create_actions(task);
     TRACE("Prepare insert statements");

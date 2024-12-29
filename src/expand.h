@@ -4,5 +4,5 @@
 
 void expand_init(const struct task*);
 void expand(const state*);
-bool expand_step(uint*, uint*, uint*);
-uint expand_count();
+bool expand_step(const state*, uint*, state**);
+uint expand_count(const state*);
