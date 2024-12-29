@@ -37,8 +37,9 @@ UTEST(expand, cells_0) {
     struct problem problem = parse_problem(CELLS_PROBLEM_0);
     struct task task       = translate(&domain, &problem);
     expand_init(&task);
+
+    expand(task.init);
+    ASSERT_EQ(expand_count(), 1u);
     domain_free(&domain);
     task_free(&task);
-
-    ASSERT_EQ(expand_count(task.init), 1u);
 }

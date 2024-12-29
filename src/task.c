@@ -40,14 +40,13 @@ static void convert_types_to_facts(
     const uint    object_count,
     const string* object_types
 ) {
-    u16 args[16];
+    u16 arg;
     for (uint i = 0; i < object_count; i++) {
         const string* type = &object_types[i];
         while (type->ptr) {
             const uint type_index = str_index(type, types, type_count);
-            args[0] = type_index;
-            args[1] = i;
-            state_insert(s, 2, args);
+            arg = i;
+            state_insert(s, type_index, 1, &arg);
             type = &type_parents[type_index];
         }
     }
@@ -64,10 +63,10 @@ static void convert_facts(
 ) {
     u16 args[16];
     for (uint i = 0; i < len; i++) {
-        args[0] = predicate_index(&facts[i].predicate, predicates, predicate_count);
+        const u16 p = predicate_index(&facts[i].predicate, predicates, predicate_count);
         for (uint t = 0; t < facts[i].arg_count; t++)
-            args[1 + t] = str_index(&facts[i].args[t], objects, object_count);
-        state_insert(s, 1 + facts[i].arg_count, args);
+            args[t] = str_index(&facts[i].args[t], objects, object_count);
+        state_insert(s, p, facts[i].arg_count, args);
     }
 }
 

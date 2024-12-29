@@ -6,15 +6,14 @@
 
 #include "state.h"
 
-static u64 create_fact(uint len, u16* args) {
-    u64 fact = 0;
+static u64 create_fact(u16 predicate, uint len, u16* args) {
+    u64 fact = (u64) 1 + (u64) predicate;
     for (uint i = 0; i < len; i++)
-        fact |= (u64) args[i] << 16 * i;
+        fact |= ((u64) 1 + (u64) args[i]) << 16 * (1 + i);
     return fact;
 }
 
 struct state {
-    uint step;
     uint count;
     u64* facts;
 };
@@ -33,8 +32,8 @@ static bool state_contains_(const struct state* s, u64 fact) {
     return false;
 }
 
-bool state_contains(const struct state* s, uint len, u16* args) {
-    return state_contains_(s, create_fact(len, args));
+bool state_contains(const struct state* s, u16 predicate, uint len, u16* args) {
+    return state_contains_(s, create_fact(predicate, len, args));
 }
 
 bool state_equal(const struct state* a, const struct state* b) {
@@ -77,8 +76,12 @@ void state_free(struct state* s) {
     free(s);
 }
 
-void state_insert(struct state* s, uint len, u16* args) {
-    const u64 fact = create_fact(len, args);
+void state_clear(struct state* s) {
+    s->count = 0;
+}
+
+void state_insert(struct state* s, u16 predicate, uint len, u16* args) {
+    const u64 fact = create_fact(predicate, len, args);
     for (uint i = 0; i < s->count; i++) {
         if (s->facts[i] == fact) {
             return; // Already contains fact
@@ -93,8 +96,8 @@ void state_insert(struct state* s, uint len, u16* args) {
     s->facts[s->count - 1] = fact;
 }
 
-void state_remove(struct state* s, uint len, u16* args) {
-    const u64 fact = create_fact(len, args);
+void state_remove(struct state* s, u16 predicate, uint len, u16* args) {
+    const u64 fact = create_fact(predicate, len, args);
     for (uint i = 0; i < s->count; i++) {
         if (s->facts[i] == fact) {
             memmove(&s->facts[i], &s->facts[i + 1], sizeof(u64) * (s->count - i - 1));
@@ -112,14 +115,33 @@ void state_remove(struct state* s, uint len, u16* args) {
     }
 }
 
-void state_step_reset(struct state* s) {
-    s->step = 0;
+struct state_iter {
+    const state* state;
+    uint index;
+};
+
+state_iter* state_iter_new(const struct state* s) {
+    state_iter* si = malloc(sizeof(state_iter));
+    si->state = s;
+    si->index = 0;
+    return si;
 }
 
-bool state_step(struct state* s, uint* predicate, u16* args) {
-    if (s->step >= state_count(s))
-        return false;
-    *predicate = (u16) s->facts[s->step];
-    s->step++;
+void state_iter_free(struct state_iter* si) {
+    free(si);
+}
+
+bool state_iter_step(struct state_iter* si, u16* pred, uint* len, u16* args) {
+    if (si->index >= si->state->count) return false;
+    const u64 fact = si->state->facts[si->index++];
+    *len  = 0;
+    *pred = ((u16) fact) - 1;
+    for (uint i = 0; i < 3; i++) {
+        const u16 arg = fact >> 16 * (i + 1);
+        if (arg)
+            args[(*len)++] = arg - 1;
+        else
+            break;
+    }
     return true;
 }
