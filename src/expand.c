@@ -8,6 +8,7 @@
 #include "expand.h"
 #include "log.h"
 #include "scheme.h"
+#include "sql.h"
 #include "state.h"
 
 sqlite3*      DB                        = NULL;
@@ -20,23 +21,6 @@ sqlite3_stmt* ACTIONS[MAX_ACTIONS]      = {NULL};
 uint          ACTIVE                    = 0;
 uint          INSERT_COUNT              = 0;
 sqlite3_stmt* INSERTS[MAX_PREDICATES]   = {NULL};
-
-static char* table_sql(const string* name, uint columns) {
-    char* buffer_out = malloc(32000);
-    char* buffer_parameters = malloc(16000);
-    uint offset = 0;
-    for (uint i = 0; i < columns; i++) {
-        char* buffer_parameter = malloc(100);
-        sprintf(buffer_parameter, "arg%d", i);
-        offset += sprintf(buffer_parameters + offset, "%s INTEGER", buffer_parameter);
-        if (i != columns - 1)
-            offset += sprintf(buffer_parameters + offset, ", ");
-        free(buffer_parameter);
-    }
-    sprintf(buffer_out, "CREATE TABLE \"%.*s\" (%s);", name->len, name->ptr, buffer_parameters);
-    free(buffer_parameters);
-    return buffer_out;
-}
 
 static void exec_sql(char* sql) {
     char* error;
@@ -72,94 +56,35 @@ static void create_tables(const struct task* task) {
         exec_sql(buffer);
     }
     for (uint i = 0; i < task->predicate_count; i++) {
-        char* sql = table_sql(&task->predicates[i], task->predicate_vars[i]);
+        char sql[1000];
+        sql_table(sql, &task->predicates[i], task->predicate_vars[i]);
         exec_sql(sql);
-        free(sql);
     }
-}
-
-static char* action_sql(const struct task* task, const Scheme* scheme) {
-    char* buffer_out    = malloc(32000);
-    char* buffer_names  = malloc(512);
-    char* buffer_tables = malloc(512);
-    char* buffer_joins  = malloc(1024);
-    uint offset = 0;
-    for (uint i = 0; i < scheme->vars; i++) {
-        offset += sprintf(buffer_tables + offset, "_objects_ o%d", i);
-        if (i != scheme->vars - 1)
-            offset += sprintf(buffer_tables + offset, ", ");
-    }
-    offset = 0;
-    for (uint i = 0; i < scheme->vars; i++) {
-        offset += sprintf(buffer_names + offset, "o%d.arg0 as arg%d", i, i);
-        if (i != scheme->vars - 1)
-            offset += sprintf(buffer_names + offset, ", ");
-    }
-    offset = 0;
-    for (uint i = 0; i < scheme->pre_count; i++) {
-        const Atom* atom = &scheme->pre[i];
-        offset += sprintf(
-            buffer_joins + offset, "\nINNER JOIN \"%.*s\" AS t%d ON", 
-            task->predicates[atom->predicate].len,
-            task->predicates[atom->predicate].ptr,
-            i
-        );
-        for (uint t = 0; t < atom->arg_count; t++) {
-            offset += sprintf(
-                buffer_joins + offset,
-                " o%d.arg0 = t%d.arg%d", atom->args[t], i, t
-            );
-            if (t != atom->arg_count - 1)
-                offset += sprintf(buffer_joins + offset, " AND");
-        }
-    }
-    sprintf(buffer_out, "SELECT %s FROM %s%s;", buffer_names, buffer_tables, buffer_joins);
-    free(buffer_names);
-    free(buffer_tables);
-    free(buffer_joins);
-    return buffer_out;
 }
 
 static void create_actions(const struct task* task) {
     assert(DB);
     for (uint i = 0; i < task->scheme_count; i++) {
-        char* sql = action_sql(task, &task->schemes[i]);
-        sqlite3_prepare_v2(DB, sql, 32000, &ACTIONS[ACTION_COUNT++], NULL);
-        free(sql);
-    }
-}
-
-static char* insert_sql(const string* name, uint vars) {
-    char* buffer_out        = malloc(10000);
-    char* buffer_parameters = malloc(4000);
-    char* buffer_values     = malloc(4000);
-    uint offset_parameters  = 0;
-    uint offset_values      = 0;
-    for (uint i = 0; i < vars; i++) {
-        offset_parameters += sprintf(buffer_parameters + offset_parameters, "\"arg%d\"", i);
-        offset_values     += sprintf(buffer_values + offset_values, "?%d", i + 1);
-        if (i + 1 < vars) {
-           offset_parameters += sprintf(buffer_parameters + offset_parameters, ", ");
-           offset_values     += sprintf(buffer_values + offset_values, ", ");
+        char sql[1000];
+        sql_action(sql, task->predicates, &task->schemes[i]);
+        if (sqlite3_prepare_v2(DB, sql, 32000, &ACTIONS[ACTION_COUNT++], NULL)) {
+            fprintf(stderr, "%s\n", sqlite3_errmsg(DB));
+            fprintf(stderr, "%s\n", sql);
+            exit(1);
         }
     }
-    sprintf(buffer_out, "INSERT INTO \"%.*s\" (%s) VALUES (%s);", 
-            name->len, name->ptr, buffer_parameters, buffer_values);
-    free(buffer_parameters);
-    free(buffer_values);
-    return buffer_out;
 }
 
 static void create_inserts(const struct task* task) {
     assert(DB);
     for (uint i = 0; i < task->predicate_count; i++) {
-        char* sql = insert_sql(&task->predicates[i], task->predicate_vars[i]);
+        char sql[1000];
+        sql_insert(sql, &task->predicates[i], task->predicate_vars[i]);
         if (sqlite3_prepare_v2(DB, sql, 32000, &INSERTS[INSERT_COUNT++], NULL)) {
             fprintf(stderr, "%s\n", sqlite3_errmsg(DB));
             fprintf(stderr, "%s\n", sql);
             exit(1);
         }
-        free(sql);
     }
 }
 
