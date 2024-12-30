@@ -29,6 +29,6 @@ test:
 	./$(TEST_NAME)
 
 clean:
-	rm -f rinth
-	rm -f bench
-	rm -f test_runner
+	rm -f $(EXE_NAME)
+	rm -f $(BENCH_NAME)
+	rm -f $(TEST_NAME)
