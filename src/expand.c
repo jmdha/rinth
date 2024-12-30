@@ -32,18 +32,21 @@ static void exec_sql(char* sql) {
     }
 }
 
+static void prepare_stmt(sqlite3_stmt** stmt, const char* sql) {
+    if (sqlite3_prepare_v2(DB, sql, 32000, stmt, NULL)) {
+        fprintf(stderr, "%s\n", sqlite3_errmsg(DB));
+        fprintf(stderr, "%s\n", sql);
+        exit(1);
+    }
+}
+
 static void create_clear(const struct task* task) {
     assert(DB);
     char buffer[10000];
     for (uint i = 0; i < task->predicate_count; i++) {
         sprintf(buffer, "DELETE FROM \"%.*s\";", 
                 task->predicates[i].len, task->predicates[i].ptr);
-        const int rc = sqlite3_prepare_v2(DB, buffer, 32000, &CLEARS[CLEAR_COUNT++], NULL);
-        if (rc) {
-            fprintf(stderr, "%s\n", sqlite3_errmsg(DB));
-            fprintf(stderr, "%s\n", buffer);
-            exit(1);
-        }
+        prepare_stmt(&CLEARS[i], buffer);
     }
 }
 
@@ -67,11 +70,7 @@ static void create_actions(const struct task* task) {
     for (uint i = 0; i < task->scheme_count; i++) {
         char sql[1000];
         sql_action(sql, task->predicates, &task->schemes[i]);
-        if (sqlite3_prepare_v2(DB, sql, 32000, &ACTIONS[ACTION_COUNT++], NULL)) {
-            fprintf(stderr, "%s\n", sqlite3_errmsg(DB));
-            fprintf(stderr, "%s\n", sql);
-            exit(1);
-        }
+        prepare_stmt(&ACTIONS[ACTION_COUNT++], sql);
     }
 }
 
@@ -80,11 +79,7 @@ static void create_inserts(const struct task* task) {
     for (uint i = 0; i < task->predicate_count; i++) {
         char sql[1000];
         sql_insert(sql, &task->predicates[i], task->predicate_vars[i]);
-        if (sqlite3_prepare_v2(DB, sql, 32000, &INSERTS[INSERT_COUNT++], NULL)) {
-            fprintf(stderr, "%s\n", sqlite3_errmsg(DB));
-            fprintf(stderr, "%s\n", sql);
-            exit(1);
-        }
+        prepare_stmt(&INSERTS[INSERT_COUNT++], sql);
     }
 }
 
