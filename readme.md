@@ -1,5 +1,4 @@
 # rinth
-[![C/C++ CI](https://github.com/jamadaha/rinth/actions/workflows/c-cpp.yml/badge.svg)](https://github.com/jamadaha/rinth/actions/workflows/c-cpp.yml)
 
 For now simply a parser of PDDL.
 
