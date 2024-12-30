@@ -7,9 +7,9 @@ The goal is at some point to make it into a grounded planner, however, that is o
 ## Building
 To build the executable, simply run the following:
 ```
-make build
+make
 ```
-The resulting executable will then be found in ./build/
+The resulting executable will be generated at ./rinth
 
 ## Tests
 To run tests, simply run the following:
