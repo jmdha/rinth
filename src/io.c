@@ -52,6 +52,7 @@ char** f_open(const char *path) {
 
 void f_close(char** buf) {
     struct file_buffer *fb = (struct file_buffer*)((char*)buf - offsetof(struct file_buffer, buf));
+    TRACE("Closing file of buffer size %d", fb->len);
     munmap(fb->buf, fb->len);
     close(fb->fd);
     free(fb);

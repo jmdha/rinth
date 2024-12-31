@@ -70,6 +70,7 @@ static void create_actions(const struct task* task) {
     for (uint i = 0; i < task->scheme_count; i++) {
         char sql[1000];
         sql_action(sql, task->predicates, &task->schemes[i]);
+        printf("%s\n", sql);
         prepare_stmt(&ACTIONS[ACTION_COUNT++], sql);
     }
 }
@@ -79,6 +80,7 @@ static void create_inserts(const struct task* task) {
     for (uint i = 0; i < task->predicate_count; i++) {
         char sql[1000];
         sql_insert(sql, &task->predicates[i], task->predicate_vars[i]);
+        printf("%s\n", sql);
         prepare_stmt(&INSERTS[INSERT_COUNT++], sql);
     }
 }
@@ -89,12 +91,13 @@ static void populate(const state* s) {
     state_iter* si = state_iter_new(s);
     while (state_iter_step(si, &predicate, &len, args)) {
         for (uint i = 0; i < len; i++)
-            sqlite3_bind_int(INSERTS[predicate], i + 1, args[i]);
+            sqlite3_bind_int(INSERTS[predicate], 1 + i, args[i]);
         const int result = sqlite3_step(INSERTS[predicate]);
         if (result != SQLITE_DONE) {
             fprintf(stderr, "Internal error: populate failed with %d\n", result);
             exit(1);
         }
+        sqlite3_reset(INSERTS[predicate]);
     }
     state_iter_free(si);
 }
@@ -108,14 +111,14 @@ void expand(const state* s) {
         sqlite3_reset(ACTIONS[i]);
 }
 
-bool expand_step(const state* old, uint* action, state** new) {
+bool expand_step(const state* old, uint* action, u16* args, state** new) {
     if (ACTIVE >= ACTION_COUNT) return false;
     const uint index = ACTIVE;
     int code;
     if ((code = sqlite3_step(ACTIONS[ACTIVE])) != SQLITE_ROW) {
         if (code == SQLITE_DONE) {
             ACTIVE++;
-            return expand_step(old, action, new);
+            return expand_step(old, action, args, new);
         } else {
             printf("%d\n", code);
             exit(1);
@@ -129,7 +132,6 @@ bool expand_step(const state* old, uint* action, state** new) {
     *new = state_clone(old);
     for (uint i = 0; i < SCHEMES[index].eff_count; i++) {
         const Atom* atom = &SCHEMES[index].eff[i];
-        u16 args[16];
         for (uint t = 0; t < atom->arg_count; t++)
             args[t] = vals[atom->args[t]];
         if (atom->val)
@@ -142,9 +144,10 @@ bool expand_step(const state* old, uint* action, state** new) {
 
 uint expand_count(const state* old) {
     uint action;
+    u16 args[MAX_VARIABLES];
     state* s;
     uint count = 0;
-    while (expand_step(old, &action, &s))
+    while (expand_step(old, &action, args, &s))
         count++;
     return count;
 }

@@ -18,7 +18,7 @@ TESTS      = $(shell find $(TEST_DIR) -type f -iname '*.c' ! -iname 'main.c')
 
 for all: CFLAGS += -D LOG_INFO -D LOG_TRACE
 all: 
-	gcc $(WFLAGS) $(CFLAGS) $(SAFETY) -o $(EXE_NAME) $(SRCS) $(SRC_DIR)/main.c $(LIBS)
+	gcc $(WFLAGS) $(CFLAGS) -o $(EXE_NAME) $(SRCS) $(SRC_DIR)/main.c $(LIBS)
 
 bench:
 	gcc $(WFLAGS) $(CFLAGS) -o $(BENCH_NAME) $(SRCS) $(BENCHS) $(BENCH_DIR)/main.c $(LIBS)

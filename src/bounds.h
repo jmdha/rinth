@@ -14,3 +14,6 @@
 // TASK
 #define MAX_ATOMS        64
 #define MAX_SCHEMES      128
+// SEARCH
+#define MAX_PATH_LEN     100
+#define MAX_PATH_ARGS    MAX_VARIABLES
