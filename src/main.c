@@ -24,6 +24,6 @@ int main(int, char **argv) {
     domain_free(&domain);
     task_free(&task);
     INFO("INITIALIZATION FINISHED");
-    printf("%d\n", solve(NULL, init, goal));
+    printf("Solve: %d\n", solve(NULL, init, goal));
     return 0;
 }

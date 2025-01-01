@@ -42,11 +42,11 @@ static void prepare_stmt(sqlite3_stmt** stmt, const char* sql) {
 
 static void create_clear(const struct task* task) {
     assert(DB);
-    char buffer[10000];
+    char buffer[1000];
     for (uint i = 0; i < task->predicate_count; i++) {
         sprintf(buffer, "DELETE FROM \"%.*s\";", 
                 task->predicates[i].len, task->predicates[i].ptr);
-        prepare_stmt(&CLEARS[i], buffer);
+        prepare_stmt(&CLEARS[CLEAR_COUNT++], buffer);
     }
 }
 
@@ -103,8 +103,10 @@ static void populate(const state* s) {
 }
 
 void expand(const state* s) {
-    for (uint i = 0; i < CLEAR_COUNT; i++)
+    for (uint i = 0; i < CLEAR_COUNT; i++) {
         sqlite3_step(CLEARS[i]);
+        sqlite3_reset(CLEARS[i]);
+    }
     populate(s);
     ACTIVE = 0;
     for (uint i = 0; i < ACTION_COUNT; i++)

@@ -65,6 +65,17 @@ UTEST(state, remove_contains_args) {
     state_free(s);
 }
 
+UTEST(state, insert_duplicate) {
+    struct state *s = state_new();
+    ASSERT_TRUE(!state_contains(s, 0, 0, NULL));
+    state_insert(s, 0, 0, NULL);
+    ASSERT_EQ(1u, state_count(s));
+    ASSERT_TRUE(state_contains(s, 0, 0, NULL));
+    state_insert(s, 0, 0, NULL);
+    ASSERT_EQ(1u, state_count(s));
+    state_free(s);
+}
+
 UTEST(state, multi_insert_remove) {
     struct state *s = state_new();
     u16 args1[] = {0};
