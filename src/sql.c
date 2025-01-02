@@ -1,8 +1,16 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "sql.h"
 
-void sql_table(char* buf, const string* name, uint vars) {
+char* sql_delete(const string* name) {
+    char* buf = malloc(1000);
+    sprintf(buf, "DELETE FROM \"%.*s\";", name->len, name->ptr);
+    return buf;
+}
+
+char* sql_table(const string* name, uint vars) {
+    char* buf = malloc(1000);
     char tmp[100];
     uint offset = 0;
     for (uint i = 0; i < vars; i++) {
@@ -11,9 +19,11 @@ void sql_table(char* buf, const string* name, uint vars) {
             offset += sprintf(tmp + offset, ", ");
     }
     sprintf(buf, "CREATE TABLE \"%.*s\" (%s);", name->len, name->ptr, tmp);
+    return buf;
 }
 
-void sql_insert(char* buf, const string* name, uint vars) {
+char* sql_insert(const string* name, uint vars) {
+    char* buf = malloc(1000);
     char buf_params[100];
     char buf_values[100];
     uint offset_params = 0;
@@ -28,9 +38,11 @@ void sql_insert(char* buf, const string* name, uint vars) {
     }
     sprintf(buf, "INSERT INTO \"%.*s\" (%s) VALUES (%s);",
             name->len, name->ptr, buf_params, buf_values);
+    return buf;
 }
 
-void sql_action(char* buf, const string* preds, const Scheme* scheme) {
+char* sql_action(const string* preds, const Scheme* scheme) {
+    char* buf = malloc(2000);
     char buf_names[100];
     char buf_tables[100];
     char buf_joins[1000];
@@ -57,4 +69,5 @@ void sql_action(char* buf, const string* preds, const Scheme* scheme) {
         }
     }
     sprintf(buf, "SELECT %s FROM %s%s;", buf_names, buf_tables, buf_joins);
+    return buf;
 }

@@ -3,6 +3,7 @@
 #include "misc.h"
 #include "scheme.h"
 
-void sql_table(char*,  const string*, uint);
-void sql_insert(char*, const string*, uint);
-void sql_action(char*, const string*, const Scheme*);
+char* sql_delete(const string*);
+char* sql_table(const string*, uint);
+char* sql_insert(const string*, uint);
+char* sql_action(const string*, const Scheme*);
