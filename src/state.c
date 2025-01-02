@@ -59,6 +59,14 @@ bool state_covers(const struct state* a, const struct state* b) {
     return true;
 }
 
+uint state_overlap (const struct state* a, const struct state* b) {
+    uint count = 0;
+    for (uint i = 0; i < a->count; i++)
+        if (state_contains_(b, a->facts[i]))
+            count++;
+    return count;
+}
+
 bool state_empty(const struct state* s) {
     return s->count == 0;
 }

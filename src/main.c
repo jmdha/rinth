@@ -1,3 +1,4 @@
+#include "eval.h"
 #include "expand.h"
 #include "io.h"
 #include "log.h"
@@ -21,6 +22,7 @@ int main(int, char **argv) {
     state* init = state_clone(task.init);
     state* goal = state_clone(task.goal);
     expand_init(&task);
+    eval_init(&task);
     domain_free(&domain);
     task_free(&task);
     INFO("INITIALIZATION FINISHED");

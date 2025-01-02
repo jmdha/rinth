@@ -12,6 +12,7 @@ state* state_clone(const state*);                                // Clone a stat
 bool   state_contains(const struct state*, u16, uint, u16*);     // Does state contain fact
 bool   state_equal   (const struct state*, const struct state*); // Are states equal
 bool   state_covers  (const struct state*, const struct state*); // Is the latter state a subset
+uint   state_overlap (const struct state*, const struct state*); // How many facts from former in latter
 bool   state_empty   (const struct state*);                      // Is state empty
 uint   state_count   (const struct state*);                      // How many facts in state
 uint   state_size    (const struct state*);                      // Size of state in bytes
