@@ -13,7 +13,9 @@
 bool solve(path* p, const state* init, const state* goal) {
     state* node = state_clone(init);
 
-    uint sen = 0;
+    u64 expansions = 0;
+    u64 states     = 0;
+    u64 sen        = 0;
     while (true) {
         uint   action;
         u16    args[MAX_VARIABLES];
@@ -21,7 +23,9 @@ bool solve(path* p, const state* init, const state* goal) {
         uint   best_val = 0;
         state* child;
         expand(node);
+        expansions++;
         while (expand_step(node, &action, args, &child)) {
+            states++;
             if (state_covers(child, goal))
                 return true;
             const uint val = eval(child);
@@ -31,7 +35,7 @@ bool solve(path* p, const state* init, const state* goal) {
                 best_child = child;
                 best_val   = val;
                 if (best_val > sen) {
-                    INFO("New best val of %d", best_val);
+                    INFO("New best val of %d (%d - %d)", best_val, expansions, states);
                     sen = best_val;
                 }
             } else {

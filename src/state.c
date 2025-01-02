@@ -33,11 +33,21 @@ state* state_clone(const state* old) {
     return new;
 }
 
-static bool state_contains_(const struct state* s, u64 fact) {
-    for (uint i = 0; i < s->count; i++)
-        if (fact == s->facts[i])
+static bool state_contains_bs(const u64* facts, int left, int right, u64 fact) {
+    while (left <= right) {
+        const int mid = left + (right - left) / 2;
+        if (facts[mid] == fact)
             return true;
+        if (facts[mid] < fact)
+            left = mid + 1;
+        else
+            right = mid - 1;
+    }
     return false;
+}
+
+static bool state_contains_(const struct state* s, u64 fact) {
+    return state_contains_bs(s->facts, 0, s->count - 1, fact);
 }
 
 bool state_contains(const struct state* s, u16 predicate, uint len, u16* args) {
