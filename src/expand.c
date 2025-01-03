@@ -8,7 +8,6 @@
 #include "expand.h"
 #include "db.h"
 #include "log.h"
-#include "scheme.h"
 #include "sql.h"
 #include "state.h"
 

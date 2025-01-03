@@ -3,8 +3,23 @@
 #include "misc.h"
 #include "bounds.h"
 #include "parse.h"
-#include "scheme.h"
 #include "state.h"
+
+typedef struct {
+    uint predicate;
+    uint arg_count;
+    uint args[MAX_VARIABLES];
+    bool val;
+} Atom;
+
+typedef struct {
+    string name;
+    uint vars;
+    uint pre_count;
+    Atom pre[MAX_ATOMS];
+    uint eff_count;
+    Atom eff[MAX_ATOMS];
+} Scheme;
 
 struct task {
     string domain_name;                    // Name of domain

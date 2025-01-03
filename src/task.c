@@ -22,11 +22,7 @@ u16 predicate_index(
         }
     }
     if (pred_index == UINT_MAX) {
-        fprintf(
-            stderr, "%.*s: Undefined predicate referenced\n", 
-            str->len, 
-            str->ptr
-        );
+        fprintf(stderr, "%.*s: Undefined predicate referenced\n", str->len, str->ptr);
         exit(1);
     }
     return pred_index;
