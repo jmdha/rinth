@@ -1,8 +1,13 @@
 # rinth
 
-For now simply a parser of PDDL.
+rinth is a lifted planning engine.
 
-The goal is at some point to make it into a grounded planner, however, that is on a standstill.
+It features:
+- A 2 GB/s Parser
+- SQL based successor generation with SQLite3
+- And not much else
+
+It is technically, probably, complete, in that it can find a path from the initial state to goal. However, it is very feature-limited. As it can not handle most anything more complex than Gripper, one of the simplest domains.
 
 ## Building
 To build the executable, simply run the following:
