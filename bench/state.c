@@ -15,12 +15,12 @@ UBENCH_EX(state, contains) {
     u16 buffer[1000];
     for (uint i = 0; i < 1000; i++) {
         uint len = random_fact(buffer);
-        state_insert(s, len, buffer);
+        state_insert(s, buffer[0], len, &buffer[1]);
     }
     UBENCH_DO_BENCHMARK() {
         for (uint i = 0; i < 100; i++) {
             uint len = random_fact(buffer);
-            state_contains(s, len, buffer);
+            state_contains(s, buffer[0], len, &buffer[1]);
         }
     }
     state_free(s);
@@ -31,7 +31,7 @@ UBENCH(state, random_insert) {
     u16 buffer[4];
     for (uint i = 0; i < 1000; i++) {
         uint len = random_fact(buffer);
-        state_insert(s, len, buffer);
+        state_insert(s, buffer[0], len, &buffer[1]);
     }
     state_free(s);
 }
