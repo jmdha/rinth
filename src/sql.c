@@ -42,13 +42,13 @@ char* sql_insert(const string* name, uint vars) {
 }
 
 char* sql_action(const string* preds, const Scheme* scheme) {
-    char* buf = malloc(2000);
+    char* buf = malloc(4000);
     char buf_names[100];
     char buf_tables[100];
     char buf_joins[1000];
-    uint offset_names  = 0;
-    uint offset_tables = 0;
-    uint offset_joins  = 0;
+    uint offset_names   = 0;
+    uint offset_tables  = 0;
+    uint offset_joins   = 0;
     for (uint i = 0; i < scheme->vars; i++) {
         offset_tables += sprintf(buf_tables + offset_tables, "_objects_ o%d", i);
         offset_names  += sprintf(buf_names  + offset_names, "o%d.arg0 AS arg%d", i, i);
@@ -59,6 +59,8 @@ char* sql_action(const string* preds, const Scheme* scheme) {
     }
     for (uint i = 0; i < scheme->pre_count; i++) {
         const Atom* atom = &scheme->pre[i];
+        if (atom->arg_count == 0)
+            continue;
         offset_joins += sprintf(buf_joins + offset_joins, "\nINNER JOIN \"%.*s\" AS t%d ON",
                                 preds[atom->predicate].len, preds[atom->predicate].ptr, i);
         for (uint t = 0; t < atom->arg_count; t++) {
@@ -67,6 +69,16 @@ char* sql_action(const string* preds, const Scheme* scheme) {
             if (t != atom->arg_count - 1)
                 offset_joins += sprintf(buf_joins + offset_joins, " AND");
         }
+    }
+    for (uint i = 0; i < scheme->pre_count; i++) {
+        const Atom* atom = &scheme->pre[i];
+        if (atom->arg_count != 0)
+            continue;
+        offset_joins += sprintf(buf_joins + offset_joins, 
+                                  "\nWHERE EXISTS (SELECT * FROM \"%.*s\")",
+                                  preds[atom->predicate].len,
+                                  preds[atom->predicate].ptr
+                                  );
     }
     sprintf(buf, "SELECT %s FROM %s%s;", buf_names, buf_tables, buf_joins);
     return buf;

@@ -137,7 +137,7 @@ enum kind lexer_next(lexer* l, string *str) {
     case '-':  return DASH;
     default:
         skip_text(l);
-        str->ptr       = &l->str[pos];
+        str->ptr = &l->str[pos];
         str->len = l->pos - pos;
         return ID;
     }
