@@ -17,7 +17,7 @@ void db_exec(sqlite3* db, char* sql) {
 }
 
 void db_prep(sqlite3* db, char* sql, sqlite3_stmt** stmt) {
-    if (sqlite3_prepare_v2(db, sql, 32000, stmt, NULL)) {
+    if (sqlite3_prepare_v2(db, sql, 1000, stmt, NULL)) {
         fprintf(stderr, "%s\n", sqlite3_errmsg(db));
         fprintf(stderr, "%s\n", sql);
         exit(1);
