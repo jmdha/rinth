@@ -25,7 +25,11 @@ int main(int, char **argv) {
     eval_init(&task);
     domain_free(&domain);
     task_free(&task);
+    f_close(fbuf_domain);
+    f_close(fbuf_problem);
     INFO("INITIALIZATION FINISHED");
     printf("Solve: %d\n", solve(NULL, init, goal));
+    state_free(init);
+    state_free(goal);
     return 0;
 }
