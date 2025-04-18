@@ -2,51 +2,54 @@
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
+#include <stb_ds.h>
 
-#include "eval.h"
 #include "search.h"
-#include "bounds.h"
+#include "eval.h"
 #include "expand.h"
-#include "log.h"
 #include "state.h"
 
-bool solve(path* p, const state* init, const state* goal) {
-    state* node = state_clone(init);
+bool contains(state** states, state* state) {
+    for (size_t i = 0; i < arrlenu(states); i++)
+        if (state_equal(states[i], state))
+            return true;
+    return false;
+}
 
-    u64 expansions = 0;
-    u64 states     = 0;
-    u64 sen        = 0;
-    while (true) {
-        uint   action;
-        u16    args[MAX_VARIABLES];
-        state* best_child = NULL;
-        uint   best_val = 0;
-        state* child;
-        expand(node);
-        expansions++;
-        while (expand_step(node, &action, args, &child)) {
-            states++;
-            if (state_covers(child, goal))
-                return true;
-            const uint val = eval(child);
-            if (val >= best_val && (!best_child || rand() % 2 == 0)) {
-                if (best_child)
-                    state_free(best_child);
-                best_child = child;
-                best_val   = val;
-                if (best_val > sen) {
-                    INFO("New best val of %d (%d - %d)", best_val, expansions, states);
-                    sen = best_val;
-                }
-            } else {
-                state_free(child);
+bool solve(path* p, const state* init, const state* goal) {
+    size_t  mark   = 0;
+    state** states = NULL;
+    arrpush(states, state_clone(init));
+
+    while (mark < arrlenu(states)) {
+        size_t best_node = 0;
+        u64    best_val  = 0;
+        for (size_t i = mark; i < arrlenu(states); i++) {
+            u64 val = eval(states[i]);
+            if (val >= best_val) {
+                best_node = i;
+                best_val  = val;
             }
         }
-        state_free(node);
-        if (!best_child)
-            return false;
-        node = best_child;
+        state* node       = states[best_node];
+        states[best_node] = states[mark];
+        states[mark]      = node;
+        mark++;
+        uint   action;
+        u16    args[MAX_VARIABLES];
+        state* child;
+        expand(node);
+        while (expand_step(node, &action, args, &child)) {
+            if (contains(states, child)) {
+                free(child);
+                continue;
+            }
+            if (state_covers(child, goal))
+                return true;
+            arrpush(states, child);
+        }
     }
+    return false;
 }
 
 bool reachable(const state* init, const state* goal) {

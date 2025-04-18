@@ -9,6 +9,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define STB_DS_IMPLEMENTATION
+#include "stb_ds.h"
+
 int main(int, char **argv) {
     log_init();
     srand(0);
