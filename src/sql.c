@@ -10,6 +10,8 @@ char* sql_delete(const string* name) {
 }
 
 char* sql_table(const string* name, uint vars) {
+    // Convert nullary table to unary
+    vars = ((vars == 0) ? 1 : vars);
     char* buf = malloc(1000);
     char tmp[100];
     uint offset = 0;
@@ -23,6 +25,8 @@ char* sql_table(const string* name, uint vars) {
 }
 
 char* sql_insert(const string* name, uint vars) {
+    // Convert nullary table to unary
+    vars = ((vars == 0) ? 1 : vars);
     char* buf = malloc(1000);
     char buf_params[100];
     char buf_values[100];
