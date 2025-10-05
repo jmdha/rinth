@@ -1,3 +1,9 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define STB_DS_IMPLEMENTATION
+#include "stb_ds.h"
+
 #include "eval.h"
 #include "expand.h"
 #include "io.h"
@@ -6,11 +12,7 @@
 #include "search.h"
 #include "state.h"
 #include "task.h"
-#include <stdio.h>
-#include <stdlib.h>
-
-#define STB_DS_IMPLEMENTATION
-#include "stb_ds.h"
+#include "translate.h"
 
 int main(int, char **argv) {
     log_init();

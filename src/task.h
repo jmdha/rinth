@@ -2,7 +2,6 @@
 
 #include "misc.h"
 #include "bounds.h"
-#include "parse.h"
 #include "state.h"
 
 typedef struct {
@@ -35,5 +34,4 @@ struct task {
     Scheme schemes[MAX_SCHEMES];
 };
 
-struct task translate(const struct domain*, const struct problem*);
 void task_free(struct task*);
