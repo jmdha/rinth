@@ -127,6 +127,10 @@ static void skip_text(lexer* l) {
         l->pos++;
 }
 
+static void next_line(lexer* l) {
+    while (l->str[++l->pos] != '\n') {}
+}
+
 enum kind lexer_next(lexer* l, string *str) {
     skip_whitespace(l);
     const uint pos = l->pos;
@@ -135,6 +139,9 @@ enum kind lexer_next(lexer* l, string *str) {
     case '(':  return LPAREN;
     case ')':  return RPAREN;
     case '-':  return DASH;
+    case ';':
+        next_line(l);
+	return lexer_next(l, str);
     default:
         skip_text(l);
         str->ptr = &l->str[pos];
