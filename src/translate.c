@@ -37,6 +37,8 @@ static void convert_types_to_facts(
     u16 arg;
     for (uint i = 0; i < object_count; i++) {
         const string* type = &object_types[i];
+	if (str_cmp_s(type, "object"))
+	    continue;
         while (type->ptr) {
             const uint type_index = str_index(type, types, type_count);
             arg = i;
