@@ -55,7 +55,7 @@ char* sql_action(const string* preds, const Scheme* scheme) {
     uint offset_joins   = 0;
     for (uint i = 0; i < scheme->vars; i++) {
         offset_tables += sprintf(buf_tables + offset_tables, "_objects_ o%d", i);
-        offset_names  += sprintf(buf_names  + offset_names, "o%d.arg0 AS arg%d", i, i);
+        offset_names  += sprintf(buf_names  + offset_names, "o%d.arg0", i);
         if (i != scheme->vars - 1) {
             offset_names  += sprintf(buf_names  + offset_names, ", ");
             offset_tables += sprintf(buf_tables + offset_tables, ", ");

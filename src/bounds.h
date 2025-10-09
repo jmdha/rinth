@@ -5,8 +5,8 @@
 #define MAX_TYPES        32
 #define MAX_PREDICATES   32
 #define MAX_ACTIONS      64
-#define MAX_VARIABLES    4
-#define MAX_BRANCHING    16
+#define MAX_VARIABLES    16
+#define MAX_BRANCHING    32
 // PROBLEM
 #define MAX_OBJECTS      1024
 #define MAX_INITS        8192
