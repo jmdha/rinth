@@ -92,7 +92,7 @@ uint state_size(const struct state* s) {
 u64 state_hash(const struct state* s) {
     u64 hash = 0;
     for (uint i = 0; i < s->count; i++)
-        hash ^= s->facts[i] * s->facts[i];
+        hash = (hash << 5) + hash + s->facts[i];
     return hash;
 }
 

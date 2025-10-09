@@ -17,6 +17,7 @@ typedef struct {
 } nodeval;
 
 bool solve(path* p, const state* init, const state* goal) {
+    u64 states_generated = 0;
     statespace* ss = statespace_new();
     nodeval* queue = NULL;
 
@@ -46,6 +47,7 @@ bool solve(path* p, const state* init, const state* goal) {
         state* child;
         expand(node);
         while (expand_step(node, &action, args, &child)) {
+	    states_generated++;
 	    if (statespace_contains(ss, child)) {
 		free(child);
 		continue;
@@ -58,8 +60,9 @@ bool solve(path* p, const state* init, const state* goal) {
 	    };
 	    statespace_add(ss, child);
             arrpush(queue, nval);
-	    if (statespace_count(ss) % 1000 == 0)
-		    INFO("SS Count: %zu", statespace_count(ss));
+	    if (statespace_count(ss) % 1000 == 0) {
+		    INFO("Generated/Count: %zu/%zu", states_generated, statespace_count(ss));
+	    }
         }
     }
     return false;
