@@ -4,49 +4,50 @@
 #include <limits.h>
 #include <stb_ds.h>
 
+#include "log.h"
 #include "search.h"
 #include "eval.h"
 #include "expand.h"
 #include "state.h"
-
-bool contains(state** states, state* state) {
-    for (size_t i = 0; i < arrlenu(states); i++)
-        if (state_equal(states[i], state))
-            return true;
-    return false;
-}
+#include "statespace.h"
 
 bool solve(path* p, const state* init, const state* goal) {
-    size_t  mark   = 0;
-    state** states = NULL;
-    arrpush(states, state_clone(init));
+    statespace* ss = statespace_new();
+    state** queue = NULL;
 
-    while (mark < arrlenu(states)) {
-        size_t best_node = 0;
-        u64    best_val  = 0;
-        for (size_t i = mark; i < arrlenu(states); i++) {
-            u64 val = eval(states[i]);
-            if (val >= best_val) {
-                best_node = i;
-                best_val  = val;
-            }
-        }
-        state* node       = states[best_node];
-        states[best_node] = states[mark];
-        states[mark]      = node;
-        mark++;
+    state* start = state_clone(init);
+
+    statespace_add(ss, start);
+    arrpush(queue, start);
+
+    while (arrlenu(queue) > 0) {
+	size_t best_node = 0;
+	u64    best_val  = 0;
+	for (size_t i = 0; i < arrlenu(queue); i++) {
+		const u64 val = eval(queue[i]);
+		if (val > best_val) {
+			best_node = i;
+			best_val  = val;
+		}
+	}
+	state* node = queue[best_node];
+	arrdel(queue, best_node);
+
         uint   action;
         u16    args[MAX_VARIABLES];
         state* child;
         expand(node);
         while (expand_step(node, &action, args, &child)) {
-            if (contains(states, child)) {
-                free(child);
-                continue;
-            }
+	    if (statespace_contains(ss, child)) {
+		free(child);
+		continue;
+	    }
             if (state_covers(child, goal))
                 return true;
-            arrpush(states, child);
+	    statespace_add(ss, child);
+            arrpush(queue, child);
+	    if (statespace_count(ss) % 1000 == 0)
+		    INFO("SS Count: %zu", statespace_count(ss));
         }
     }
     return false;

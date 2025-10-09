@@ -8,7 +8,7 @@ LIB_DIR    = third_party
 BIN_DIR    = bin
 WFLAGS     = -Wall -Wextra -Wshadow
 LIBS       = -lm -lsqlite3
-CFLAGS     = -I$(SRC_DIR) -I$(LIB_DIR) -ggdb -O0 -flto -std=gnu17 -march=native
+CFLAGS     = -I$(SRC_DIR) -I$(LIB_DIR) -ggdb -O3 -flto -std=gnu17 -march=native -fno-omit-frame-pointer
 SAFETY     = -fstack-protector-strong -fstack-clash-protection -fcf-protection -fsanitize=address -fno-omit-frame-pointer -fno-semantic-interposition
 SRCS       = $(shell find $(SRC_DIR) -type f -iname '*.c' ! -iname 'main.c')
 BENCHS     = $(shell find $(BENCH_DIR) -type f -iname '*.c' ! -iname 'main.c')
