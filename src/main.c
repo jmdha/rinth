@@ -33,7 +33,7 @@ int main(int, char **argv) {
     f_close(fbuf_domain);
     f_close(fbuf_problem);
     INFO("INITIALIZATION FINISHED");
-    printf("Solve: %d\n", solve(NULL, init, goal));
+    printf("Solve: %d\n", reachable(init, goal));
     state_free(init);
     state_free(goal);
     return 0;
