@@ -2,7 +2,21 @@
 
 #include "task.h"
 
-void expand_init(const struct task*);
-void expand(const state*);
-bool expand_step(const state*, uint*, u16*, state**);
-uint expand_count(const state*);
+void expand_init(
+	const struct task* task
+);
+
+void expand(
+	const state* s
+);
+
+bool expand_step(
+	const state* s,
+	uint* predicate,
+	u16* len,
+	state** args
+);
+
+uint expand_count(
+	const state* s
+);
