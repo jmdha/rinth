@@ -8,7 +8,9 @@ struct statespace {
 	size_t  capacity;
 };
 
-statespace* statespace_new() {
+statespace* statespace_new(
+	void
+) {
 	statespace* ss = malloc(sizeof(struct statespace));
 
 	ss->count    = 0;
@@ -18,11 +20,16 @@ statespace* statespace_new() {
 	return ss;
 }
 
-size_t statespace_count(const statespace* ss) {
+size_t statespace_count(
+	const statespace* ss
+) {
 	return ss->count;
 }
 
-bool statespace_contains(const statespace* ss, const state* s) {
+bool statespace_contains(
+	const statespace* ss,
+	const state* s
+) {
 	const u64 hash = state_hash(s);
 	for (size_t o = 0; o < ss->capacity; o++) {
 		const u64 i = (hash + o) % ss->capacity;
@@ -34,7 +41,11 @@ bool statespace_contains(const statespace* ss, const state* s) {
 	return false;
 }
 
-static void statespace_insert(state** m, size_t capacity, state* s) {
+static void statespace_insert(
+	state** m,
+	size_t capacity,
+	state* s
+) {
 	const u64 hash = state_hash(s);
 	for (size_t o = 0; o < capacity; o++) {
 		const u64 i = (hash + o) % capacity;
@@ -46,7 +57,9 @@ static void statespace_insert(state** m, size_t capacity, state* s) {
 	exit(1);
 }
 
-static void statespace_grow(statespace* ss) {
+static void statespace_grow(
+	statespace* ss
+) {
 	const size_t new_cap = 2 * ss->capacity;
 	state** new_map      = calloc(new_cap, sizeof(state*));
 	for (size_t i = 0; i < ss->capacity; i++)
@@ -57,7 +70,10 @@ static void statespace_grow(statespace* ss) {
 	ss->capacity = new_cap;
 }
 
-void statespace_add(statespace* ss, state* s) {
+void statespace_add(
+	statespace* ss,
+	state* s
+) {
 	if (ss->count * 2 > ss->capacity)
 		statespace_grow(ss);
 	statespace_insert(ss->map, ss->capacity, s);
