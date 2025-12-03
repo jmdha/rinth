@@ -3,8 +3,33 @@
 #include <sqlite3.h>
 #include <stdbool.h>
 
-void db_init(sqlite3**);
-void db_exec(sqlite3*, char*);
-void db_prep(sqlite3*, char*, sqlite3_stmt**);
-void db_exec_stmt(sqlite3*, sqlite3_stmt*);
-bool db_step(sqlite3*, sqlite3_stmt*);
+// Create an in memory sqlite database
+void db_init(
+	sqlite3** db
+);
+
+// Execute sql on db
+void db_exec(
+	sqlite3* db,
+	char* sql
+);
+
+// Prepare given sql as stmt
+void db_prep(
+	sqlite3* db,
+	char* sql,
+	sqlite3_stmt** stmt
+);
+
+// Execute stmt on db
+void db_exec_stmt(
+	sqlite3* db,
+	sqlite3_stmt* stmt
+);
+
+// Perform step of stmt
+// Returns false if no more steps
+bool db_step(
+	sqlite3* db,
+	sqlite3_stmt* stmt
+);
