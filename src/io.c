@@ -11,49 +11,49 @@
 #include "log.h"
 
 struct file_buffer {
-    int    fd;
-    size_t len;
-    char*  buf;
+	int    fd;
+	size_t len;
+	char*  buf;
 };
 
 char** f_open(const char *path) {
-    int    fd;
-    size_t len;
-    char*  buf;
-
-    TRACE("Open %s", path);
-    fd = open(path, O_RDONLY);
-    if (fd == -1) {
-        perror(path);
-        exit(1);
-    }
-
-    struct stat sb;
-    if (fstat(fd, &sb) == -1) {
-        perror(path);
-        close(fd);
-        exit(1);
-    }
-    len = sb.st_size;
-    buf = mmap(NULL, len, PROT_READ, MAP_PRIVATE, fd, 0);
-    if (buf == MAP_FAILED) {
-        perror(path);
-        close(fd);
-        exit(1);
-    }
-
-    struct file_buffer* fb = malloc(sizeof(struct file_buffer));
-    fb->fd  = fd;
-    fb->len = len;
-    fb->buf = buf;
-    INFO("Buffer size %d of %s", len, path);
-    return &fb->buf;
+	int    fd;
+	size_t len;
+	char*  buf;
+	
+	TRACE("Open %s", path);
+	fd = open(path, O_RDONLY);
+	if (fd == -1) {
+		perror(path);
+		exit(1);
+	}
+	
+	struct stat sb;
+	if (fstat(fd, &sb) == -1) {
+		perror(path);
+		close(fd);
+		exit(1);
+	}
+	len = sb.st_size;
+	buf = mmap(NULL, len, PROT_READ, MAP_PRIVATE, fd, 0);
+	if (buf == MAP_FAILED) {
+		perror(path);
+		close(fd);
+		exit(1);
+	}
+	
+	struct file_buffer* fb = malloc(sizeof(struct file_buffer));
+	fb->fd  = fd;
+	fb->len = len;
+	fb->buf = buf;
+	INFO("Buffer size %d of %s", len, path);
+	return &fb->buf;
 }
 
 void f_close(char** buf) {
-    struct file_buffer *fb = (struct file_buffer*)((char*)buf - offsetof(struct file_buffer, buf));
-    TRACE("Closing file of buffer size %d", fb->len);
-    munmap(fb->buf, fb->len);
-    close(fb->fd);
-    free(fb);
+	struct file_buffer *fb = (struct file_buffer*)((char*)buf - offsetof(struct file_buffer, buf));
+	TRACE("Closing file of buffer size %d", fb->len);
+	munmap(fb->buf, fb->len);
+	close(fb->fd);
+	free(fb);
 }

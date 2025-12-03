@@ -1,6 +1,11 @@
 #pragma once
 
-#include <sys/stat.h>
+// Open file via mmap
+char** f_open(
+	const char *path
+);
 
-char** f_open(const char *path);
-void   f_close(char** fb);
+// Close file
+void f_close(
+	char** fb
+);
