@@ -65,6 +65,23 @@ static void populate(const state* s) {
         state_iter_free(si);
 }
 
+state *apply(const state *s, const schema_t* sc, const u16* args) {
+	state* n = state_clone(s);
+
+	for (size_t i = 0; i < sc->eff_count; i++) {
+		const atom_t* atom = &sc->eff[i];
+		u16 vals[16];
+		for (uint t = 0; t < atom->arg_count; t++)
+			vals[t] = args[atom->args[t]];
+		if (atom->val)
+			state_insert(n, atom->predicate, atom->arg_count, vals);
+		else
+			state_remove(n, atom->predicate, atom->arg_count, vals);
+	}
+
+	return n;
+}
+
 void expand(const state* s) {
         for (uint i = 0; i < CLEAR_COUNT; i++) {
                 sqlite3_step(CLEARS[i]);
@@ -79,26 +96,15 @@ void expand(const state* s) {
 bool expand_step(const state* old, uint* action, u16* args, state** new) {
         if (ACTIVE >= ACTION_COUNT)
                 return false;
-        const uint index = ACTIVE;
         if (!db_step(DB, ACTIONS[ACTIVE])) {
                 ACTIVE++;
                 return expand_step(old, action, args, new);
         }
-        *action        = index;
+        *action        = ACTIVE;
         const uint len = sqlite3_column_count(ACTIONS[ACTIVE]);
-        u16        vals[16];
         for (uint i = 0; i < len; i++)
-                vals[i] = sqlite3_column_int(ACTIONS[index], i);
-        *new = state_clone(old);
-        for (uint i = 0; i < SCHEMAS[index].eff_count; i++) {
-                const atom_t* atom = &SCHEMAS[index].eff[i];
-                for (uint t = 0; t < atom->arg_count; t++)
-                        args[t] = vals[atom->args[t]];
-                if (atom->val)
-                        state_insert(*new, atom->predicate, atom->arg_count, args);
-                else
-                        state_remove(*new, atom->predicate, atom->arg_count, args);
-        }
+                args[i] = sqlite3_column_int(ACTIONS[ACTIVE], i);
+	*new = apply(old, &SCHEMAS[*action], args);
         return true;
 }
 
