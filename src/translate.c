@@ -85,7 +85,7 @@ typedef struct {
 // Converts an expression which may only be a conjunction of atoms (or nots)
 // Should generally call flatten_expression first
 static uint convert_expression(
-	Atom*                    atoms,
+	atom_t*                  atoms,
 	const struct expression* exp,
 	const string*            vars,
 	const uint               var_count,
@@ -133,7 +133,7 @@ static uint convert_expression(
 // This occurs in the case of OR expressions (only possible in precondition)
 // Each sub-expression will lead to a differing scheme, and even more in the case of multiple OR's
 static void convert_action(
-	Scheme*                 schemes,
+	schema_t*               schemas,
 	uint*                   count,
 	const struct action*    action,
 	const struct predicate* predicates,
@@ -144,27 +144,27 @@ static void convert_action(
 	uint pre_exp_count = flatten_expression(pre_exps, action->precondition);
 	uint eff_exp_count = flatten_expression(eff_exps, action->effect);
 	for (uint i = 0; i < pre_exp_count; i++) {
-		Atom pre_atoms[MAX_ATOMS];
+		atom_t pre_atoms[MAX_ATOMS];
 		uint pre_atom_count = convert_expression(
 			pre_atoms, &pre_exps[i], 
 			action->vars, action->var_count, 
 			predicates, predicate_count
 		);
 		for (uint t = 0; t < eff_exp_count; t++) {
-			Atom eff_atoms[MAX_ATOMS];
+			atom_t eff_atoms[MAX_ATOMS];
 			uint eff_atom_count = convert_expression(
 				eff_atoms, &eff_exps[t],
 				action->vars, action->var_count,
 				predicates, predicate_count
 			);
 			
-			Scheme *scheme    = &schemes[(*count)++];
-			scheme->name      = action->name;
-			scheme->vars      = action->var_count;
-			scheme->pre_count = pre_atom_count;
-			scheme->eff_count = eff_atom_count;
-			memcpy(scheme->pre, pre_atoms, pre_atom_count * sizeof(Atom));
-			memcpy(scheme->eff, eff_atoms, eff_atom_count * sizeof(Atom));
+			schema_t *schema  = &schemas[(*count)++];
+			schema->name      = action->name;
+			schema->vars      = action->var_count;
+			schema->pre_count = pre_atom_count;
+			schema->eff_count = eff_atom_count;
+			memcpy(schema->pre, pre_atoms, pre_atom_count * sizeof(atom_t));
+			memcpy(schema->eff, eff_atoms, eff_atom_count * sizeof(atom_t));
 		}
 	}
 	INFO(
@@ -173,11 +173,11 @@ static void convert_action(
 	);
 }
 
-struct task translate(
+task_t translate(
 	const struct domain* domain,
 	const struct problem* problem
 ) {
-	struct task task = {0};
+	task_t task = {0};
 	uint offset;
 	
 	task.domain_name  = domain->name;
@@ -233,14 +233,14 @@ struct task translate(
 	for (uint i = 0; i < domain->action_count; i++) {
 		TRACE("Translate action %.*s", domain->actions[i].name.len, domain->actions[i].name.ptr);
 		convert_action(
-			task.schemes, &task.scheme_count, 
+			task.schemas, &task.schema_count, 
 			&domain->actions[i], 
 			domain->predicates, domain->predicate_count
 		);
 	}
 	INFO("Facts init: %d", state_count(task.init));
 	INFO("Facts goal: %d", state_count(task.goal));
-	INFO("Schemes:    %d", task.scheme_count);
+	INFO("Schemes:    %d", task.schema_count);
 	return task;
 }
 

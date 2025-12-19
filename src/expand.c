@@ -15,7 +15,7 @@ sqlite3*      DB                        = NULL;
 uint          CLEAR_COUNT               = 0;
 sqlite3_stmt* CLEARS[MAX_PREDICATES]    = {NULL};
 uint          ACTION_COUNT              = 0;
-Scheme        SCHEMES[MAX_SCHEMES];
+schema_t      SCHEMAS[MAX_SCHEMES];
 char*         ACTION_NAMES[MAX_ACTIONS] = {NULL};
 sqlite3_stmt* ACTIONS[MAX_ACTIONS]      = {NULL};
 uint          ACTIVE                    = 0;
@@ -23,7 +23,7 @@ uint          INSERT_COUNT              = 0;
 sqlite3_stmt* INSERTS[MAX_PREDICATES]   = {NULL};
 
 static void create_clear(
-	const struct task* task
+	const task_t* task
 ) {
 	for (uint i = 0; i < task->predicate_count; i++)
 		db_prep(DB, sql_delete(&task->predicates[i]), &CLEARS[CLEAR_COUNT++]);
@@ -31,7 +31,7 @@ static void create_clear(
 
 // HACK: Replace _objects_ with action arguments
 static void create_tables(
-	const struct task* task
+	const task_t* task
 ) {
 	char* buffer = malloc(1000);
 	sprintf(buffer, "CREATE TABLE _objects_ (arg0 INTEGER);");
@@ -46,14 +46,14 @@ static void create_tables(
 }
 
 static void create_actions(
-	const struct task* task
+	const task_t* task
 ) {
-	for (uint i = 0; i < task->scheme_count; i++)
-		db_prep(DB, sql_action(task->predicates, &task->schemes[i]), &ACTIONS[ACTION_COUNT++]);
+	for (uint i = 0; i < task->schema_count; i++)
+		db_prep(DB, sql_action(task->predicates, &task->schemas[i]), &ACTIONS[ACTION_COUNT++]);
 }
 
 static void create_inserts(
-	const struct task* task
+	const task_t* task
 ) {
 	for (uint i = 0; i < task->predicate_count; i++)
 		db_prep(DB, sql_insert(&task->predicates[i], task->predicate_vars[i]), &INSERTS[INSERT_COUNT++]);
@@ -104,8 +104,8 @@ bool expand_step(
 	for (uint i = 0; i < len; i++)
 		vals[i] = sqlite3_column_int(ACTIONS[index], i);
 	*new = state_clone(old);
-	for (uint i = 0; i < SCHEMES[index].eff_count; i++) {
-		const Atom* atom = &SCHEMES[index].eff[i];
+	for (uint i = 0; i < SCHEMAS[index].eff_count; i++) {
+		const atom_t* atom = &SCHEMAS[index].eff[i];
 		for (uint t = 0; t < atom->arg_count; t++)
 			args[t] = vals[atom->args[t]];
 		if (atom->val)
@@ -141,7 +141,7 @@ static void expand_fini(
 		ACTION_NAMES[i] = NULL;
 		ACTIONS[i]      = NULL;
 	}
-	memset(SCHEMES, 0, ACTION_COUNT * sizeof(Scheme));
+	memset(SCHEMAS, 0, ACTION_COUNT * sizeof(schema_t));
 	ACTION_COUNT = 0;
 	for (uint i = 0; i < INSERT_COUNT; i++) {
 		sqlite3_finalize(INSERTS[i]);
@@ -150,13 +150,13 @@ static void expand_fini(
 	INSERT_COUNT = 0;
 }
 
-void expand_init(const struct task* task) {
+void expand_init(const task_t* task) {
 	atexit(expand_fini);
 	// In case of this being called multiple times
 	// Prior instances are cleared first
 	expand_fini();
-	for (uint i = 0; i < task->scheme_count; i++)
-		memcpy(&SCHEMES[i], &task->schemes[i], sizeof(Scheme));
+	for (uint i = 0; i < task->schema_count; i++)
+		memcpy(&SCHEMAS[i], &task->schemas[i], sizeof(schema_t));
 	TRACE("Open SQL connection");
 	db_init(&DB);
 	TRACE("Create SQL tables");

@@ -19,5 +19,5 @@ char* sql_insert(
 
 char* sql_action(
 	const string* preds,
-	const Scheme* sceheme
+	const schema_t* scehema
 );

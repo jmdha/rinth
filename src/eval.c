@@ -12,7 +12,7 @@ static void eval_fini(
 	goal = NULL;
 }
 
-void eval_init(const struct task* task) {
+void eval_init(const task_t* task) {
 	atexit(eval_fini);
 	eval_fini();
 	goal = state_clone(task->goal);

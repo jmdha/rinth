@@ -3,7 +3,7 @@
 #include "task.h"
 
 void expand_init(
-	const struct task* task
+	const task_t* task
 );
 
 void expand(

@@ -26,7 +26,7 @@ int main(
 	char** fbuf_problem = f_open(path_problem);
 	struct domain domain = parse_domain(*fbuf_domain);
 	struct problem problem = parse_problem(*fbuf_problem);
-	struct task task = translate(&domain, &problem);
+	task_t task = translate(&domain, &problem);
 	state* init = state_clone(task.init);
 	state* goal = state_clone(task.goal);
 	expand_init(&task);

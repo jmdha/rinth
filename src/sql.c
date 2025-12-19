@@ -55,7 +55,7 @@ char* sql_insert(
 
 char* sql_action(
 	const string* preds,
-	const Scheme* scheme
+	const schema_t* schema
 ) {
 	char* buf = malloc(4000);
 	char buf_names[100];
@@ -64,16 +64,16 @@ char* sql_action(
 	uint offset_names   = 0;
 	uint offset_tables  = 0;
 	uint offset_joins   = 0;
-	for (uint i = 0; i < scheme->vars; i++) {
+	for (uint i = 0; i < schema->vars; i++) {
 		offset_tables += sprintf(buf_tables + offset_tables, "_objects_ o%d", i);
 		offset_names  += sprintf(buf_names  + offset_names, "o%d.arg0", i);
-		if (i != scheme->vars - 1) {
+		if (i != schema->vars - 1) {
 			offset_names  += sprintf(buf_names  + offset_names, ", ");
 			offset_tables += sprintf(buf_tables + offset_tables, ", ");
 		}
 	}
-	for (uint i = 0; i < scheme->pre_count; i++) {
-		const Atom* atom = &scheme->pre[i];
+	for (uint i = 0; i < schema->pre_count; i++) {
+		const atom_t* atom = &schema->pre[i];
 		if (atom->arg_count == 0)
 			continue;
 		offset_joins += sprintf(buf_joins + offset_joins, "\nINNER JOIN \"%.*s\" AS t%d ON",
@@ -85,8 +85,8 @@ char* sql_action(
 				offset_joins += sprintf(buf_joins + offset_joins, " AND");
 		}
 	}
-	for (uint i = 0; i < scheme->pre_count; i++) {
-		const Atom* atom = &scheme->pre[i];
+	for (uint i = 0; i < schema->pre_count; i++) {
+		const atom_t* atom = &schema->pre[i];
 		if (atom->arg_count != 0)
 			continue;
 		offset_joins += sprintf(buf_joins + offset_joins, 

@@ -7,7 +7,7 @@
 // Initialize eval
 // Should be called once per task
 void eval_init(
-	const struct task*
+	const task_t*
 );
 
 // Evaluate the state compared to the goal of task
