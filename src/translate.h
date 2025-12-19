@@ -1,9 +1,6 @@
 #pragma once
 
-#include "task.h"
 #include "parse.h"
+#include "task.h"
 
-task_t translate(
-	const struct domain*,
-	const struct problem*
-);
+task_t translate(const struct domain *, const struct problem *);

@@ -1,11 +1,7 @@
 #pragma once
 
 // Open file via mmap
-char** f_open(
-	const char *path
-);
+char **f_open(const char *path);
 
 // Close file
-void f_close(
-	char** fb
-);
+void f_close(char **fb);

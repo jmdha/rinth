@@ -2,18 +2,18 @@
 
 // DOMAIN
 #define MAX_REQUIREMENTS 32
-#define MAX_TYPES        32
-#define MAX_PREDICATES   32
-#define MAX_ACTIONS      64
-#define MAX_VARIABLES    16
-#define MAX_BRANCHING    32
+#define MAX_TYPES 32
+#define MAX_PREDICATES 32
+#define MAX_ACTIONS 64
+#define MAX_VARIABLES 16
+#define MAX_BRANCHING 32
 // PROBLEM
-#define MAX_OBJECTS      1024
-#define MAX_INITS        8192
-#define MAX_GOALS        1024
+#define MAX_OBJECTS 1024
+#define MAX_INITS 8192
+#define MAX_GOALS 1024
 // TASK
-#define MAX_ATOMS        64
-#define MAX_SCHEMES      128
+#define MAX_ATOMS 64
+#define MAX_SCHEMES 128
 // SEARCH
-#define MAX_PATH_LEN     100
-#define MAX_PATH_ARGS    MAX_VARIABLES
+#define MAX_PATH_LEN 100
+#define MAX_PATH_ARGS MAX_VARIABLES
