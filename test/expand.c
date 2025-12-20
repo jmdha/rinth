@@ -50,7 +50,7 @@ const char* CELLS_PROBLEM_1 =
 UTEST(expand, cells_0) {
     struct domain domain   = parse_domain(CELLS_DOMAIN);
     struct problem problem = parse_problem(CELLS_PROBLEM_0);
-    struct task task       = translate(&domain, &problem);
+    task_t task       = translate(&domain, &problem);
     expand_init(&task);
 
     expand(task.init);
@@ -62,7 +62,7 @@ UTEST(expand, cells_0) {
 UTEST(expand, cells_1) {
     struct domain domain   = parse_domain(CELLS_DOMAIN);
     struct problem problem = parse_problem(CELLS_PROBLEM_1);
-    struct task task       = translate(&domain, &problem);
+    task_t task       = translate(&domain, &problem);
     expand_init(&task);
 
     expand(task.init);
