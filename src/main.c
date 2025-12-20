@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 #define STB_DS_IMPLEMENTATION
-#include "stb_ds.h"
+#include <stb/stb_ds.h>
 
 #include "eval.h"
 #include "expand.h"

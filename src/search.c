@@ -1,5 +1,5 @@
 #include <limits.h>
-#include <stb_ds.h>
+#include <stb/stb_ds.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
