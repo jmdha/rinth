@@ -1,34 +1,28 @@
-EXE_NAME   = rinth
-BENCH_NAME = benchmark
-TEST_NAME  = testrunner
-SRC_DIR    = src
-BENCH_DIR  = bench
-TEST_DIR   = test
-LIB_DIR    = third_party
-BIN_DIR    = bin
-WFLAGS     = -Wall -Wextra -Wshadow
-LIBS       = -lm -lsqlite3
-CFLAGS     = -I$(SRC_DIR) -I$(LIB_DIR) -ggdb -O3 -flto -std=gnu17 -march=native -fno-omit-frame-pointer
-SAFETY     = -fstack-protector-strong -fstack-clash-protection -fcf-protection -fsanitize=address -fno-omit-frame-pointer -fno-semantic-interposition
-SRCS       = $(shell find $(SRC_DIR) -type f -iname '*.c' ! -iname 'main.c')
-BENCHS     = $(shell find $(BENCH_DIR) -type f -iname '*.c' ! -iname 'main.c')
-TESTS      = $(shell find $(TEST_DIR) -type f -iname '*.c' ! -iname 'main.c')
+NAME   = rinth
+CFLAGS += -Isrc -Ithird_party
+CFLAGS += -O3 -flto
+CFLAGS += -lsqlite3
 
 .PHONY: all bench test
 
 for all: CFLAGS += -D LOG_INFO -D LOG_TRACE
 all: 
-	gcc $(WFLAGS) $(CFLAGS) -o $(EXE_NAME) $(SRCS) $(SRC_DIR)/main.c $(LIBS)
+	gcc $(CFLAGS) -o $(NAME) \
+	src/main.c \
+	src/db.c src/eval.c src/expand.c src/io.c src/log.c src/misc.c src/parse.c \
+	src/search.c src/sql.c src/state.c src/statespace.c src/task.c src/translate.c
 
+for bench: CFLAGS += -lm
 bench:
-	gcc $(WFLAGS) $(CFLAGS) -o $(BENCH_NAME) $(SRCS) $(BENCHS) $(BENCH_DIR)/main.c $(LIBS)
-	./$(BENCH_NAME)
+	gcc $(CFLAGS) -o benchmark \
+	bench/main.c \
+	bench/parse.c bench/state.c \
+	src/db.c src/eval.c src/expand.c src/io.c src/log.c src/misc.c src/parse.c \
+	src/search.c src/sql.c src/state.c src/statespace.c src/task.c src/translate.c
 
 test:
-	gcc $(WFLAGS) $(CFLAGS) -o $(TEST_NAME) $(SRCS) $(TESTS) $(TEST_DIR)/main.c $(LIBS)
-	./$(TEST_NAME)
-
-clean:
-	rm -f $(EXE_NAME)
-	rm -f $(BENCH_NAME)
-	rm -f $(TEST_NAME)
+	gcc $(CFLAGS) -o testrunner \
+	test/main.c \
+	test/expand.c test/parse.c test/state.c test/translate.c \
+	src/db.c src/eval.c src/expand.c src/io.c src/log.c src/misc.c src/parse.c \
+	src/search.c src/sql.c src/state.c src/statespace.c src/task.c src/translate.c
