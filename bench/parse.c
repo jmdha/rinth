@@ -99,6 +99,6 @@ UBENCH_EX(parse, domain) {
 
 UBENCH_EX(parse, problem) {
         UBENCH_DO_BENCHMARK()
-        for (uint i = 0; i < t; i++)
+        for (uint i = 0; i < 1000; i++)
                 parse_problem(PROBLEM);
 }
