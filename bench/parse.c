@@ -2,7 +2,7 @@
 
 #include "parse.h"
 
-static const char *DOMAIN = "(define"
+static const char* DOMAIN = "(define"
                             "	(domain blocksworld)"
                             "	(:requirements :strips)"
                             "	(:predicates"
@@ -75,7 +75,7 @@ static const char *DOMAIN = "(define"
                             "	)"
                             ")";
 
-static const char *PROBLEM = "(define (problem blocksworld-01)"
+static const char* PROBLEM = "(define (problem blocksworld-01)"
                              " (:domain blocksworld)"
                              " (:objects b1 b2)"
                              " (:init "
@@ -92,17 +92,13 @@ static const char *PROBLEM = "(define (problem blocksworld-01)"
                              ")))";
 
 UBENCH_EX(parse, domain) {
-    struct domain domain;
-    UBENCH_DO_BENCHMARK() {
-        for (uint i = 0; i < 100; i++)
-            parse_domain_(&domain, DOMAIN);
-    }
+        UBENCH_DO_BENCHMARK()
+        for (uint i = 0; i < 1000; i++)
+                parse_domain(DOMAIN);
 }
 
 UBENCH_EX(parse, problem) {
-    struct problem problem;
-    UBENCH_DO_BENCHMARK() {
-        for (uint i = 0; i < 1000; i++)
-            parse_problem_(&problem, PROBLEM);
-    }
+        UBENCH_DO_BENCHMARK()
+        for (uint i = 0; i < t; i++)
+                parse_problem(PROBLEM);
 }
