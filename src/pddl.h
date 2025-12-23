@@ -22,8 +22,8 @@ typedef struct {
 typedef struct {
 	string      name;
 	string      vars[MAX_PDDL_VARS];
-	string      precondition[MAX_PDDL_STACK];
-	string      effect[MAX_PDDL_STACK];
+	string      pre[MAX_PDDL_STACK];
+	string      eff[MAX_PDDL_STACK];
 } pddl_action;
 
 typedef struct {

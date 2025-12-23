@@ -83,20 +83,20 @@ UTEST(pddl_parse_domain, action_pre) {
 
 	ASSERT_EQ(1, d.actions[0].name.len);
 	ASSERT_STRNEQ("a", d.actions[0].name.ptr, d.actions[0].name.len);
-	ASSERT_EQ(1, d.actions[0].precondition[0].len);
-	ASSERT_EQ(3, d.actions[0].precondition[1].len);
-	ASSERT_EQ(1, d.actions[0].precondition[2].len);
-	ASSERT_EQ(2, d.actions[0].precondition[3].len);
-	ASSERT_EQ(1, d.actions[0].precondition[4].len);
-	ASSERT_EQ(1, d.actions[0].precondition[5].len);
-	ASSERT_STRNEQ("(",   d.actions[0].precondition[0].ptr, d.actions[0].precondition[0].len);
-	ASSERT_STRNEQ("and", d.actions[0].precondition[1].ptr, d.actions[0].precondition[1].len);
-	ASSERT_STRNEQ("(",   d.actions[0].precondition[2].ptr, d.actions[0].precondition[2].len);
-	ASSERT_STRNEQ("p0",  d.actions[0].precondition[3].ptr, d.actions[0].precondition[3].len);
-	ASSERT_STRNEQ(")",   d.actions[0].precondition[4].ptr, d.actions[0].precondition[4].len);
-	ASSERT_STRNEQ(")",   d.actions[0].precondition[5].ptr, d.actions[0].precondition[5].len);
-	ASSERT_EQ(0, d.actions[0].precondition[6].len);
-	ASSERT_EQ(NULL, d.actions[0].precondition[6].ptr);
+	ASSERT_EQ(1, d.actions[0].pre[0].len);
+	ASSERT_EQ(3, d.actions[0].pre[1].len);
+	ASSERT_EQ(1, d.actions[0].pre[2].len);
+	ASSERT_EQ(2, d.actions[0].pre[3].len);
+	ASSERT_EQ(1, d.actions[0].pre[4].len);
+	ASSERT_EQ(1, d.actions[0].pre[5].len);
+	ASSERT_STRNEQ("(",   d.actions[0].pre[0].ptr, d.actions[0].pre[0].len);
+	ASSERT_STRNEQ("and", d.actions[0].pre[1].ptr, d.actions[0].pre[1].len);
+	ASSERT_STRNEQ("(",   d.actions[0].pre[2].ptr, d.actions[0].pre[2].len);
+	ASSERT_STRNEQ("p0",  d.actions[0].pre[3].ptr, d.actions[0].pre[3].len);
+	ASSERT_STRNEQ(")",   d.actions[0].pre[4].ptr, d.actions[0].pre[4].len);
+	ASSERT_STRNEQ(")",   d.actions[0].pre[5].ptr, d.actions[0].pre[5].len);
+	ASSERT_EQ(0, d.actions[0].pre[6].len);
+	ASSERT_EQ(NULL, d.actions[0].pre[6].ptr);
 }
 
 UTEST(pddl_parse_problem, empty) {

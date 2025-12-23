@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include "pddl.h"
+#include "log.h"
 
 typedef enum { EOI, LPAREN, RPAREN, ID, MAX_KIND } kind;
 
@@ -93,9 +94,9 @@ void parse_action(const char** l, pddl_action* action) {
                         assert(lexer_next(l, &t) == LPAREN);
                         parse_ids(l, action->vars);
                 } else if (strncmp(t.ptr, ":precondition", t.len) == 0) {
-                        parse_expression(l, action->precondition);
+                        parse_expression(l, action->pre);
                 } else if (strncmp(t.ptr, ":effect", t.len) == 0) {
-                        parse_expression(l, action->effect);
+                        parse_expression(l, action->eff);
                 } else {
                         fprintf(stderr, "unexpected keyword %.*s\n", (int)t.len, t.ptr);
                         exit(1);
@@ -109,13 +110,17 @@ const char* pddl_domain_match(pddl_domain* d, const char* l) {
 
         assert(lexer_next(&l, &t) == ID);
         if (strncmp(t.ptr, "domain", t.len) == 0) {
+		TRACE("Parse domain name");
                 assert(lexer_next(&l, &d->name) == ID);
                 assert(lexer_next(&l, &t) == RPAREN);
         } else if (strncmp(t.ptr, ":requirements", t.len) == 0) {
+		TRACE("Parse domain requirements");
                 parse_ids(&l, d->requirements);
         } else if (strncmp(t.ptr, ":predicates", t.len) == 0) {
+		TRACE("Parse domain predicates");
                 parse_predicates(&l, d->predicates);
         } else if (strncmp(t.ptr, ":action", t.len) == 0) {
+		TRACE("Parse domain action");
                 parse_action(&l, &d->actions[0]);
         } else {
                 fprintf(stderr, "unexpected keyword %.*s\n", (int)t.len, t.ptr);
@@ -129,6 +134,8 @@ pddl_domain pddl_domain_parse(const char* s) {
         pddl_domain d = {0};
         string      t = {0};
         kind        k = 0;
+
+	TRACE("Parse domain");
 
         assert(lexer_next(&s, &t) == LPAREN);
         assert(lexer_next(&s, &t) == ID);
@@ -158,16 +165,21 @@ const char* pddl_problem_match(pddl_problem* p, const char* l) {
 
         assert(lexer_next(&l, &t) == ID);
         if (strncmp(t.ptr, "problem", t.len) == 0) {
+		TRACE("Parse problem name");
                 assert(lexer_next(&l, &p->name) == ID);
                 assert(lexer_next(&l, &t) == RPAREN);
 	} else if (strncmp(t.ptr, ":domain", t.len) == 0) {
+		TRACE("Parse problem domain");
                 assert(lexer_next(&l, &p->domain) == ID);
                 assert(lexer_next(&l, &t) == RPAREN);
         } else if (strncmp(t.ptr, ":objects", t.len) == 0) {
+		TRACE("Parse problem objects");
                 parse_ids(&l, p->objects);
 	} else if (strncmp(t.ptr, ":init", t.len) == 0) {
+		TRACE("Parse problem inits");
 		parse_atoms(&l, p->inits);
 	} else if (strncmp(t.ptr, ":goal", t.len) == 0) {
+		TRACE("Parse problem goals");
                 assert(lexer_next(&l, &t) == LPAREN);
                 assert(lexer_next(&l, &t) == ID);
 		parse_atoms(&l, p->goals);
@@ -180,8 +192,10 @@ const char* pddl_problem_match(pddl_problem* p, const char* l) {
 
 pddl_problem pddl_problem_parse(const char* s) {
         pddl_problem p = {0};
-        string      t = {0};
-        kind        k = 0;
+        string       t = {0};
+        kind         k = 0;
+
+	TRACE("Parse problem");
 
         assert(lexer_next(&s, &t) == LPAREN);
         assert(lexer_next(&s, &t) == ID);

@@ -8,4 +8,7 @@ typedef struct {
 	size_t      len;
 } string;
 
+size_t slen(const string* arr);
+const string* sfind(const string* arr, const string* s);
+
 #endif
