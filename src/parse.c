@@ -263,50 +263,6 @@ static void parse_action(lexer* l, struct action* action) {
         }
 }
 
-void parse_domain_(struct domain* d, const char* str) {
-        lexer l              = {.str = str, .pos = 0};
-        d->name.ptr          = NULL;
-        d->requirement_count = 0;
-        d->predicate_count   = 0;
-        d->action_count      = 0;
-        lexer_expect(&l, LPAREN);
-        lexer_expect_def(&l, KEYWORD_DEFINE);
-        string    tmp = {0};
-        enum kind kind;
-        while ((kind = lexer_next(&l, &tmp)) != EOI) {
-                if (kind == RPAREN)
-                        break;
-                assert(kind == LPAREN);
-                lexer_next(&l, &tmp);
-                enum keyword keyword = keyword_match(&tmp);
-                TRACE("Parse %s", KEYWORD_NAMES[keyword]);
-                switch (keyword) {
-                case KEYWORD_NAME:
-                        parse_id(&l, &d->name);
-                        break;
-                case KEYWORD_REQUIREMENTS:
-                        parse_ids(&l, d->requirements, &d->requirement_count);
-                        break;
-                case KEYWORD_TYPES:
-                        parse_typed(&l, &d->type_count, d->types, d->type_parents, true);
-                        break;
-                case KEYWORD_PREDICATES:
-                        parse_predicates(&l, d->predicates, &d->predicate_count);
-                        break;
-                case KEYWORD_ACTION:
-                        parse_action(&l, &d->actions[d->action_count++]);
-                        break;
-                default:
-                        fprintf(stderr, "%s: Unexpected keyword\n", KEYWORD_NAMES[keyword]);
-                        exit(1);
-                }
-        }
-        INFO("Domain:     %.*s", d->name.len, d->name.ptr);
-        INFO("Types:      %d", d->type_count);
-        INFO("Predicates: %d", d->predicate_count);
-        INFO("Actions:    %d", d->action_count);
-}
-
 static void parse_facts(lexer* l, struct fact* facts, uint* count) {
         *count = 0;
         while (lexer_next(l, NULL) == LPAREN) {
@@ -322,17 +278,14 @@ static void parse_goal(lexer* l, struct fact* facts, uint* count) {
         lexer_expect(l, RPAREN);
 }
 
-void parse_problem_(struct problem* p, const char* str) {
-        lexer l         = {.str = str, .pos = 0};
-        p->name.ptr     = NULL;
-        p->domain.ptr   = NULL;
-        p->object_count = 0;
-        p->init_count   = 0;
-        p->goal_count   = 0;
-        lexer_expect(&l, LPAREN);
-        lexer_expect_def(&l, KEYWORD_DEFINE);
+struct domain parse_domain(const char* str) {
+        struct domain d = { 0 };
+        lexer l              = {.str = str, .pos = 0};
         string    tmp = {0};
         enum kind kind;
+
+        lexer_expect(&l, LPAREN);
+        lexer_expect_def(&l, KEYWORD_DEFINE);
         while ((kind = lexer_next(&l, &tmp)) != EOI) {
                 if (kind == RPAREN)
                         break;
@@ -342,41 +295,75 @@ void parse_problem_(struct problem* p, const char* str) {
                 TRACE("Parse %s", KEYWORD_NAMES[keyword]);
                 switch (keyword) {
                 case KEYWORD_NAME:
-                        parse_id(&l, &p->name);
+                        parse_id(&l, &d.name);
                         break;
-                case KEYWORD_DOMAIN:
-                        parse_id(&l, &p->domain);
+                case KEYWORD_REQUIREMENTS:
+                        parse_ids(&l, d.requirements, &d.requirement_count);
                         break;
-                case KEYWORD_OBJECTS:
-                        parse_typed(&l, &p->object_count, p->objects, p->object_types, false);
+                case KEYWORD_TYPES:
+                        parse_typed(&l, &d.type_count, d.types, d.type_parents, true);
                         break;
-                case KEYWORD_INIT:
-                        parse_facts(&l, p->inits, &p->init_count);
+                case KEYWORD_PREDICATES:
+                        parse_predicates(&l, d.predicates, &d.predicate_count);
                         break;
-                case KEYWORD_GOAL:
-                        parse_goal(&l, p->goals, &p->goal_count);
+                case KEYWORD_ACTION:
+                        parse_action(&l, &d.actions[d.action_count++]);
                         break;
                 default:
                         fprintf(stderr, "%s: Unexpected keyword\n", KEYWORD_NAMES[keyword]);
                         exit(1);
                 }
         }
-        INFO("Problem: %.*s", p->name.len, p->name.ptr);
-        INFO("Objects: %d", p->object_count);
-        INFO("Inits:   %d", p->init_count);
-        INFO("Goals:   %d", p->goal_count);
-}
+        INFO("Domain:     %.*s", d.name.len, d.name.ptr);
+        INFO("Types:      %d", d.type_count);
+        INFO("Predicates: %d", d.predicate_count);
+        INFO("Actions:    %d", d.action_count);
 
-struct domain parse_domain(const char* str) {
-        struct domain domain;
-        parse_domain_(&domain, str);
-        return domain;
+        return d;
 }
 
 struct problem parse_problem(const char* str) {
-        struct problem problem;
-        parse_problem_(&problem, str);
-        return problem;
+        struct problem p = { 0 };
+        lexer l         = {.str = str, .pos = 0};
+        string    tmp = {0};
+        enum kind kind;
+
+        lexer_expect(&l, LPAREN);
+        lexer_expect_def(&l, KEYWORD_DEFINE);
+        while ((kind = lexer_next(&l, &tmp)) != EOI) {
+                if (kind == RPAREN)
+                        break;
+                assert(kind == LPAREN);
+                lexer_next(&l, &tmp);
+                enum keyword keyword = keyword_match(&tmp);
+                TRACE("Parse %s", KEYWORD_NAMES[keyword]);
+                switch (keyword) {
+                case KEYWORD_NAME:
+                        parse_id(&l, &p.name);
+                        break;
+                case KEYWORD_DOMAIN:
+                        parse_id(&l, &p.domain);
+                        break;
+                case KEYWORD_OBJECTS:
+                        parse_typed(&l, &p.object_count, p.objects, p.object_types, false);
+                        break;
+                case KEYWORD_INIT:
+                        parse_facts(&l, p.inits, &p.init_count);
+                        break;
+                case KEYWORD_GOAL:
+                        parse_goal(&l, p.goals, &p.goal_count);
+                        break;
+                default:
+                        fprintf(stderr, "%s: Unexpected keyword\n", KEYWORD_NAMES[keyword]);
+                        exit(1);
+                }
+        }
+        INFO("Problem: %.*s", p.name.len, p.name.ptr);
+        INFO("Objects: %d", p.object_count);
+        INFO("Inits:   %d", p.init_count);
+        INFO("Goals:   %d", p.goal_count);
+
+        return p;
 }
 
 static void expression_free(struct expression* exp) {

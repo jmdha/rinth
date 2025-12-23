@@ -66,12 +66,6 @@ struct problem {
         struct fact goals[MAX_GOALS];
 };
 
-void parse_domain_(struct domain *domain, const char *str);
-
-void parse_problem_(struct problem *problem, const char *str);
-
 struct domain parse_domain(const char *str);
-
 struct problem parse_problem(const char *str);
-
 void domain_free(struct domain *domain);
