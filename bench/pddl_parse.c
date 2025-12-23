@@ -1,6 +1,6 @@
 #include <ubench/ubench.h>
 
-#include "parse.h"
+#include "pddl.h"
 
 static const char* DOMAIN = "(define"
                             "	(domain blocksworld)"
@@ -93,12 +93,13 @@ static const char* PROBLEM = "(define (problem blocksworld-01)"
 
 UBENCH_EX(parse, domain) {
         UBENCH_DO_BENCHMARK()
-        for (uint i = 0; i < 1000; i++)
-                parse_domain(DOMAIN);
+        for (uint i = 0; i < 1000000; i++) {
+                pddl_domain_parse(DOMAIN);
+	}
 }
 
 UBENCH_EX(parse, problem) {
         UBENCH_DO_BENCHMARK()
         for (uint i = 0; i < 1000; i++)
-                parse_problem(PROBLEM);
+                pddl_problem_parse(PROBLEM);
 }
