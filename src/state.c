@@ -78,11 +78,17 @@ uint state_overlap(const struct state* a, const struct state* b) {
         return count;
 }
 
-bool state_empty(const struct state* s) { return s->count == 0; }
+bool state_empty(const struct state* s) {
+        return s->count == 0;
+}
 
-uint state_count(const struct state* s) { return s->count; }
+uint state_count(const struct state* s) {
+        return s->count;
+}
 
-uint state_size(const struct state* s) { return sizeof(s->count) + s->count * sizeof(u64); }
+uint state_size(const struct state* s) {
+        return sizeof(s->count) + s->count * sizeof(u64);
+}
 
 u64 state_hash(const struct state* s) {
         u64 hash = 0;
@@ -97,7 +103,9 @@ void state_free(struct state* s) {
         free(s);
 }
 
-void state_clear(struct state* s) { s->count = 0; }
+void state_clear(struct state* s) {
+        s->count = 0;
+}
 
 void state_insert(struct state* s, u16 predicate, uint len, u16* args) {
         const u64 fact = create_fact(predicate, len, args);
@@ -146,7 +154,9 @@ state_iter* state_iter_new(const struct state* s) {
         return si;
 }
 
-void state_iter_free(struct state_iter* si) { free(si); }
+void state_iter_free(struct state_iter* si) {
+        free(si);
+}
 
 bool state_iter_step(struct state_iter* si, u16* pred, uint* len, u16* args) {
         if (si->index >= si->state->count)

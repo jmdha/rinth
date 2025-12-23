@@ -16,4 +16,6 @@ void eval_init(const task_t* task) {
         goal = state_clone(task->goal);
 }
 
-uint eval(const state* s) { return state_overlap(s, goal); }
+uint eval(const state* s) {
+        return state_overlap(s, goal);
+}

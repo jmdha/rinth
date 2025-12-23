@@ -18,7 +18,9 @@ statespace* statespace_new(void) {
         return ss;
 }
 
-size_t statespace_count(const statespace* ss) { return ss->count; }
+size_t statespace_count(const statespace* ss) {
+        return ss->count;
+}
 
 bool statespace_contains(const statespace* ss, const state* s) {
         const u64 hash = state_hash(s);

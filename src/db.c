@@ -5,7 +5,9 @@
 #include "db.h"
 #include "log.h"
 
-void db_init(sqlite3** db) { sqlite3_open(":memory:", db); }
+void db_init(sqlite3** db) {
+        sqlite3_open(":memory:", db);
+}
 
 void db_exec(sqlite3* db, char* sql) {
         TRACE("db_exec: %s", sql);

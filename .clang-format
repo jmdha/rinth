@@ -4,6 +4,7 @@ IndentWidth: 8
 ---
 Language: C
 ColumnLimit: 100
+AllowShortFunctionsOnASingleLine: Empty
 AlignConsecutiveDeclarations: true
 AlignConsecutiveAssignments:  true
 AlignConsecutiveMacros:       true

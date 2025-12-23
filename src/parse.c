@@ -84,9 +84,13 @@ enum keyword keyword_match(const string* str) {
         return MAX_KEYWORD;
 }
 
-static bool is_whitespace(char c) { return ((unsigned char)c) - 1 <= 32; }
+static bool is_whitespace(char c) {
+        return ((unsigned char)c) - 1 <= 32;
+}
 
-static bool is_text(char c) { return c > 41; }
+static bool is_text(char c) {
+        return c > 41;
+}
 
 static void skip_whitespace(lexer* l) {
         while (is_whitespace(l->str[l->pos]))

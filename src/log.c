@@ -17,7 +17,9 @@
 
 clock_t program_start;
 
-void log_init(void) { program_start = clock(); }
+void log_init(void) {
+        program_start = clock();
+}
 
 void log_out(int level, const char* msg, ...) {
         char formatted[32000];
