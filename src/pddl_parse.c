@@ -121,7 +121,12 @@ const char* pddl_domain_match(pddl_domain* d, const char* l) {
                 parse_predicates(&l, d->predicates);
         } else if (strncmp(t.ptr, ":action", t.len) == 0) {
 		TRACE("Parse domain action");
-                parse_action(&l, &d->actions[0]);
+		for (pddl_action* a = d->actions; a; a++) {
+			if (a->name.ptr)
+				continue;
+                	parse_action(&l, a);
+			break;
+		}
         } else {
                 fprintf(stderr, "unexpected keyword %.*s\n", (int)t.len, t.ptr);
                 exit(1);
