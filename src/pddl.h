@@ -9,7 +9,7 @@
 #define MAX_PDDL_PREDICATES   8
 #define MAX_PDDL_VARS         4
 #define MAX_PDDL_ACTIONS      8
-#define MAX_PDDL_STACK        64
+#define MAX_PDDL_STACK        512
 #define MAX_PDDL_OBJECTS      128
 #define MAX_PDDL_INITS        512
 #define MAX_PDDL_GOALS        128
