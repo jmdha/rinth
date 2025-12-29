@@ -78,11 +78,11 @@ UTEST(translate_pddl, action_predicates) {
 }
 
 UTEST(translate_pddl, action_vars) {
-        const char* domain_str =
-            "(define (:predicates (a ?a ?b)) (:action abc :parameters (v0 v1) :precondition (and (a v0 v1))))";
-        const char*        problem_str = "(define)";
-        const pddl_domain  domain      = pddl_domain_parse(domain_str);
-        const pddl_problem problem     = pddl_problem_parse(problem_str);
+        const char* domain_str = "(define (:predicates (a ?a ?b)) (:action abc :parameters (v0 v1) "
+                                 ":precondition (and (a v0 v1))))";
+        const char* problem_str    = "(define)";
+        const pddl_domain  domain  = pddl_domain_parse(domain_str);
+        const pddl_problem problem = pddl_problem_parse(problem_str);
 
         const task def = translate_pddl(&domain, &problem);
 
@@ -96,9 +96,9 @@ UTEST(translate_pddl, action_vars) {
         ASSERT_EQ(SIZE_MAX, def.actions[0].eff_pos[0].predicate);
         ASSERT_EQ(SIZE_MAX, def.actions[0].eff_neg[0].predicate);
 
-	ASSERT_EQ(2, def.actions[0].pre_pos[0].arity);
-	ASSERT_EQ(0, def.actions[0].pre_pos[0].vars[0]);
-	ASSERT_EQ(1, def.actions[0].pre_pos[0].vars[1]);
+        ASSERT_EQ(2, def.actions[0].pre_pos[0].arity);
+        ASSERT_EQ(0, def.actions[0].pre_pos[0].vars[0]);
+        ASSERT_EQ(1, def.actions[0].pre_pos[0].vars[1]);
 }
 
 UTEST(translate_pddl, action_negative) {
@@ -138,57 +138,57 @@ UTEST(translate_pddl, action_multi_negative) {
 }
 
 UTEST(translate_pddl, inits_nullary) {
-        const char* domain_str = "(define (:predicates (a)))";
+        const char*        domain_str  = "(define (:predicates (a)))";
         const char*        problem_str = "(define (:init (a)))";
         const pddl_domain  domain      = pddl_domain_parse(domain_str);
         const pddl_problem problem     = pddl_problem_parse(problem_str);
 
         const task def = translate_pddl(&domain, &problem);
 
-	ASSERT_EQ(0, def.inits[0].predicate);
-	ASSERT_EQ(SIZE_MAX, def.inits[1].predicate);
+        ASSERT_EQ(0, def.inits[0].predicate);
+        ASSERT_EQ(SIZE_MAX, def.inits[1].predicate);
 }
 
 UTEST(translate_pddl, inits_unary) {
-        const char* domain_str = "(define (:predicates (a ?a)))";
+        const char*        domain_str  = "(define (:predicates (a ?a)))";
         const char*        problem_str = "(define (:objects o1) (:init (a o1)))";
         const pddl_domain  domain      = pddl_domain_parse(domain_str);
         const pddl_problem problem     = pddl_problem_parse(problem_str);
 
         const task def = translate_pddl(&domain, &problem);
 
-	ASSERT_EQ(0, def.inits[0].predicate);
-	ASSERT_EQ(SIZE_MAX, def.inits[1].predicate);
+        ASSERT_EQ(0, def.inits[0].predicate);
+        ASSERT_EQ(SIZE_MAX, def.inits[1].predicate);
 
-	ASSERT_EQ(1, def.inits[0].arity);
-	ASSERT_EQ(0, def.inits[0].vars[0]);
+        ASSERT_EQ(1, def.inits[0].arity);
+        ASSERT_EQ(0, def.inits[0].vars[0]);
 }
 
 UTEST(translate_pddl, inits_nary) {
-        const char* domain_str = "(define (:predicates (a ?a ?b)))";
+        const char*        domain_str  = "(define (:predicates (a ?a ?b)))";
         const char*        problem_str = "(define (:objects o1 o2) (:init (a o2 o1)))";
         const pddl_domain  domain      = pddl_domain_parse(domain_str);
         const pddl_problem problem     = pddl_problem_parse(problem_str);
 
         const task def = translate_pddl(&domain, &problem);
 
-	ASSERT_EQ(0, def.inits[0].predicate);
-	ASSERT_EQ(SIZE_MAX, def.inits[1].predicate);
+        ASSERT_EQ(0, def.inits[0].predicate);
+        ASSERT_EQ(SIZE_MAX, def.inits[1].predicate);
 
-	ASSERT_EQ(2, def.inits[0].arity);
-	ASSERT_EQ(1, def.inits[0].vars[0]);
-	ASSERT_EQ(0, def.inits[0].vars[1]);
+        ASSERT_EQ(2, def.inits[0].arity);
+        ASSERT_EQ(1, def.inits[0].vars[0]);
+        ASSERT_EQ(0, def.inits[0].vars[1]);
 }
 
 UTEST(translate_pddl, inits_multiple) {
-        const char* domain_str = "(define (:predicates (a) (b)))";
+        const char*        domain_str  = "(define (:predicates (a) (b)))";
         const char*        problem_str = "(define (:init (a) (b)))";
         const pddl_domain  domain      = pddl_domain_parse(domain_str);
         const pddl_problem problem     = pddl_problem_parse(problem_str);
 
         const task def = translate_pddl(&domain, &problem);
 
-	ASSERT_EQ(0, def.inits[0].predicate);
-	ASSERT_EQ(1, def.inits[1].predicate);
-	ASSERT_EQ(SIZE_MAX, def.inits[2].predicate);
+        ASSERT_EQ(0, def.inits[0].predicate);
+        ASSERT_EQ(1, def.inits[1].predicate);
+        ASSERT_EQ(SIZE_MAX, def.inits[2].predicate);
 }

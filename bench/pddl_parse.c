@@ -95,7 +95,7 @@ UBENCH_EX(parse, domain) {
         UBENCH_DO_BENCHMARK()
         for (uint i = 0; i < 1000000; i++) {
                 pddl_domain_parse(DOMAIN);
-	}
+        }
 }
 
 UBENCH_EX(parse, problem) {
