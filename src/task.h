@@ -34,4 +34,6 @@ typedef struct {
 	atom   goals[MAX_GOALS];
 } task;
 
+task task_init(void);
+
 #endif

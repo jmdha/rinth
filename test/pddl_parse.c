@@ -77,7 +77,7 @@ UTEST(pddl_parse_domain, action_vars) {
 }
 
 UTEST(pddl_parse_domain, action_pre) {
-        const char* s = "(define (:action a :precondition(and (p0))))";
+        const char* s = "(define (:action a :precondition(and (a))))";
 
         pddl_domain d = pddl_domain_parse(s);
 
@@ -86,13 +86,13 @@ UTEST(pddl_parse_domain, action_pre) {
         ASSERT_EQ(1, d.actions[0].pre[0].len);
         ASSERT_EQ(3, d.actions[0].pre[1].len);
         ASSERT_EQ(1, d.actions[0].pre[2].len);
-        ASSERT_EQ(2, d.actions[0].pre[3].len);
+        ASSERT_EQ(1, d.actions[0].pre[3].len);
         ASSERT_EQ(1, d.actions[0].pre[4].len);
         ASSERT_EQ(1, d.actions[0].pre[5].len);
         ASSERT_STRNEQ("(", d.actions[0].pre[0].ptr, d.actions[0].pre[0].len);
         ASSERT_STRNEQ("and", d.actions[0].pre[1].ptr, d.actions[0].pre[1].len);
         ASSERT_STRNEQ("(", d.actions[0].pre[2].ptr, d.actions[0].pre[2].len);
-        ASSERT_STRNEQ("p0", d.actions[0].pre[3].ptr, d.actions[0].pre[3].len);
+        ASSERT_STRNEQ("a", d.actions[0].pre[3].ptr, d.actions[0].pre[3].len);
         ASSERT_STRNEQ(")", d.actions[0].pre[4].ptr, d.actions[0].pre[4].len);
         ASSERT_STRNEQ(")", d.actions[0].pre[5].ptr, d.actions[0].pre[5].len);
         ASSERT_EQ(0, d.actions[0].pre[6].len);

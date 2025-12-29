@@ -11,7 +11,7 @@ all:
 	src/main.c \
 	src/misc.c src/io.c src/log.c src/algo.c \
 	src/pddl_parse.c src/pddl_validate.c \
-	src/translate_pddl.c \
+	src/task.c src/translate_pddl.c \
 	$(LIBS)
 
 for bench: LIBS += -lm
@@ -21,7 +21,7 @@ bench:
 	bench/pddl_parse.c \
 	src/misc.c src/io.c src/log.c src/algo.c \
 	src/pddl_parse.c src/pddl_validate.c \
-	src/translate_pddl.c \
+	src/task.c src/translate_pddl.c \
 	$(LIBS)
 
 test:
@@ -30,5 +30,5 @@ test:
 	test/algo.c test/pddl_parse.c test/translate_pddl.c \
 	src/misc.c src/io.c src/log.c src/algo.c \
 	src/pddl_parse.c src/pddl_validate.c \
-	src/translate_pddl.c \
+	src/task.c src/translate_pddl.c \
 	$(LIBS)
