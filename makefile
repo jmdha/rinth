@@ -13,6 +13,7 @@ all:
 	src/pddl_parse.c src/pddl_validate.c \
 	src/task.c src/translate_pddl.c \
 	src/state.c \
+	src/expand.c src/expand_cp.c src/expand_sqlite.c \
 	$(LIBS)
 
 for bench: LIBS += -lm
@@ -24,14 +25,16 @@ bench:
 	src/pddl_parse.c src/pddl_validate.c \
 	src/task.c src/translate_pddl.c \
 	src/state.c \
+	src/expand.c src/expand_cp.c src/expand_sqlite.c \
 	$(LIBS)
 
 test:
 	gcc $(CFLAGS) -o testrunner \
 	test/main.c \
-	test/algo.c test/pddl_parse.c test/translate_pddl.c \
+	test/algo.c test/pddl_parse.c test/translate_pddl.c test/expand.c \
 	src/misc.c src/io.c src/log.c src/algo.c \
 	src/pddl_parse.c src/pddl_validate.c \
 	src/task.c src/translate_pddl.c \
 	src/state.c \
+	src/expand.c src/expand_cp.c src/expand_sqlite.c \
 	$(LIBS)

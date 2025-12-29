@@ -1,3 +1,4 @@
+#include "expand.h"
 #include "io.h"
 #include "log.h"
 #include "pddl.h"
@@ -17,12 +18,9 @@ int main(int argc, char** argv) {
         INFO("Domain:  %.*s", domain.name.len, domain.name.ptr);
         INFO("Problem: %.*s", problem.name.len, problem.name.ptr);
 
-        // expand_init(&def);
+        expand_init(&def);
         // eval_init(&def);
         // search_init(&def);
-
-        f_close(domain_str);
-        f_close(problem_str);
 
         INFO("INITIALIZATION FINISHED");
 

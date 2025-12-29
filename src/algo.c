@@ -36,7 +36,7 @@ bool cp_propagate(cp_iter* cpi) {
         return false;
 }
 
-bool cp_step(size_t* vals, cp_iter* cpi) {
+bool cp_step(cp_iter* cpi, size_t* vals) {
         if (!cpi->root[0])
                 return false;
         if (cpi->root[0][cpi->offsets[0]] == SIZE_MAX)

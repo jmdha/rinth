@@ -1,13 +1,13 @@
 #include <assert.h>
 #include <limits.h>
 #include <memory.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>
 
 #include "state.h"
 
-static uint64_t create_fact(size_t predicate, size_t len, size_t* args) {
+static uint64_t create_fact(size_t predicate, size_t len, const size_t* args) {
         uint64_t fact = (uint64_t)1 + (uint64_t)predicate;
         for (size_t i = 0; i < len; i++)
                 fact |= ((uint64_t)1 + (uint64_t)args[i]) << 16 * (1 + (uint64_t)i);
@@ -15,7 +15,7 @@ static uint64_t create_fact(size_t predicate, size_t len, size_t* args) {
 }
 
 struct state {
-        uint count;
+        uint      count;
         uint64_t* facts;
 };
 
@@ -51,7 +51,7 @@ static bool state_contains_(const struct state* s, uint64_t fact) {
         return state_contains_bs(s->facts, 0, s->count - 1, fact);
 }
 
-bool state_contains(const struct state* s, size_t predicate, size_t len, size_t* args) {
+bool state_contains(const struct state* s, size_t predicate, size_t len, const size_t* args) {
         return state_contains_(s, create_fact(predicate, len, args));
 }
 
@@ -71,7 +71,7 @@ bool state_covers(const struct state* a, const struct state* b) {
         return true;
 }
 
-uint state_overlap(const struct state* a, const struct state* b) {
+size_t state_overlap(const struct state* a, const struct state* b) {
         size_t count = 0;
         for (size_t i = 0; i < a->count; i++)
                 if (state_contains_(b, a->facts[i]))
@@ -83,11 +83,11 @@ bool state_empty(const struct state* s) {
         return s->count == 0;
 }
 
-uint state_count(const struct state* s) {
+size_t state_count(const struct state* s) {
         return s->count;
 }
 
-uint state_size(const struct state* s) {
+size_t state_size(const struct state* s) {
         return sizeof(s->count) + s->count * sizeof(uint64_t);
 }
 
@@ -108,14 +108,15 @@ void state_clear(struct state* s) {
         s->count = 0;
 }
 
-void state_insert(struct state* s, size_t predicate, size_t len, size_t* args) {
+void state_insert(struct state* s, size_t predicate, size_t len, const size_t* args) {
         const uint64_t fact = create_fact(predicate, len, args);
         for (size_t i = 0; i < s->count; i++) {
                 if (s->facts[i] == fact) {
                         return; // Already contains fact
                 } else if (s->facts[i] > fact) {
                         s->facts = realloc(s->facts, sizeof(size_t) * ++s->count);
-                        memmove(&s->facts[i + 1], &s->facts[i], sizeof(size_t) * (s->count - i - 1));
+                        memmove(&s->facts[i + 1], &s->facts[i],
+                                sizeof(size_t) * (s->count - i - 1));
                         s->facts[i] = fact;
                         return; // Inserted fact in sorted list
                 }
@@ -124,11 +125,12 @@ void state_insert(struct state* s, size_t predicate, size_t len, size_t* args) {
         s->facts[s->count - 1] = fact;
 }
 
-void state_remove(struct state* s, size_t predicate, size_t len, size_t* args) {
+void state_remove(struct state* s, size_t predicate, size_t len, const size_t* args) {
         const uint64_t fact = create_fact(predicate, len, args);
         for (uint i = 0; i < s->count; i++) {
                 if (s->facts[i] == fact) {
-                        memmove(&s->facts[i], &s->facts[i + 1], sizeof(uint64_t) * (s->count - i - 1));
+                        memmove(&s->facts[i], &s->facts[i + 1],
+                                sizeof(uint64_t) * (s->count - i - 1));
                         if (s->count == 1) {
                                 free(s->facts);
                                 s->facts = NULL;
@@ -163,8 +165,8 @@ bool state_iter_step(struct state_iter* si, size_t* pred, size_t* len, size_t* a
         if (si->index >= si->state->count)
                 return false;
         const uint64_t fact = si->state->facts[si->index++];
-        *len           = 0;
-        *pred          = ((uint16_t)fact) - 1;
+        *len                = 0;
+        *pred               = ((uint16_t)fact) - 1;
         for (uint i = 0; i < 3; i++) {
                 const size_t arg = fact >> 16 * (i + 1);
                 if (arg)

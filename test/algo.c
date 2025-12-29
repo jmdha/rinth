@@ -8,7 +8,7 @@ UTEST(algo_cp, empty) {
 
         cp_iter* cpi = cp_init(vals);
 
-        ASSERT_FALSE(cp_step(out, cpi));
+        ASSERT_FALSE(cp_step(cpi, out));
 }
 
 UTEST(algo_cp, column_single) {
@@ -18,9 +18,9 @@ UTEST(algo_cp, column_single) {
 
         cp_iter* cpi = cp_init(vals);
 
-        ASSERT_TRUE(cp_step(out, cpi));
+        ASSERT_TRUE(cp_step(cpi, out));
         ASSERT_EQ(1, out[0]);
-        ASSERT_FALSE(cp_step(out, cpi));
+        ASSERT_FALSE(cp_step(cpi, out));
 }
 
 UTEST(algo_cp, column_multiple) {
@@ -30,11 +30,11 @@ UTEST(algo_cp, column_multiple) {
 
         cp_iter* cpi = cp_init(vals);
 
-        ASSERT_TRUE(cp_step(out, cpi));
+        ASSERT_TRUE(cp_step(cpi, out));
         ASSERT_EQ(1, out[0]);
-        ASSERT_TRUE(cp_step(out, cpi));
+        ASSERT_TRUE(cp_step(cpi, out));
         ASSERT_EQ(2, out[0]);
-        ASSERT_FALSE(cp_step(out, cpi));
+        ASSERT_FALSE(cp_step(cpi, out));
 }
 
 UTEST(algo_cp, 2_columns) {
@@ -45,10 +45,10 @@ UTEST(algo_cp, 2_columns) {
 
         cp_iter* cpi = cp_init(vals);
 
-        ASSERT_TRUE(cp_step(out, cpi));
+        ASSERT_TRUE(cp_step(cpi, out));
         ASSERT_EQ(1, out[0]);
         ASSERT_EQ(10, out[1]);
-        ASSERT_FALSE(cp_step(out, cpi));
+        ASSERT_FALSE(cp_step(cpi, out));
 }
 
 UTEST(algo_cp, 2_columns_multiple) {
@@ -59,19 +59,19 @@ UTEST(algo_cp, 2_columns_multiple) {
 
         cp_iter* cpi = cp_init(vals);
 
-        ASSERT_TRUE(cp_step(out, cpi));
+        ASSERT_TRUE(cp_step(cpi, out));
         ASSERT_EQ(1, out[0]);
         ASSERT_EQ(10, out[1]);
-        ASSERT_TRUE(cp_step(out, cpi));
+        ASSERT_TRUE(cp_step(cpi, out));
         ASSERT_EQ(2, out[0]);
         ASSERT_EQ(10, out[1]);
-        ASSERT_TRUE(cp_step(out, cpi));
+        ASSERT_TRUE(cp_step(cpi, out));
         ASSERT_EQ(1, out[0]);
         ASSERT_EQ(11, out[1]);
-        ASSERT_TRUE(cp_step(out, cpi));
+        ASSERT_TRUE(cp_step(cpi, out));
         ASSERT_EQ(2, out[0]);
         ASSERT_EQ(11, out[1]);
-        ASSERT_FALSE(cp_step(out, cpi));
+        ASSERT_FALSE(cp_step(cpi, out));
 }
 
 UTEST(algo_cp, 3_columns_multiple) {
@@ -83,29 +83,29 @@ UTEST(algo_cp, 3_columns_multiple) {
 
         cp_iter* cpi = cp_init(vals);
 
-        ASSERT_TRUE(cp_step(out, cpi));
+        ASSERT_TRUE(cp_step(cpi, out));
         ASSERT_EQ(1, out[0]);
         ASSERT_EQ(11, out[1]);
         ASSERT_EQ(21, out[2]);
-        ASSERT_TRUE(cp_step(out, cpi));
+        ASSERT_TRUE(cp_step(cpi, out));
         ASSERT_EQ(1, out[0]);
         ASSERT_EQ(12, out[1]);
         ASSERT_EQ(21, out[2]);
-        ASSERT_TRUE(cp_step(out, cpi));
+        ASSERT_TRUE(cp_step(cpi, out));
         ASSERT_EQ(1, out[0]);
         ASSERT_EQ(11, out[1]);
         ASSERT_EQ(22, out[2]);
-        ASSERT_TRUE(cp_step(out, cpi));
+        ASSERT_TRUE(cp_step(cpi, out));
         ASSERT_EQ(1, out[0]);
         ASSERT_EQ(12, out[1]);
         ASSERT_EQ(22, out[2]);
-        ASSERT_TRUE(cp_step(out, cpi));
+        ASSERT_TRUE(cp_step(cpi, out));
         ASSERT_EQ(1, out[0]);
         ASSERT_EQ(11, out[1]);
         ASSERT_EQ(33, out[2]);
-        ASSERT_TRUE(cp_step(out, cpi));
+        ASSERT_TRUE(cp_step(cpi, out));
         ASSERT_EQ(1, out[0]);
         ASSERT_EQ(12, out[1]);
         ASSERT_EQ(33, out[2]);
-        ASSERT_FALSE(cp_step(out, cpi));
+        ASSERT_FALSE(cp_step(cpi, out));
 }

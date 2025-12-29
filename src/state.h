@@ -14,7 +14,7 @@ state *state_new(void);
 state *state_clone(const state *s);
 
 // Does state contain fact
-bool state_contains(const struct state *s, size_t predicate, size_t len, size_t *args);
+bool state_contains(const struct state *s, size_t predicate, size_t len, const size_t *args);
 
 // Are states equal
 bool state_equal(const struct state *a, const struct state *b);
@@ -23,16 +23,16 @@ bool state_equal(const struct state *a, const struct state *b);
 bool state_covers(const struct state *a, const struct state *b);
 
 // How many facts from former in latter
-uint state_overlap(const struct state *a, const struct state *b);
+size_t state_overlap(const struct state *a, const struct state *b);
 
 // Is state empty
 bool state_empty(const struct state *s);
 
 // How many facts in state
-uint state_count(const struct state *s);
+size_t state_count(const struct state *s);
 
 // Size of state in bytes
-uint state_size(const struct state *s);
+size_t state_size(const struct state *s);
 
 // Generate a hash of state
 size_t state_hash(const struct state *s);
@@ -44,10 +44,10 @@ void state_free(struct state *s);
 void state_clear(struct state *s);
 
 // Inserts facts into state
-void state_insert(struct state *s, size_t predicate, size_t len, size_t *args);
+void state_insert(struct state *s, size_t predicate, size_t len, const size_t *args);
 
 // Removes fact from state
-void state_remove(struct state *s, size_t predicate, size_t len, size_t *args);
+void state_remove(struct state *s, size_t predicate, size_t len, const size_t *args);
 
 // Create new state iter
 state_iter *state_iter_new(const struct state *s);
