@@ -36,11 +36,10 @@ void expand_cp(const state* s) {
         }
         ACTION = 0;
         STATE  = s;
-	CP = cp_init(ARGS[ACTION]);
 }
 
 bool is_legal(const state* s, const action* a, const size_t* args) {
-        size_t buf[256];
+        size_t buf[32];
         for (size_t i = 0; a->pre_pos[i].predicate != SIZE_MAX; i++) {
                 const atom* atom = &a->pre_pos[i];
                 for (size_t i = 0; i < atom->arity; i++)
@@ -52,27 +51,28 @@ bool is_legal(const state* s, const action* a, const size_t* args) {
                 const atom* atom = &a->pre_neg[i];
                 for (size_t i = 0; i < atom->arity; i++)
                         buf[i] = args[atom->vars[i]];
-                if (!state_contains(s, atom->predicate, atom->arity, buf))
+                if (state_contains(s, atom->predicate, atom->arity, buf))
                         return false;
         }
         return true;
 }
 
 bool expand_step_cp(size_t* action, size_t* args) {
-        if (ACTION >= COUNT)
-                return false;
+	do {
+		if (ACTION >= COUNT)
+			return false;
+		if (!CP)
+			CP = cp_init(ARGS[ACTION]);
+        	if (!cp_step(CP, args)) {
+        	        ACTION++;
+        	        if (CP) {
+        	                cp_free(CP);
+				CP = NULL;
+			}
+			continue;
+        	}
+	} while (!is_legal(STATE, &ACTIONS[ACTION], args));
 
-        *action = ACTION;
-        if (!cp_step(CP, args)) {
-                ACTION++;
-                if (CP)
-                        cp_free(CP);
-                CP = cp_init(ARGS[ACTION]);
-                return expand_step_cp(action, args);
-        }
-
-        if (!is_legal(STATE, &ACTIONS[ACTION], args))
-                return expand_step_cp(action, args);
-
-        return true;
+	*action = ACTION;
+        return ACTION < COUNT;
 }

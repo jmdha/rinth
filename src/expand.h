@@ -16,4 +16,6 @@ bool expand_step(size_t* action, size_t* args);
 bool expand_step_cp(size_t* action, size_t* args);
 bool expand_step_sqlite(size_t* action, size_t* args);
 
+state* successor(size_t* action, size_t* args);
+
 #endif

@@ -38,7 +38,6 @@ void translate_expression(atom* pos, atom* neg, const string* exp, const string*
                                         a->vars[t - e_atom - 1] = sfind(vars, &exp[t]) - vars;
                                 a->arity = i - e_atom - 1;
                                 e_atom   = SIZE_MAX;
-                                continue;
                         }
 
                         if (nots[count - 1] == depth)
@@ -72,17 +71,22 @@ void translate_actions(action* out, const pddl_action* in, const string* preds) 
                 translate_action(out++, in++, preds);
 }
 
-void translate_fact(atom* out, const pddl_atom* in, const string* preds, const string* objects) {
-        out->predicate = sfind(preds, &in->predicate) - preds;
-        out->arity     = slen(in->vars);
+atom translate_fact(const pddl_atom* in, const string* preds, const string* objects) {
+	atom out = {0};
+        out.predicate = sfind(preds, &in->predicate) - preds;
+        out.arity     = slen(in->vars);
         for (size_t i = 0; in->vars[i].ptr; i++)
-                out->vars[i] = sfind(objects, &in->vars[i]) - objects;
+                out.vars[i] = sfind(objects, &in->vars[i]) - objects;
+	return out;
 }
 
-void translate_facts(atom* out, const pddl_atom* in, const string* preds, const string* objects) {
+void translate_facts(state** out, const pddl_atom* in, const string* preds, const string* objects) {
         TRACE("Translate facts");
-        while (in->predicate.ptr)
-                translate_fact(out++, in++, preds, objects);
+	*out = state_new();
+        while (in->predicate.ptr) {
+                const atom a = translate_fact(in++, preds, objects);
+		state_insert(*out, a.predicate, a.arity, a.vars);
+	}
 }
 
 task translate_pddl(const pddl_domain* d, const pddl_problem* p) {
@@ -95,8 +99,8 @@ task translate_pddl(const pddl_domain* d, const pddl_problem* p) {
         translate_predicates(t.predicates, d->predicates);
         translate_objects(t.objects, p->objects);
         translate_actions(t.actions, d->actions, t.predicates);
-        translate_facts(t.inits, p->inits, t.predicates, t.objects);
-        translate_facts(t.goals, p->goals, t.predicates, t.objects);
+        translate_facts(&t.init, p->inits, t.predicates, t.objects);
+        translate_facts(&t.goal, p->goals, t.predicates, t.objects);
 
         return t;
 }

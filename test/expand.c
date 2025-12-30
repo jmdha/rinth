@@ -36,12 +36,8 @@ UTEST(expand_cp, 1_step) {
         const pddl_problem problem     = pddl_problem_parse(PROBLEM);
         const task def = translate_pddl(&domain, &problem);
 
-	state* s = state_new();
-	for (size_t i = 0; def.inits[i].predicate != SIZE_MAX; i++)
-		state_insert(s, def.inits[i].predicate, def.inits[i].arity, def.inits[i].vars);
-
 	expand_init_cp(&def);
-	expand_cp(s);
+	expand_cp(def.init);
 	
 	size_t action;
 	size_t args[64];
@@ -50,6 +46,4 @@ UTEST(expand_cp, 1_step) {
 	ASSERT_EQ(0, action);
 	ASSERT_EQ(0, args[0]);
 	ASSERT_EQ(1, args[1]);
-
-	state_free(s);
 }

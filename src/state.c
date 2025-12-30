@@ -34,9 +34,9 @@ state* state_clone(const state* s) {
         return new;
 }
 
-static bool state_contains_bs(const uint64_t* facts, size_t left, size_t right, uint64_t fact) {
+static bool state_contains_bs(const uint64_t* facts, int left, int right, uint64_t fact) {
         while (left <= right) {
-                const size_t mid = left + (right - left) / 2;
+                const int mid = left + (right - left) / 2;
                 if (facts[mid] == fact)
                         return true;
                 if (facts[mid] < fact)
@@ -58,7 +58,7 @@ bool state_contains(const struct state* s, size_t predicate, size_t len, const s
 bool state_equal(const struct state* a, const struct state* b) {
         if (a->count != b->count)
                 return false;
-        for (uint i = 0; i < a->count; i++)
+        for (size_t i = 0; i < a->count; i++)
                 if (a->facts[i] != b->facts[i])
                         return false;
         return true;
@@ -167,8 +167,8 @@ bool state_iter_step(struct state_iter* si, size_t* pred, size_t* len, size_t* a
         const uint64_t fact = si->state->facts[si->index++];
         *len                = 0;
         *pred               = ((uint16_t)fact) - 1;
-        for (uint i = 0; i < 3; i++) {
-                const size_t arg = fact >> 16 * (i + 1);
+        for (size_t i = 0; i < 3; i++) {
+                const size_t arg = (uint16_t)(fact >> 16 * (i + 1));
                 if (arg)
                         args[(*len)++] = arg - 1;
                 else
