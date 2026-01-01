@@ -6,7 +6,6 @@
 #define GROWTH_FACTOR 4
 
 struct states {
-	size_t  ele;
 	size_t  len;
 	size_t  cap;
 	state** map;
@@ -15,7 +14,6 @@ struct states {
 states* states_new(void) {
 	states* S = malloc(sizeof(states));
 
-	S->ele = SIZE_MAX;
 	S->len = 0;
 	S->cap = 8;
 	S->map = calloc(S->cap, sizeof(state*));
@@ -41,18 +39,16 @@ bool states_contains(const states* S, const state* s) {
 	return false;
 }
 
-size_t states_insert(state** map, size_t cap, state* s) {
+void states_insert(state** map, size_t cap, state* s) {
 	const uint64_t hash = state_hash(s);
 
 	for (size_t o = 0; o < cap; o++) {
 		const uint64_t i = (hash + o) % cap;
 		if (!map[i]) {
 			map[i] = s;
-			return i;
+			break;
 		}
 	}
-
-	return SIZE_MAX;
 }
 
 void states_grow(states* S) {
@@ -69,9 +65,8 @@ void states_grow(states* S) {
 void states_add(states* S, state* s) {
 	if (GROWTH_FACTOR * S->len > S->cap)
 		states_grow(S);
-	size_t i = states_insert(S->map, S->cap, s);
+	states_insert(S->map, S->cap, s);
 	S->len++;
-	S->ele = i;
 }
 
 void states_remove(states* S, state* s) {
@@ -82,30 +77,6 @@ void states_remove(states* S, state* s) {
 		if (S->map[i] && state_equal(S->map[i], s)) {
 			S->map[i] = NULL;
 			S->len--;
-			if (i == S->ele)
-				S->ele = SIZE_MAX;
 		}
 	}
-}
-
-state* states_pop(states* S) {
-	if (S->ele != SIZE_MAX) {
-		state *s = S->map[S->ele];
-		S->map[S->ele] = NULL;
-		S->len--;
-		S->ele = SIZE_MAX;
-		return s;
-	}
-
-	for (size_t i = 0; i < S->cap; i++)
-		if (S->map[i]) {
-			state* s = S->map[i];
-			S->len--;
-			S->map[i] = NULL;
-			if (i == S->ele)
-				S->ele = SIZE_MAX;
-			return s;
-		}
-
-	return NULL;
 }

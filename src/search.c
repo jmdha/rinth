@@ -7,13 +7,16 @@
 
 path solve(const state* init, const state* goal) {
 	path p = { 0 };
-	states* q = states_new();
 	states* v = states_new();
+	size_t qlen = 0;
+	size_t qcap = 8;
+	state** q = malloc(qcap * sizeof(state*));
+	size_t gen = 0;
 
-	states_add(q, state_clone(init));
+	q[qlen++] = state_clone(init);
 
-	while (states_count > 0) {
-		state* s = states_pop(q);
+	while (qlen > 0) {
+		state* s = q[--qlen];
 		states_add(v, s);
 
 		expand(s);
@@ -22,18 +25,25 @@ path solve(const state* init, const state* goal) {
 		size_t args[64];
 		state* child;
 		while ((child = successor(&action, args))) {
-			if (states_contains(q, child) || states_contains(v, child)) {
+			gen++;
+			if (states_contains(v, child)) {
 				state_free(child);
 				continue;
 			}
 
 			if (state_covers(child, goal)) {
 				p.len = 0;
-				printf("Visited: %zu | Queue: %zu\n", states_count(v), states_count(q));
+				printf("Visited: %zu\n", states_count(v));
+				printf("Generated: %zu\n", gen);
 				return p;
 			}
 
-			states_add(q, child);
+			if (qlen >= qcap) {
+				qcap *= 4;
+				q = realloc(q, qcap * sizeof(state*));
+			}
+
+			q[qlen++] = child;
 		}
 	}
 
