@@ -88,10 +88,12 @@ size_t state_size(const struct state* s) {
         return sizeof(s->count) + s->count * sizeof(uint64_t);
 }
 
-size_t state_hash(const struct state* s) {
-        size_t hash = 0;
-        for (size_t i = 0; i < s->count; i++)
-                hash = (hash << 5) + hash + s->facts[i];
+uint64_t state_hash(const struct state* s) {
+        uint64_t hash = 2166136261;
+        for (size_t i = 0; i < s->count; i++) {
+		hash ^= s->facts[i];
+		hash *= 1099511628211;
+	}
         return hash;
 }
 

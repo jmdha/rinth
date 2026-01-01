@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdbool.h>
+#include <stdint.h>
 
 #include "misc.h"
 
@@ -35,7 +36,7 @@ size_t state_count(const struct state *s);
 size_t state_size(const struct state *s);
 
 // Generate a hash of state
-size_t state_hash(const struct state *s);
+uint64_t state_hash(const struct state *s);
 
 // Frees state allocation
 void state_free(struct state *s);
