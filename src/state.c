@@ -58,10 +58,7 @@ bool state_contains(const struct state* s, size_t predicate, size_t len, const s
 bool state_equal(const struct state* a, const struct state* b) {
         if (a->count != b->count)
                 return false;
-        for (size_t i = 0; i < a->count; i++)
-                if (a->facts[i] != b->facts[i])
-                        return false;
-        return true;
+	return memcmp(a->facts, b->facts, a->count * sizeof(uint64_t)) == 0;
 }
 
 bool state_covers(const struct state* a, const struct state* b) {
