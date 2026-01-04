@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "task.h"
 
@@ -34,6 +35,11 @@ task task_init(void) {
         }
 
         return def;
+}
+
+void task_free(task* def) {
+	state_free(def->init);
+	state_free(def->goal);
 }
 
 void task_print(const task* def) {

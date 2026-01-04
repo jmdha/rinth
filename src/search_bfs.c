@@ -6,45 +6,52 @@
 #include "expand.h"
 #include "states.h"
 
+typedef struct node {
+	state* s;
+	struct node* n;
+} node;
+
 path solve_bfs(const state* init, const state* goal) {
-	path p = { 0 };
-	states* v = states_new();
-	size_t qlen = 0;
-	size_t qcap = 8;
-	state** q = malloc(qcap * sizeof(state*));
+	path   p;
+	size_t action;
+	size_t args[64];
+	node*  queue;
 
-	q[qlen++] = state_clone(init);
+	queue    = malloc(sizeof(node));
+	queue->s = state_clone(init);
+	queue->n = NULL;
 
-	while (qlen > 0) {
-		state* s = q[0];
-		memmove(&q[0], &q[1], --qlen);
-		states_add(v, s);
-
-		expand(s);
-
-		size_t action;
-		size_t args[64];
+	while (queue) {
+		node*  curr;
 		state* child;
-		while ((child = successor(&action, args))) {
-			if (states_contains(v, child)) {
-				state_free(child);
-				continue;
-			}
 
+		curr  = queue;
+		queue = queue->n;
+
+		expand(curr->s);
+		while ((child = successor(&action, args))) {
 			if (state_covers(child, goal)) {
 				p.len = 0;
-				return p;
+				goto DONE;
 			}
-
-			if (qlen >= qcap) {
-				qcap *= 4;
-				q = realloc(q, qcap * sizeof(state*));
-			}
-
-			q[qlen++] = child;
+			
+			node* child_node = malloc(sizeof(node));
+			child_node->s    = child;
+			child_node->n    = queue;
+			queue            = child_node;
 		}
+		state_free(curr->s);
+		free(curr);
 	}
 
-	return p;
+	p.len = SIZE_MAX;
 
+DONE:
+	while (queue) {
+		node* next = queue->n;
+		state_free(queue->s);
+		free(queue);
+		queue = next;
+	}
+	return p;
 }

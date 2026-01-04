@@ -15,7 +15,7 @@ all:
 	src/task.c src/translate_pddl.c \
 	src/state.c src/states.c \
 	src/expand.c src/expand_cp.c src/expand_sqlite.c \
-	src/search.c src/search_bfs.c src/search_dfs.c src/search_gbfs.c src/search_lazy.c \
+	src/search.c src/search_bfs.c src/search_gbfs.c src/search_lazy.c \
 	$(LIBS)
 
 for bench: LIBS += -lm
@@ -28,7 +28,7 @@ bench:
 	src/task.c src/translate_pddl.c \
 	src/state.c src/states.c \
 	src/expand.c src/expand_cp.c src/expand_sqlite.c \
-	src/search.c src/search_bfs.c src/search_dfs.c src/search_gbfs.c src/search_lazy.c \
+	src/search.c src/search_bfs.c src/search_gbfs.c src/search_lazy.c \
 	$(LIBS)
 
 test:
@@ -40,5 +40,5 @@ test:
 	src/task.c src/translate_pddl.c \
 	src/state.c src/states.c \
 	src/expand.c src/expand_cp.c src/expand_sqlite.c \
-	src/search.c src/search_bfs.c src/search_dfs.c src/search_gbfs.c src/search_lazy.c \
+	src/search.c src/search_bfs.c src/search_gbfs.c src/search_lazy.c \
 	$(LIBS)

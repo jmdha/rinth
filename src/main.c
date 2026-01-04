@@ -35,6 +35,10 @@ int main(int argc, char** argv) {
 	//		printf(" %.*s", (int) def.objects[sol.args[i][t]].len, def.objects[sol.args[i][t]].ptr);
 	//	printf(")\n");
 	//}
+	
+	task_free(&def);
+	f_close(domain_str);
+	f_close(problem_str);
 
         return 0;
 }

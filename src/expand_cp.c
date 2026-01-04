@@ -11,15 +11,25 @@ size_t***     ARGS    = NULL;
 const state*  STATE   = NULL;
 cp_iter*      CP      = NULL;
 
+void fini(void) {
+	for (size_t i = 0; ARGS[i]; i++) {
+		for (size_t t = 0; ARGS[i][t]; t++)
+			free(ARGS[i][t]);
+		free(ARGS[i]);
+	}
+	free(ARGS);
+}
+
 void expand_init_cp(const task* def) {
+	atexit(fini);
 	COUNT = 0;
         ACTIONS = def->actions;
         for (size_t i = 0; ACTIONS[i].name.ptr; i++)
                 COUNT++;
         // TODO: Make args influenced my statics
-        ARGS = malloc(COUNT * sizeof(size_t**));
+        ARGS = calloc((1 + COUNT), sizeof(size_t**));
         for (size_t i = 0; ACTIONS[i].name.ptr; i++)
-                ARGS[i] = malloc(ACTIONS[i].arity * sizeof(size_t*));
+                ARGS[i] = calloc((1 + ACTIONS[i].arity), sizeof(size_t*));
         for (size_t i = 0; ACTIONS[i].name.ptr; i++)
                 for (size_t t = 0; t < ACTIONS[i].arity; t++) {
                         ARGS[i][t] = malloc((1 + slen(def->objects)) * sizeof(size_t));

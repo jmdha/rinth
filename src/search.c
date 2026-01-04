@@ -9,8 +9,6 @@ path solve(const state* init, const state* goal, search_kind skind) {
 	switch (skind) {
 		case SEARCH_BFS:
 			return solve_bfs(init, goal);
-		case SEARCH_DFS:
-			return solve_dfs(init, goal);
 		case SEARCH_GBFS:
 			return solve_gbfs(init, goal);
 		case SEARCH_LAZY:

@@ -34,6 +34,7 @@ typedef struct {
 } task;
 
 task task_init(void);
+void task_free(task* def);
 void task_print(const task* def);
 
 #endif

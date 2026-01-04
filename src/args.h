@@ -10,7 +10,6 @@ typedef enum {
 typedef enum {
 	SEARCH_NONE,
 	SEARCH_BFS,
-	SEARCH_DFS,
 	SEARCH_GBFS,
 	SEARCH_LAZY,
 } search_kind;

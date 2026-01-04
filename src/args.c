@@ -31,8 +31,6 @@ args args_parse(int argc, char** argv) {
 		case 's':
 			if (strcmp("bfs", optarg) == 0)
 				a.search = SEARCH_BFS;
-			else if (strcmp("dfs", optarg) == 0)
-				a.search = SEARCH_DFS;
 			else if (strcmp("gbfs", optarg) == 0)
 				a.search = SEARCH_GBFS;
 			else if (strcmp("lazy", optarg) == 0)
