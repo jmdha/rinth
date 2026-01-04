@@ -10,12 +10,25 @@ static const action* ACTIONS = NULL;
 void (*f_expand)(const state*);
 bool (*f_expand_step)(size_t*, size_t*);
 
-void expand_init(const task* t) {
-        expand_init_cp(t);
-        expand_init_sqlite(t);
+void expand_init(const task* t, expand_kind ekind) {
+	if (ekind == EXPAND_NONE)
+		ekind = EXPAND_CP;
 
-        f_expand      = expand_cp;
-        f_expand_step = expand_step_cp;
+	switch (ekind) {
+	case EXPAND_CP:
+		expand_init_cp(t);
+		f_expand = expand_cp;
+		f_expand_step = expand_step_cp;
+		break;
+	case EXPAND_SQLITE:
+		expand_init_sqlite(t);
+		f_expand = expand_sqlite;
+		f_expand_step = expand_step_sqlite;
+		break;
+	default:
+		fprintf(stderr, "%d: unexpected expansion kind\n", ekind);
+		break;
+	}
 
 	TASK = t;
 	ACTIONS = t->actions;

@@ -1,10 +1,11 @@
 #ifndef EXPAND_H
 #define EXPAND_H
 
+#include "args.h"
 #include "task.h"
 #include "state.h"
 
-void expand_init(const task* t);
+void expand_init(const task* t, expand_kind ekind);
 void expand_init_cp(const task* t);
 void expand_init_sqlite(const task* t);
 

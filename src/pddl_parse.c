@@ -86,7 +86,6 @@ void parse_expression(const char** l, string* stack) {
 
 void parse_action(const char** l, pddl_action* action) {
         string t = {0};
-        kind   k = 0;
 
         assert(lexer_next(l, &action->name) == ID);
         while (lexer_next(l, &t) != RPAREN) {
@@ -106,7 +105,6 @@ void parse_action(const char** l, pddl_action* action) {
 
 const char* pddl_domain_match(pddl_domain* d, const char* l) {
         string t = {0};
-        kind   k = 0;
 
         assert(lexer_next(&l, &t) == ID);
         if (strncmp(t.ptr, "domain", t.len) == 0) {
@@ -166,7 +164,6 @@ void parse_atoms(const char** l, pddl_atom* atoms) {
 
 const char* pddl_problem_match(pddl_problem* p, const char* l) {
         string t = {0};
-        kind   k = 0;
 
         assert(lexer_next(&l, &t) == ID);
         if (strncmp(t.ptr, "problem", t.len) == 0) {

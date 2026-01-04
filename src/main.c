@@ -11,10 +11,9 @@
 int main(int argc, char** argv) {
         log_init();
 
-        const char*  domain_path  = argv[1];
-        const char*  problem_path = argv[2];
-        char**       domain_str   = f_open(domain_path);
-        char**       problem_str  = f_open(problem_path);
+	const args   a            = args_parse(argc, argv);
+        char**       domain_str   = f_open(a.path_domain);
+        char**       problem_str  = f_open(a.path_problem);
         pddl_domain  domain       = pddl_domain_parse(*domain_str);
         pddl_problem problem      = pddl_problem_parse(*problem_str);
         task         def          = translate_pddl(&domain, &problem);
@@ -23,11 +22,11 @@ int main(int argc, char** argv) {
 
 	task_print(&def);
 
-        expand_init(&def);
+        expand_init(&def, a.expand);
 
         INFO("INITIALIZATION FINISHED");
 
-        path sol = solve(def.init, def.goal);
+        path sol = solve(def.init, def.goal, a.search);
 	printf("%zu\n", sol.len);
 	//for (size_t i = 0; i < sol.len; i++) {
 	//	const action* a = &def.actions[sol.actions[i]];
