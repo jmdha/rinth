@@ -12,6 +12,10 @@ void print_help(void) {
 args args_parse(int argc, char** argv) {
 	args a = { 0 };
 
+	a.search = SEARCH_BFS;
+	a.expand = EXPAND_CP;
+	a.eval   = EVAL_GOAL_COUNT;
+
 	int opt;
 	while ((opt = getopt(argc, argv, "t:d:p:s:e:h:")) != -1) {
 		switch (opt) {
@@ -34,7 +38,7 @@ args args_parse(int argc, char** argv) {
 			else if (strcmp("lazy", optarg) == 0)
 				a.search = SEARCH_LAZY;
 			else {
-				printf("unknown search algorithm\n");
+				fprintf(stderr, "%s: unknown search algorithm\n", optarg);
 				exit(1);
 			}
 			break;
@@ -44,7 +48,7 @@ args args_parse(int argc, char** argv) {
 			else if (strcmp("sqlite", optarg) == 0)
 				a.expand = EXPAND_SQLITE;
 			else {
-				printf("unknown expansion strategy\n");
+				fprintf(stderr, "%s: unknown expansion policy\n", optarg);
 				exit(1);
 			}
 			break;
@@ -52,7 +56,7 @@ args args_parse(int argc, char** argv) {
 			if (strcmp("goal_count", optarg) == 0)
 				a.eval = EVAL_GOAL_COUNT;
 			else {
-				printf("unknown heuristic\n");
+				fprintf(stderr, "%s: unknown heuristic\n", optarg);
 				exit(1);
 			}
 			break;
