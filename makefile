@@ -1,7 +1,8 @@
 NAME    = rinth
 CFLAGS += -Isrc -Ithird_party
-CFLAGS += -O0 -flto -ggdb
+CFLAGS += -O3 -flto -ggdb
 CFLAGS += -Wall
+#CFLAGS += -fsanitize=address
 LIBS   +=
 
 .PHONY: all bench test
@@ -15,6 +16,7 @@ all:
 	src/task.c src/translate_pddl.c \
 	src/state.c src/states.c \
 	src/expand.c src/expand_cp.c src/expand_sqlite.c \
+	src/eval.c src/eval_goal_count.c \
 	src/search.c src/search_bfs.c src/search_gbfs.c src/search_lazy.c \
 	$(LIBS)
 
@@ -28,6 +30,7 @@ bench:
 	src/task.c src/translate_pddl.c \
 	src/state.c src/states.c \
 	src/expand.c src/expand_cp.c src/expand_sqlite.c \
+	src/eval.c src/eval_goal_count.c \
 	src/search.c src/search_bfs.c src/search_gbfs.c src/search_lazy.c \
 	$(LIBS)
 
@@ -40,5 +43,6 @@ test:
 	src/task.c src/translate_pddl.c \
 	src/state.c src/states.c \
 	src/expand.c src/expand_cp.c src/expand_sqlite.c \
+	src/eval.c src/eval_goal_count.c \
 	src/search.c src/search_bfs.c src/search_gbfs.c src/search_lazy.c \
 	$(LIBS)

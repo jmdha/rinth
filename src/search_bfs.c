@@ -24,13 +24,13 @@ path solve_bfs(const state* init, const state* goal) {
 		state* node  = queue[0];
 		state* child = NULL;
 
-		// What even is time complexity
 		memmove(&queue[0], &queue[1], queue_len * sizeof(state*));
 
 		expand(node);
 		while ((child = successor(&action, args))) {
 			if (state_covers(child, goal)) {
 				state_free(node);
+				state_free(child);
 				for (size_t i = 0; i < queue_len; i++)
 					state_free(queue[i]);
 				free(queue);
@@ -45,6 +45,7 @@ path solve_bfs(const state* init, const state* goal) {
 
 			queue[queue_len++] = child;
 		}
+		state_free(node);
 	}
 
 	free(queue);

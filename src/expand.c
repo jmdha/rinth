@@ -1,7 +1,9 @@
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "expand.h"
+#include "log.h"
 
 static const task*   TASK = NULL;
 static const state*  STATE = NULL;
@@ -10,7 +12,14 @@ static const action* ACTIONS = NULL;
 void (*f_expand)(const state*);
 bool (*f_expand_step)(size_t*, size_t*);
 
+static size_t SUCCESSORS = 0;
+
+static void fini(void) {
+	INFO("Successors generated %zu", SUCCESSORS);
+}
+
 void expand_init(const task* t, expand_kind ekind) {
+	atexit(fini);
 	if (ekind == EXPAND_NONE)
 		ekind = EXPAND_CP;
 
@@ -80,5 +89,6 @@ state* successor(size_t* action_index, size_t* args) {
 	//}
 	//state_iter_free(si);
 
+	SUCCESSORS++;
 	return s;
 }

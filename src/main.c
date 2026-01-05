@@ -7,6 +7,7 @@
 #include "task.h"
 #include "translate.h"
 #include "search.h"
+#include "eval.h"
 
 int main(int argc, char** argv) {
         log_init();
@@ -23,6 +24,7 @@ int main(int argc, char** argv) {
 	task_print(&def);
 
         expand_init(&def, a.expand);
+	eval_init(&def, a.eval);
 
         INFO("INITIALIZATION FINISHED");
 

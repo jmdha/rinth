@@ -21,6 +21,11 @@ states* states_new(void) {
 	return S;
 }
 
+void states_free(states* s) {
+	free(s->map);
+	free(s);
+}
+
 size_t states_count(const states* s) {
 	return s->len;
 }

@@ -23,7 +23,7 @@ void translate_objects(string* out, const string* in) {
 void translate_expression(atom* pos, atom* neg, const string* exp, const string* vars,
                           const string* preds) {
         TRACE("Translate expression");
-        size_t nots[100];
+        size_t nots[1000];
         size_t count  = 0;
         size_t depth  = 0;
         size_t e_atom = SIZE_MAX;
@@ -40,7 +40,7 @@ void translate_expression(atom* pos, atom* neg, const string* exp, const string*
                                 e_atom   = SIZE_MAX;
                         }
 
-                        if (nots[count - 1] == depth)
+                        if (count != 0 && nots[count - 1] == depth)
                                 count--;
                         depth--;
                 } else if (3 == exp[i].len && strncmp(exp[i].ptr, "not", exp[i].len) == 0) {
