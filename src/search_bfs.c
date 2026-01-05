@@ -6,52 +6,48 @@
 #include "expand.h"
 #include "states.h"
 
-typedef struct node {
-	state* s;
-	struct node* n;
-} node;
 
 path solve_bfs(const state* init, const state* goal) {
-	path   p;
-	size_t action;
-	size_t args[64];
-	node*  queue;
+	path    p;
+	size_t  action;
+	size_t  args[64];
+	state** queue;
+	size_t  queue_len;
+	size_t  queue_cap;
 
-	queue    = malloc(sizeof(node));
-	queue->s = state_clone(init);
-	queue->n = NULL;
+	queue_len = 1;
+	queue_cap = 8;
+	queue     = malloc(queue_cap * sizeof(state*));
+	queue[0]  = state_clone(init);
 
-	while (queue) {
-		node*  curr;
-		state* child;
+	while (queue_len-- > 0) {
+		state* node  = queue[0];
+		state* child = NULL;
 
-		curr  = queue;
-		queue = queue->n;
+		// What even is time complexity
+		memmove(&queue[0], &queue[1], queue_len * sizeof(state*));
 
-		expand(curr->s);
+		expand(node);
 		while ((child = successor(&action, args))) {
 			if (state_covers(child, goal)) {
+				state_free(node);
+				for (size_t i = 0; i < queue_len; i++)
+					state_free(queue[i]);
+				free(queue);
 				p.len = 0;
-				goto DONE;
+				return p;
 			}
 			
-			node* child_node = malloc(sizeof(node));
-			child_node->s    = child;
-			child_node->n    = queue;
-			queue            = child_node;
+			if (queue_len >= queue_cap) {
+				queue_cap = 2 * queue_cap;
+				queue     = realloc(queue, queue_cap * sizeof(state*));
+			}
+
+			queue[queue_len++] = child;
 		}
-		state_free(curr->s);
-		free(curr);
 	}
 
+	free(queue);
 	p.len = SIZE_MAX;
-
-DONE:
-	while (queue) {
-		node* next = queue->n;
-		state_free(queue->s);
-		free(queue);
-		queue = next;
-	}
 	return p;
 }
