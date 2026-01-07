@@ -3,7 +3,6 @@
 
 #include "search.h"
 #include "expand.h"
-#include "states.h"
 
 path solve(const state* init, const state* goal, search_kind skind) {
 	switch (skind) {

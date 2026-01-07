@@ -14,7 +14,7 @@ all:
 	src/args.c src/misc.c src/io.c src/log.c src/algo.c \
 	src/pddl_parse.c src/pddl_validate.c \
 	src/task.c src/translate_pddl.c \
-	src/state.c src/states.c \
+	src/state.c src/state_heap.c src/state_queue.c src/state_set.c \
 	src/expand.c src/expand_cp.c src/expand_sqlite.c \
 	src/eval.c src/eval_goal_count.c \
 	src/search.c src/search_bfs.c src/search_gbfs.c src/search_lazy.c \
@@ -28,7 +28,7 @@ bench:
 	src/misc.c src/io.c src/log.c src/algo.c \
 	src/pddl_parse.c src/pddl_validate.c \
 	src/task.c src/translate_pddl.c \
-	src/state.c src/states.c \
+	src/state.c src/state_heap.c src/state_queue.c src/state_set.c \
 	src/expand.c src/expand_cp.c src/expand_sqlite.c \
 	src/eval.c src/eval_goal_count.c \
 	src/search.c src/search_bfs.c src/search_gbfs.c src/search_lazy.c \
@@ -38,10 +38,11 @@ test:
 	gcc $(CFLAGS) -o testrunner \
 	test/main.c \
 	test/algo.c test/pddl_parse.c test/translate_pddl.c test/expand.c \
+	test/state_heap.c \
 	src/misc.c src/io.c src/log.c src/algo.c \
 	src/pddl_parse.c src/pddl_validate.c \
 	src/task.c src/translate_pddl.c \
-	src/state.c src/states.c \
+	src/state.c src/state_heap.c src/state_queue.c src/state_set.c \
 	src/expand.c src/expand_cp.c src/expand_sqlite.c \
 	src/eval.c src/eval_goal_count.c \
 	src/search.c src/search_bfs.c src/search_gbfs.c src/search_lazy.c \
