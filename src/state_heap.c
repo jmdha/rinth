@@ -32,7 +32,7 @@ state_heap* sh_new(void) {
 }
 
 void sh_free(state_heap* sh) {
-	for (size_t i = 0; i < sh->len; i++) {
+	for (size_t i = 0; i < sh->cap; i++) {
 		for (size_t t = 0; t < sh->arr[i].len; t++)
 			state_free(sh->arr[i].arr[t]);
 		free(sh->arr[i].arr);
@@ -68,11 +68,14 @@ void sh_push(state_heap* sh, state* s, size_t val) {
 	}
 
 	b->arr[b->len++] = s;
+	sh->len++;
 }
 
 state* sh_pop(state_heap* sh) {
 	for (int i = sh->cap - 1; i >= 0; i--)
-		if (sh->arr[i].len > 0)
+		if (sh->arr[i].len > 0) {
+			sh->len--;
 			return sh->arr[i].arr[--sh->arr[i].len];
+		}
 	return NULL;
 }

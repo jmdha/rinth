@@ -9,7 +9,7 @@ UTEST(state_heap, empty) {
 
 	ASSERT_EQ(0, sh_size(sh));
 
-	sh_free(sh, true);
+	sh_free(sh);
 }
 
 UTEST(state_heap, single) {
@@ -19,7 +19,7 @@ UTEST(state_heap, single) {
 	sh = sh_new();
 	s  = state_new();
 
-	sh_push(sh, state_new(), 0);
+	sh_push(sh, s, 0);
 
 	ASSERT_EQ(1, sh_size(sh));
 
@@ -27,6 +27,6 @@ UTEST(state_heap, single) {
 
 	ASSERT_EQ(0, sh_size(sh));
 
-	sh_free(sh, true);
+	sh_free(sh);
 	state_free(s);
 }

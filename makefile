@@ -11,7 +11,7 @@ for all: CFLAGS += -D LOG_INFO -D LOG_TRACE
 all: 
 	gcc $(CFLAGS) -o $(NAME) \
 	src/main.c \
-	src/args.c src/misc.c src/io.c src/log.c src/algo.c \
+	src/args.c src/bit.c src/misc.c src/io.c src/log.c src/algo.c \
 	src/pddl_parse.c src/pddl_validate.c \
 	src/task.c src/translate_pddl.c \
 	src/state.c src/state_heap.c src/state_queue.c src/state_set.c \
@@ -25,7 +25,7 @@ bench:
 	gcc $(CFLAGS) -o benchmark \
 	bench/main.c \
 	bench/pddl_parse.c \
-	src/misc.c src/io.c src/log.c src/algo.c \
+	src/args.c src/bit.c src/misc.c src/io.c src/log.c src/algo.c \
 	src/pddl_parse.c src/pddl_validate.c \
 	src/task.c src/translate_pddl.c \
 	src/state.c src/state_heap.c src/state_queue.c src/state_set.c \
@@ -38,8 +38,8 @@ test:
 	gcc $(CFLAGS) -o testrunner \
 	test/main.c \
 	test/algo.c test/pddl_parse.c test/translate_pddl.c test/expand.c \
-	test/state_heap.c \
-	src/misc.c src/io.c src/log.c src/algo.c \
+	test/state.c test/state_heap.c \
+	src/args.c src/bit.c src/misc.c src/io.c src/log.c src/algo.c \
 	src/pddl_parse.c src/pddl_validate.c \
 	src/task.c src/translate_pddl.c \
 	src/state.c src/state_heap.c src/state_queue.c src/state_set.c \

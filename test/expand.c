@@ -34,7 +34,7 @@ const char* PROBLEM = "(define"
 UTEST(expand_cp, 1_step) {
         const pddl_domain  domain      = pddl_domain_parse(DOMAIN);
         const pddl_problem problem     = pddl_problem_parse(PROBLEM);
-        const task def = translate_pddl(&domain, &problem);
+        task def                       = translate_pddl(&domain, &problem);
 
 	expand_init_cp(&def);
 	expand_cp(def.init);
@@ -46,4 +46,6 @@ UTEST(expand_cp, 1_step) {
 	ASSERT_EQ(0, action);
 	ASSERT_EQ(0, args[0]);
 	ASSERT_EQ(1, args[1]);
+
+	task_free(&def);
 }

@@ -9,11 +9,13 @@ UTEST(translate_pddl, empty) {
         const pddl_domain  domain      = pddl_domain_parse(domain_str);
         const pddl_problem problem     = pddl_problem_parse(problem_str);
 
-        const task def = translate_pddl(&domain, &problem);
+        task def = translate_pddl(&domain, &problem);
 
         ASSERT_EQ(NULL, def.predicates[0].ptr);
         ASSERT_EQ(NULL, def.objects[0].ptr);
         ASSERT_EQ(NULL, def.actions[0].name.ptr);
+
+	task_free(&def);
 }
 
 UTEST(translate_pddl, predicates) {
@@ -22,7 +24,7 @@ UTEST(translate_pddl, predicates) {
         const pddl_domain  domain      = pddl_domain_parse(domain_str);
         const pddl_problem problem     = pddl_problem_parse(problem_str);
 
-        const task def = translate_pddl(&domain, &problem);
+        task def = translate_pddl(&domain, &problem);
 
         ASSERT_EQ(NULL, def.objects[0].ptr);
         ASSERT_EQ(NULL, def.actions[0].name.ptr);
@@ -31,6 +33,8 @@ UTEST(translate_pddl, predicates) {
         ASSERT_EQ(1, def.predicates[1].len);
         ASSERT_STRNEQ("a", def.predicates[0].ptr, def.predicates[0].len);
         ASSERT_STRNEQ("b", def.predicates[1].ptr, def.predicates[1].len);
+
+	task_free(&def);
 }
 
 UTEST(translate_pddl, objects) {
@@ -39,7 +43,7 @@ UTEST(translate_pddl, objects) {
         const pddl_domain  domain      = pddl_domain_parse(domain_str);
         const pddl_problem problem     = pddl_problem_parse(problem_str);
 
-        const task def = translate_pddl(&domain, &problem);
+        task def = translate_pddl(&domain, &problem);
 
         ASSERT_EQ(NULL, def.predicates[0].ptr);
         ASSERT_EQ(NULL, def.actions[0].name.ptr);
@@ -49,6 +53,8 @@ UTEST(translate_pddl, objects) {
         ASSERT_STRNEQ("a", def.objects[0].ptr, def.objects[0].len);
         ASSERT_STRNEQ("ab", def.objects[1].ptr, def.objects[1].len);
         ASSERT_EQ(NULL, def.objects[2].ptr);
+
+	task_free(&def);
 }
 
 UTEST(translate_pddl, action_predicates) {
@@ -58,7 +64,7 @@ UTEST(translate_pddl, action_predicates) {
         const pddl_domain  domain      = pddl_domain_parse(domain_str);
         const pddl_problem problem     = pddl_problem_parse(problem_str);
 
-        const task def = translate_pddl(&domain, &problem);
+        task def = translate_pddl(&domain, &problem);
 
         ASSERT_EQ(3, def.actions[0].name.len);
         ASSERT_STRNEQ("abc", def.actions[0].name.ptr, def.actions[0].name.len);
@@ -69,6 +75,8 @@ UTEST(translate_pddl, action_predicates) {
         ASSERT_EQ(SIZE_MAX, def.actions[0].pre_neg[0].predicate);
         ASSERT_EQ(0, def.actions[0].eff_pos[0].predicate);
         ASSERT_EQ(SIZE_MAX, def.actions[0].eff_neg[0].predicate);
+
+	task_free(&def);
 }
 
 UTEST(translate_pddl, action_vars) {
@@ -78,7 +86,7 @@ UTEST(translate_pddl, action_vars) {
         const pddl_domain  domain  = pddl_domain_parse(domain_str);
         const pddl_problem problem = pddl_problem_parse(problem_str);
 
-        const task def = translate_pddl(&domain, &problem);
+        task def = translate_pddl(&domain, &problem);
 
         ASSERT_EQ(3, def.actions[0].name.len);
         ASSERT_STRNEQ("abc", def.actions[0].name.ptr, def.actions[0].name.len);
@@ -93,6 +101,8 @@ UTEST(translate_pddl, action_vars) {
         ASSERT_EQ(2, def.actions[0].pre_pos[0].arity);
         ASSERT_EQ(0, def.actions[0].pre_pos[0].vars[0]);
         ASSERT_EQ(1, def.actions[0].pre_pos[0].vars[1]);
+
+	task_free(&def);
 }
 
 UTEST(translate_pddl, action_negative) {
@@ -102,7 +112,7 @@ UTEST(translate_pddl, action_negative) {
         const pddl_domain  domain      = pddl_domain_parse(domain_str);
         const pddl_problem problem     = pddl_problem_parse(problem_str);
 
-        const task def = translate_pddl(&domain, &problem);
+        task def = translate_pddl(&domain, &problem);
 
         ASSERT_EQ(3, def.actions[0].name.len);
         ASSERT_STRNEQ("abc", def.actions[0].name.ptr, def.actions[0].name.len);
@@ -111,6 +121,8 @@ UTEST(translate_pddl, action_negative) {
         ASSERT_EQ(0, def.actions[0].pre_neg[0].predicate);
         ASSERT_EQ(SIZE_MAX, def.actions[0].eff_pos[0].predicate);
         ASSERT_EQ(SIZE_MAX, def.actions[0].eff_neg[0].predicate);
+
+	task_free(&def);
 }
 
 UTEST(translate_pddl, action_multi_negative) {
@@ -120,7 +132,7 @@ UTEST(translate_pddl, action_multi_negative) {
         const pddl_domain  domain      = pddl_domain_parse(domain_str);
         const pddl_problem problem     = pddl_problem_parse(problem_str);
 
-        const task def = translate_pddl(&domain, &problem);
+        task def = translate_pddl(&domain, &problem);
 
         ASSERT_EQ(3, def.actions[0].name.len);
         ASSERT_STRNEQ("abc", def.actions[0].name.ptr, def.actions[0].name.len);
@@ -129,6 +141,8 @@ UTEST(translate_pddl, action_multi_negative) {
         ASSERT_EQ(SIZE_MAX, def.actions[0].pre_neg[0].predicate);
         ASSERT_EQ(SIZE_MAX, def.actions[0].eff_pos[0].predicate);
         ASSERT_EQ(SIZE_MAX, def.actions[0].eff_neg[0].predicate);
+
+	task_free(&def);
 }
 
 //UTEST(translate_pddl, inits_nullary) {
