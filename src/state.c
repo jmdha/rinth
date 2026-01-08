@@ -8,9 +8,9 @@
 #include "state.h"
 
 static uint64_t create_fact(size_t predicate, size_t len, const size_t* args) {
-        uint64_t fact = (uint64_t)1 + (uint64_t)predicate;
+	uint64_t fact = (uint64_t)predicate << 48;
         for (size_t i = 0; i < len; i++)
-                fact |= ((uint64_t)1 + (uint64_t)args[i]) << 16 * (1 + (uint64_t)i);
+                fact |= (uint64_t)args[i] << 16 * (uint64_t)i;
         return fact;
 }
 
