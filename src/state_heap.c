@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 #include "state_heap.h"
+#include "log.h"
 
 typedef struct {
 	size_t  len;
@@ -53,6 +54,7 @@ void sh_push(state_heap* sh, state* s, size_t val) {
 	if (val >= sh->cap) {
 		sh->cap *= 2;
 		sh->arr = realloc(sh->arr, sh->cap * sizeof(bucket));
+		INFO("State Heap: %zu", sh->len);
 		for (size_t i = sh->cap / 2; i < sh->cap; i++) {
 			sh->arr[i].len = 0;
 			sh->arr[i].cap = 8;

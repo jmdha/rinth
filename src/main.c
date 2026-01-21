@@ -18,10 +18,11 @@ int main(int argc, char** argv) {
         pddl_domain  domain       = pddl_domain_parse(*domain_str);
         pddl_problem problem      = pddl_problem_parse(*problem_str);
         task         def          = translate_pddl(&domain, &problem);
-        INFO("Domain:  %.*s", domain.name.len, domain.name.ptr);
-        INFO("Problem: %.*s", problem.name.len, problem.name.ptr);
 
-	task_print(&def);
+        INFO("Domain:     %.*s", domain.name.len, domain.name.ptr);
+        INFO("Problem:    %.*s", problem.name.len, problem.name.ptr);
+	INFO("Predicates: %zu", slen(def.predicates));
+	INFO("Objects:    %zu", slen(def.objects));
 
         expand_init(&def, a.expand);
 	eval_init(&def, a.eval);
@@ -30,13 +31,6 @@ int main(int argc, char** argv) {
 
         path sol = solve(def.init, def.goal, a.search);
 	printf("%zu\n", sol.len);
-	//for (size_t i = 0; i < sol.len; i++) {
-	//	const action* a = &def.actions[sol.actions[i]];
-	//	printf("(%.*s", (int) a->name.len, a->name.ptr);
-	//	for (size_t t = 0; t < a->arity; t++)
-	//		printf(" %.*s", (int) def.objects[sol.args[i][t]].len, def.objects[sol.args[i][t]].ptr);
-	//	printf(")\n");
-	//}
 	
 	task_free(&def);
 	f_close(domain_str);
