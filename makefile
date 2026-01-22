@@ -24,7 +24,7 @@ for bench: LIBS += -lm
 bench:
 	gcc $(CFLAGS) -o benchmark \
 	bench/main.c \
-	bench/pddl_parse.c \
+	bench/state.c bench/pddl_parse.c \
 	src/args.c src/bit.c src/misc.c src/io.c src/log.c src/algo.c \
 	src/pddl_parse.c src/pddl_validate.c \
 	src/task.c src/translate_pddl.c \
