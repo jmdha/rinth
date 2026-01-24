@@ -64,3 +64,21 @@ UTEST(state, contains_unary) {
 
 	state_free(s);
 }
+
+UTEST(state, equal) {
+	state* a = state_new();
+	state* b = state_new();
+
+	ASSERT_TRUE(state_equal(a, b));
+
+	state_insert(a, 0, 0, NULL);
+
+	ASSERT_FALSE(state_equal(a, b));
+
+	state_insert(b, 0, 0, NULL);
+
+	ASSERT_TRUE(state_equal(a, b));
+
+	state_free(a);
+	state_free(b);
+}
