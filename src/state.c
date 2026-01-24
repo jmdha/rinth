@@ -61,14 +61,13 @@ bool state_covers(const struct state* a, const struct state* b) {
 }
 
 size_t state_overlap(const struct state* a, const struct state* b) {
-	state_iter* si = state_iter_new(a);
-	size_t      count = 0;
-	size_t      pred;
-	size_t      len;
-	size_t      args[16];
-	while (state_iter_step(si, &pred, &len, args))
-		if (state_contains(b, pred, len, args))
+	size_t count = 0;
+	for (size_t i = 0; i < a->cap; i++) {
+		if (a->buf[i] == SIZE_MAX)
+			continue;
+		if (state_contains_(b, a->buf[i]))
 			count++;
+	}
 	return count;
 }
 
@@ -90,6 +89,7 @@ uint64_t state_hash(const struct state* s) {
 		if (s->buf[i] == SIZE_MAX)
 			continue;
 		hash ^= s->buf[i];
+		hash *= 1099511628211;
 	}
 	return hash;
 }
