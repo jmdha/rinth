@@ -85,7 +85,13 @@ size_t state_size(const struct state* s) {
 }
 
 uint64_t state_hash(const struct state* s) {
-	return 0; // TODO
+	uint64_t hash = 2166136261;
+	for (size_t i = 0; i < s->cap; i++) {
+		if (s->buf[i] == SIZE_MAX)
+			continue;
+		hash ^= s->buf[i];
+	}
+	return hash;
 }
 
 void state_free(struct state* s) {
