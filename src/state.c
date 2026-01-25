@@ -126,21 +126,15 @@ void state_clear(struct state* s) {
 		s->buf[i] = SIZE_MAX;
 }
 
-static bool insert_fact(uint64_t* buf, size_t cap, uint64_t fact) {
-	uint64_t index = fact_index(cap, fact);
-	if (buf[index] != SIZE_MAX)
-		return false;
-	buf[index] = fact;
-	return true;
-}
-
 static bool copy_buf(uint64_t* buf, size_t cap, size_t old_cap, const uint64_t* old_buf) {
 	for (size_t i = 0; i < old_cap; i++) {
 		uint64_t fact = old_buf[i];
 		if (fact == SIZE_MAX)
 			continue;
-		if (!insert_fact(buf, cap, fact))
+		size_t index = fact_index(cap, fact);
+		if (buf[index] != SIZE_MAX)
 			return false;
+		buf[index] = fact;
 	}
 	return true;
 }
