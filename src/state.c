@@ -21,6 +21,10 @@ static uint64_t fact_new(size_t predicate, size_t len, const size_t* args) {
         return fact;
 }
 
+static size_t fact_index(size_t cap, uint64_t fact) {
+	return fact % cap;
+}
+
 state* state_new(void) {
         state* s = malloc(sizeof(state));
 	s->len   = 0;
@@ -41,7 +45,7 @@ state* state_clone(const state* s) {
 }
 
 bool state_contains_(const struct state* s, uint64_t fact) {
-	return fact == s->buf[fact % s->cap];
+	return fact == s->buf[fact_index(s->cap, fact)];
 }
 
 bool state_contains(const struct state* s, size_t predicate, size_t len, const size_t* args) {
@@ -109,7 +113,7 @@ void state_clear(struct state* s) {
 }
 
 static bool insert_fact(uint64_t* buf, size_t cap, uint64_t fact) {
-	uint64_t index = fact % cap;
+	uint64_t index = fact_index(cap, fact);
 	if (buf[index] != SIZE_MAX)
 		return false;
 	buf[index] = fact;
@@ -137,7 +141,7 @@ static bool update_buf(uint64_t* buf, size_t cap, uint64_t fact, size_t old_cap,
 
 void state_insert(struct state* s, size_t predicate, size_t len, const size_t* args) {
 	uint64_t fact  = fact_new(predicate, len, args);
-	size_t   index = fact % s->cap;
+	size_t   index = fact_index(s->cap, fact);
 	if (s->buf[index] == fact)
 		return; // Already in state
 	s->len++;
@@ -160,7 +164,7 @@ void state_insert(struct state* s, size_t predicate, size_t len, const size_t* a
 
 void state_remove(struct state* s, size_t predicate, size_t len, const size_t* args) {
 	uint64_t fact  = fact_new(predicate, len, args);
-	size_t   index = fact % s->cap;
+	size_t   index = fact_index(s->cap, fact);
 	if (s->buf[index] != fact)
 		return; // Not in state
 	s->buf[index] = SIZE_MAX;
