@@ -132,11 +132,8 @@ static bool copy_buf(uint64_t* buf, size_t cap, size_t old_cap, const uint64_t* 
 }
 
 static bool update_buf(uint64_t* buf, size_t cap, uint64_t fact, size_t old_cap, uint64_t* old_buf) {
-	if (!copy_buf(buf, cap, old_cap, old_buf))
-		return false;
-	if (!insert_fact(buf, cap, fact))
-		return false;
-	return true;
+	buf[fact_index(cap, fact)] = fact;
+	return copy_buf(buf, cap, old_cap, old_buf);
 }
 
 void state_insert(struct state* s, size_t predicate, size_t len, const size_t* args) {
