@@ -61,18 +61,18 @@ state* successor(size_t* action_index, size_t* args) {
 	const action* a = &ACTIONS[*action_index];
 
         size_t buf[32];
-	for (size_t i = 0; a->eff_pos[i].predicate != SIZE_MAX; i++) {
-                const atom* atom = &a->eff_pos[i];
-                for (size_t i = 0; i < atom->arity; i++)
-                        buf[i] = args[atom->vars[i]];
-		state_insert(s, atom->predicate, atom->arity, buf);
-	}
-
 	for (size_t i = 0; a->eff_neg[i].predicate != SIZE_MAX; i++) {
                 const atom* atom = &a->eff_neg[i];
                 for (size_t i = 0; i < atom->arity; i++)
                         buf[i] = args[atom->vars[i]];
 		state_remove(s, atom->predicate, atom->arity, buf);
+	}
+
+	for (size_t i = 0; a->eff_pos[i].predicate != SIZE_MAX; i++) {
+                const atom* atom = &a->eff_pos[i];
+                for (size_t i = 0; i < atom->arity; i++)
+                        buf[i] = args[atom->vars[i]];
+		state_insert(s, atom->predicate, atom->arity, buf);
 	}
 
 	//state_iter* si = state_iter_new(s);
