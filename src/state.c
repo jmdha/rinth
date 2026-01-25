@@ -55,13 +55,27 @@ bool state_contains(const struct state* s, size_t predicate, size_t len, const s
 bool state_equal(const struct state* a, const struct state* b) {
 	if (state_count(a) != state_count(b))
 		return false;
-	return state_overlap(a, b) == state_count(a);
+	if (a->cap == b->cap)
+		return memcmp(a->buf, b->buf, a->cap * sizeof(uint64_t)) == 0;
+	for (size_t i = 0; i < a->cap; i++)
+		if (a->buf[i] != SIZE_MAX && !state_contains_(b, a->buf[i]))
+			return false;
+	for (size_t i = 0; i < b->cap; i++)
+		if (b->buf[i] != SIZE_MAX && !state_contains_(a, b->buf[i]))
+			return false;
+	return true;
 }
 
 bool state_covers(const struct state* a, const struct state* b) {
 	if (state_count(a) < state_count(b))
 		return false;
-	return state_overlap(a, b) == state_count(b);
+	for (size_t i = 0; i < b->cap; i++) {
+		if (b->buf[i] == SIZE_MAX)
+			continue;
+		if (!state_contains_(a, b->buf[i]))
+			return false;
+	}
+	return true;
 }
 
 size_t state_overlap(const struct state* a, const struct state* b) {
