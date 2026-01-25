@@ -71,7 +71,11 @@ void ss_grow(state_set* ss) {
 void ss_add(state_set* ss, state* s) {
 	if (GROWTH_FACTOR * ss->len > ss->cap) {
 		ss_grow(ss);
-		INFO("State Set: %zu %zu %zu B", ss->len, ss->cap, ss->cap * sizeof(uint64_t));
+		size_t size = sizeof(state_set);
+		for (size_t i = 0; i < ss->cap; i++)
+			if (ss->set[i])
+				size += state_size(ss->set[i]);
+		INFO("State Set: %zu %zu %zu MB", ss->len, ss->cap, size / 1000 / 1000);
 	}
 	ss_insert(ss->set, ss->cap, s);
 	ss->len++;
