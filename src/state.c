@@ -131,11 +131,6 @@ static bool copy_buf(uint64_t* buf, size_t cap, size_t old_cap, const uint64_t* 
 	return true;
 }
 
-static bool update_buf(uint64_t* buf, size_t cap, uint64_t fact, size_t old_cap, uint64_t* old_buf) {
-	buf[fact_index(cap, fact)] = fact;
-	return copy_buf(buf, cap, old_cap, old_buf);
-}
-
 void state_insert(struct state* s, size_t predicate, size_t len, const size_t* args) {
 	uint64_t fact  = fact_new(predicate, len, args);
 	size_t   index = fact_index(s->cap, fact);
@@ -153,7 +148,8 @@ void state_insert(struct state* s, size_t predicate, size_t len, const size_t* a
 		buf = realloc(buf, cap * sizeof(uint64_t));
 		for (size_t i = 0; i < cap; i++)
 			buf[i] = SIZE_MAX;
-	} while (!update_buf(buf, cap, fact, s->cap, s->buf));
+		buf[fact_index(cap, fact)] = fact;
+	} while (!copy_buf(buf, cap, s->cap, s->buf));
 	free(s->buf);
 	s->cap = cap;
 	s->buf = buf;
