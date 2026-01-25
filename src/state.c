@@ -146,11 +146,10 @@ void state_insert(struct state* s, size_t predicate, size_t len, const size_t* a
 		return; // Inserted without rebuild required
 	}
 	size_t    cap = 2 * s->len;
-	uint64_t* buf = malloc(cap * sizeof(uint64_t));
+	uint64_t* buf = NULL;
 	do {
-		free(buf);
 		cap++;
-		buf = malloc(cap * sizeof(uint64_t));
+		buf = realloc(buf, cap * sizeof(uint64_t));
 		for (size_t i = 0; i < cap; i++)
 			buf[i] = SIZE_MAX;
 	} while (!update_buf(buf, cap, fact, s->cap, s->buf));
