@@ -17,7 +17,7 @@ struct state {
 static uint64_t fact_new(size_t predicate, size_t len, const size_t* args) {
 	uint64_t fact = ((uint64_t)predicate + 1) << 48;
         for (size_t i = 0; i < len; i++)
-                fact |= ((uint64_t)args[i] + 1) << 16 * (uint64_t)i;
+                fact |= (uint64_t)args[i] << 16 * (uint64_t)i;
         return fact;
 }
 
@@ -122,21 +122,15 @@ void state_clear(struct state* s) {
 	s->buf = calloc(s->cap, sizeof(uint64_t));
 }
 
-static bool insert_fact(uint64_t* buf, size_t cap, uint64_t fact) {
-	uint64_t index = fact_index(cap, fact);
-	if (buf[index])
-		return false;
-	buf[index] = fact;
-	return true;
-}
-
 static bool copy_buf(uint64_t* buf, size_t cap, size_t old_cap, const uint64_t* old_buf) {
 	for (size_t i = 0; i < old_cap; i++) {
 		uint64_t fact = old_buf[i];
 		if (!fact)
 			continue;
-		if (!insert_fact(buf, cap, fact))
+		size_t index = fact_index(cap, fact);
+		if (buf[index])
 			return false;
+		buf[index] = fact;
 	}
 	return true;
 }
@@ -200,7 +194,7 @@ bool state_iter_step(struct state_iter* si, size_t* pred, size_t* len, size_t* a
         	for (size_t i = 0; i < 3; i++) {
         	        const size_t arg = (uint16_t)(fact >> 16 * (i + 1));
         	        if (arg)
-        	                args[(*len)++] = arg - 1;
+        	                args[(*len)++] = arg;
         	        else
         	                break;
         	}
