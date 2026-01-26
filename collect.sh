@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+coverage=0
 echo "task,expand,search,time,error" > out.csv
 for file in "$@"
 do
@@ -9,4 +10,8 @@ do
 	time=$(grep -Po '\bEXPR_TIME\s+\K\S+' $file)
 	error=$(grep -Po '\bEXPR_ERROR\s+\K\S+' $file)
 	echo "$task,$expand,$search,$time,$error" >> out.csv
+	if [[ -z $error ]]; then
+		coverage=$(($coverage+1))
+	fi
 done
+echo "coverage: $coverage"

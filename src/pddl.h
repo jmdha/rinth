@@ -10,9 +10,9 @@
 #define MAX_PDDL_VARS         4
 #define MAX_PDDL_ACTIONS      8
 #define MAX_PDDL_STACK        512
-#define MAX_PDDL_OBJECTS      128
-#define MAX_PDDL_INITS        512
-#define MAX_PDDL_GOALS        128
+#define MAX_PDDL_OBJECTS      1024
+#define MAX_PDDL_INITS        1024
+#define MAX_PDDL_GOALS        1024
 
 typedef struct {
 	string      name;
