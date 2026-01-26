@@ -51,5 +51,5 @@ test:
 expr: all
 	rm -rf logs
 	mkdir logs
-	parallel -j 4 --eta ./expr.sh ::: blocksworld{0..89} ::: cp ::: gbfs
+	time parallel -j 16 --eta ./expr.sh ::: blocksworld{0..89} ::: cp ::: gbfs
 	./collect.sh logs/*
