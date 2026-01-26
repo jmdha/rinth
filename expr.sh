@@ -3,10 +3,12 @@ task=$1
 expand=$2
 search=$3
 
-log=logs/${task}_${expand}_${search}
+name=${task}_${expand}_${search}
+log=logs/${name}
 
-ulimit -v $((8*1024*1024))
-timeout 30m ./rinth \
+time_start=$(date +%s.%N)
+ulimit -v $((4*1024*1024))
+timeout 5m ./rinth \
 	-d ~/Data/experiment/$task/domain.pddl \
 	-p ~/Data/experiment/$task/problem.pddl \
 	-e $expand \
@@ -14,11 +16,19 @@ timeout 30m ./rinth \
 	> $log
 
 ec=$?
+elapsed=$( date +%s.%N --date="$time_start seconds ago" )
+
+echo "EXPR_TIME $elapsed" >> $log
 
 if [ $ec -eq 124 ]; then
-	echo "TIME LIMIT" >> $log
+	echo "EXPR_ERROR TIME_LIMIT" >> $log
+	echo "$name - TIME LIMIT - $elapsed"
 elif [ $ec -eq 12 ]; then
-	echo "MEMORY LIMIT" >> $log
+	echo "EXPR_ERROR MEMORY_LIMIT" >> $log
+	echo "$name - MEMORY LIMIT - $elapsed"
 elif [ $ec -ne 0 ]; then
-	echo "ERROR ${ec}" >> $log
+	echo "EXPR_ERROR $ec" >> $log
+	echo "$name - ERROR $ec - $elapsed"
+else
+	echo "$name - OK - $elapsed"
 fi
