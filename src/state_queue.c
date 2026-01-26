@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <memory.h>
+#include <errno.h>
 
 #include "state_queue.h"
 
@@ -15,6 +16,8 @@ state_queue* sq_new(void) {
 	sq->len = 0;
 	sq->cap = 8;
 	sq->ele = malloc(sq->cap * sizeof(state*));
+	if (!sq->ele)
+		exit(errno);
 
 	return sq;
 }
@@ -54,6 +57,8 @@ void sq_push(state_queue* sq, state* s) {
 	if (sq->len >= sq->cap) {
 		sq->cap = 2 * sq->cap;
 		sq->ele = realloc(sq->ele, sq->cap * sizeof(state*));
+		if (!sq->ele)
+			exit(errno);
 	}
 
 	sq->ele[sq->len++] = s;

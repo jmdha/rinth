@@ -1,5 +1,6 @@
 #include <memory.h>
 #include <stdint.h>
+#include <errno.h>
 
 #include "algo.h"
 
@@ -20,6 +21,8 @@ cp_iter* cp_init(size_t** vals) {
         for (size_t i = 0; cpi->root[i]; i++)
                 len++;
         cpi->offsets = calloc(len, sizeof(size_t));
+	if (!cpi->offsets)
+		exit(errno);
         return cpi;
 }
 

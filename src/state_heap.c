@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <errno.h>
 
 #include "state_heap.h"
 #include "log.h"
@@ -18,15 +19,21 @@ struct state_heap {
 
 state_heap* sh_new(void) {
 	state_heap* sh = malloc(sizeof(state_heap));
+	if (!sh)
+		exit(errno);
 
 	sh->len = 0;
 	sh->cap = 8;
 	sh->arr = malloc(sh->cap * sizeof(bucket));
+	if (!sh->arr)
+		exit(errno);
 	for (size_t i = 0; i < sh->cap; i++) {
 		bucket* b = &sh->arr[i];
 		b->len = 0;
 		b->cap = 8;
 		b->arr = malloc(b->cap * sizeof(bucket));
+		if (!b->arr)
+			exit(errno);
 	}
 
 	return sh;
@@ -54,11 +61,15 @@ void sh_push(state_heap* sh, state* s, size_t val) {
 	if (val >= sh->cap) {
 		sh->cap *= 2;
 		sh->arr = realloc(sh->arr, sh->cap * sizeof(bucket));
+		if (!sh->arr)
+			exit(errno);
 		INFO("State Heap: %zu", sh->len);
 		for (size_t i = sh->cap / 2; i < sh->cap; i++) {
 			sh->arr[i].len = 0;
 			sh->arr[i].cap = 8;
 			sh->arr[i].arr = malloc(sh->arr[i].cap * sizeof(state*));
+			if (!sh->arr[i].arr)
+				exit(errno);
 		}
 	}
 
@@ -67,6 +78,8 @@ void sh_push(state_heap* sh, state* s, size_t val) {
 	if (b->len >= b->cap) {
 		b->cap *= 2;
 		b->arr = realloc(b->arr, b->cap * sizeof(state*));
+		if (!b->arr)
+			exit(errno);
 	}
 
 	b->arr[b->len++] = s;

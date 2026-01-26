@@ -6,6 +6,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <errno.h>
 
 #include "io.h"
 
@@ -41,6 +42,8 @@ char** f_open(const char* path) {
         }
 
         struct file_buffer* fb = malloc(sizeof(struct file_buffer));
+	if (!fb)
+		exit(errno);
         fb->fd                 = fd;
         fb->len                = len;
         fb->buf                = buf;

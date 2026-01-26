@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <errno.h>
 
 #include "algo.h"
 #include "expand.h"
@@ -28,11 +29,18 @@ void expand_init_cp(const task* def) {
                 COUNT++;
         // TODO: Make args influenced my statics
         ARGS = calloc((1 + COUNT), sizeof(size_t**));
-        for (size_t i = 0; ACTIONS[i].name.ptr; i++)
+	if (!ARGS)
+		exit(errno);
+        for (size_t i = 0; ACTIONS[i].name.ptr; i++) {
                 ARGS[i] = calloc((1 + ACTIONS[i].arity), sizeof(size_t*));
+		if (!ARGS[i])
+			exit(errno);
+	}
         for (size_t i = 0; ACTIONS[i].name.ptr; i++)
                 for (size_t t = 0; t < ACTIONS[i].arity; t++) {
                         ARGS[i][t] = malloc((1 + slen(def->objects)) * sizeof(size_t));
+			if (!ARGS[i][t])
+				exit(errno);
                         for (size_t j = 0; j < slen(def->objects); j++)
                                 ARGS[i][t][j] = j;
 			ARGS[i][t][slen(def->objects)] = SIZE_MAX;

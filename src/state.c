@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
 
 #include "state.h"
 
@@ -27,9 +28,13 @@ static size_t fact_index(size_t cap, uint64_t fact) {
 
 state* state_new(void) {
         state* s = malloc(sizeof(state));
+	if (!s)
+		exit(errno);
 	s->len   = 0;
 	s->cap   = 8;
 	s->buf   = malloc(s->cap * sizeof(uint64_t));
+	if (!s->buf)
+		exit(errno);
 	for (size_t i = 0; i < s->cap; i++)
 		s->buf[i] = SIZE_MAX;
         return s;
@@ -37,9 +42,13 @@ state* state_new(void) {
 
 state* state_clone(const state* s) {
 	state* n = malloc(sizeof(state));
+	if (!n)
+		exit(errno);
 	n->len   = s->len;
 	n->cap   = s->cap;
 	n->buf   = malloc(n->cap * sizeof(uint64_t));
+	if (!n->buf)
+		exit(errno);
 	memcpy(n->buf, s->buf, s->cap * sizeof(uint64_t));
 	return n;
 }
@@ -122,6 +131,8 @@ void state_clear(struct state* s) {
 	s->len = 0;
 	s->cap = 8;
 	s->buf = malloc(s->cap * sizeof(uint64_t));
+	if (!s->buf)
+		exit(errno);
 	for (size_t i = 0; i < s->cap; i++)
 		s->buf[i] = SIZE_MAX;
 }
@@ -154,6 +165,8 @@ void state_insert(struct state* s, size_t predicate, size_t len, const size_t* a
 	do {
 		cap++;
 		buf = realloc(buf, cap * sizeof(uint64_t));
+		if (!buf)
+			exit(errno);
 		for (size_t i = 0; i < cap; i++)
 			buf[i] = SIZE_MAX;
 		buf[fact_index(cap, fact)] = fact;
@@ -179,6 +192,8 @@ struct state_iter {
 
 state_iter* state_iter_new(const struct state* s) {
         state_iter* si = malloc(sizeof(state_iter));
+	if (!si)
+		exit(errno);
 	si->state      = s;
 	si->index      = 0;
         return si;

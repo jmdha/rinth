@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <stdlib.h>
+#include <errno.h>
 
 #include "state_set.h"
 #include "log.h"
@@ -18,6 +19,8 @@ state_set* ss_new(void) {
 	ss->len = 0;
 	ss->cap = 8;
 	ss->set = calloc(ss->cap, sizeof(state*));
+	if (!ss->set)
+		exit(errno);
 
 	return ss;
 }
@@ -60,6 +63,8 @@ void ss_insert(state** set, size_t cap, state* s) {
 void ss_grow(state_set* ss) {
 	const size_t cap = GROWTH_FACTOR * ss->cap;
 	state**      set = calloc(cap, sizeof(state*));
+	if (!set)
+		exit(errno);
 	for (size_t i = 0; i < ss->cap; i++)
 		if (ss->set[i])
 			ss_insert(set, cap, ss->set[i]);
