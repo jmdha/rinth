@@ -35,6 +35,10 @@ size_t state_count(const state *s);
 // Size of state in bytes
 size_t state_size(const state *s);
 
+// Bits per Fact
+// How many bits are used to store a fact on average
+float state_bpf(const state* s);
+
 // Generate a hash of state
 uint64_t state_hash(const state *s);
 

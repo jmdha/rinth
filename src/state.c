@@ -110,6 +110,10 @@ size_t state_size(const struct state* s) {
 	return sizeof(state) + s->cap * sizeof(uint64_t);
 }
 
+float state_bpf(const state* s) {
+	return (float) 8 * state_size(s) / (float) state_count(s);
+}
+
 uint64_t state_hash(const struct state* s) {
 	uint64_t hash = 2166136261;
 	for (size_t i = 0; i < s->cap; i++) {

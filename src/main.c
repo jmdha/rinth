@@ -23,8 +23,8 @@ int main(int argc, char** argv) {
         INFO("Problem:    %.*s", problem.name.len, problem.name.ptr);
 	INFO("Predicates: %zu", slen(def.predicates));
 	INFO("Objects:    %zu", slen(def.objects));
-	INFO("Init:       %zu (%zu B)", state_count(def.init), state_size(def.init));
-	INFO("Goal:       %zu (%zu B)", state_count(def.goal), state_size(def.goal));
+	INFO("Init:       %zu (%zu B %.1f bpf)", state_count(def.init), state_size(def.init), state_bpf(def.init));
+	INFO("Goal:       %zu (%zu B %.1f bpf)", state_count(def.goal), state_size(def.goal), state_bpf(def.goal));
 
         expand_init(&def, a.expand);
 	eval_init(&def, a.eval);
