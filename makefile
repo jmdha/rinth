@@ -47,3 +47,9 @@ test:
 	src/eval.c src/eval_goal_count.c \
 	src/search.c src/search_bfs.c src/search_gbfs.c src/search_lazy.c \
 	$(LIBS)
+
+expr: all
+	rm -rf logs
+	mkdir logs
+	parallel -j 4 ./expr.sh ::: blocksworld{0..89} ::: cp ::: gbfs
+	./collect.sh logs/*

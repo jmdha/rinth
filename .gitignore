@@ -2,3 +2,4 @@ rinth
 testrunner
 benchmark
 logs/*
+out.csv

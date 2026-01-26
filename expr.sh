@@ -18,17 +18,13 @@ timeout 5m ./rinth \
 ec=$?
 elapsed=$( date +%s.%N --date="$time_start seconds ago" )
 
+echo "EXPR_TASK $task" >> $log
+echo "EXPR_EXPAND $expand" >> $log
+echo "EXPR_SEARCH $search" >> $log
 echo "EXPR_TIME $elapsed" >> $log
 
-if [ $ec -eq 124 ]; then
-	echo "EXPR_ERROR TIME_LIMIT" >> $log
-	echo "$name - TIME LIMIT - $elapsed"
-elif [ $ec -eq 12 ]; then
-	echo "EXPR_ERROR MEMORY_LIMIT" >> $log
-	echo "$name - MEMORY LIMIT - $elapsed"
-elif [ $ec -ne 0 ]; then
+if [ $ec -ne 0 ]; then
 	echo "EXPR_ERROR $ec" >> $log
-	echo "$name - ERROR $ec - $elapsed"
-else
-	echo "$name - OK - $elapsed"
 fi
+
+echo "$ec - $name - $elapsed"
