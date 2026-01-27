@@ -34,6 +34,10 @@ size_t ss_count(const state_set* ss) {
 	return ss->len;
 }
 
+bool ss_empty(const state_set* ss) {
+	return ss_count(ss) == 0;
+}
+
 bool ss_contains(const state_set* ss, const state* s) {
 	const uint64_t hash = state_hash(s);
 
@@ -80,7 +84,6 @@ void ss_add(state_set* ss, state* s) {
 		for (size_t i = 0; i < ss->cap; i++)
 			if (ss->set[i])
 				size += state_size(ss->set[i]);
-		INFO("State Set: %zu %zu %zu MB", ss->len, ss->cap, size / 1000 / 1000);
 	}
 	ss_insert(ss->set, ss->cap, s);
 	ss->len++;
@@ -96,4 +99,15 @@ void ss_remove(state_set* ss, state* s) {
 			ss->len--;
 		}
 	}
+}
+
+state* ss_pop(state_set* ss) {
+	for (size_t i = 0; i < ss->cap; i++)
+		if (ss->set[i]) {
+			state* s = ss->set[i];
+			ss->len--;
+			ss->set[i] = NULL;
+			return s;
+		}
+	return NULL;
 }

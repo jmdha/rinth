@@ -8,7 +8,7 @@ log=logs/${name}
 
 time_start=$(date +%s.%N)
 ulimit -v $((1*1024*1024))
-timeout 5m ./rinth \
+timeout 30m ./rinth \
 	-d ~/Data/experiment/$task/domain.pddl \
 	-p ~/Data/experiment/$task/problem.pddl \
 	-e $expand \
