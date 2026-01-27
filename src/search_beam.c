@@ -8,7 +8,7 @@
 #include "expand.h"
 #include "eval.h"
 
-path solve_gbfs(const state* init, const state* goal) {
+path solve_beam(const state* init, const state* goal) {
 	path        p;
 	size_t      action;
 	size_t      args[64];
@@ -45,6 +45,7 @@ path solve_gbfs(const state* init, const state* goal) {
 			sh_push(queue, child, eval(child));
 		}
 		state_free(node);
+		sh_reduce(queue, 1024);
 	}
 	p.len = SIZE_MAX;
 	return p;

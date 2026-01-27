@@ -12,6 +12,8 @@ path solve(const state* init, const state* goal, search_kind skind) {
 			return solve_gbfs(init, goal);
 		case SEARCH_LAZY:
 			return solve_lazy(init, goal);
+		case SEARCH_BEAM:
+			return solve_beam(init, goal);
 		default:
 			fprintf(stderr, "%d: unexpected search kind", skind);
 			exit(1);

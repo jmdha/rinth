@@ -73,3 +73,15 @@ state* sh_pop(state_heap* sh) {
 			return ss_pop(sh->arr[i]);
 	return NULL;
 }
+
+void sh_reduce(state_heap* sh, size_t count) {
+	size_t ccount = sh_count(sh);
+	for (size_t i = 0; i < sh->cap; i++) {
+		while (!ss_empty(sh->arr[i])) {
+			if (ccount < count)
+				break;
+			free(ss_pop(sh->arr[i]));
+			ccount--;
+		}
+	}
+}

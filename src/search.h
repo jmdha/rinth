@@ -17,5 +17,6 @@ path solve_bfs(const state* init, const state* goal);
 path solve_dfs(const state* init, const state* goal);
 path solve_gbfs(const state* init, const state* goal);
 path solve_lazy(const state* init, const state* goal);
+path solve_beam(const state* init, const state* goal);
 
 #endif

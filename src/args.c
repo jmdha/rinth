@@ -35,6 +35,8 @@ args args_parse(int argc, char** argv) {
 				a.search = SEARCH_GBFS;
 			else if (strcmp("lazy", optarg) == 0)
 				a.search = SEARCH_LAZY;
+			else if (strcmp("beam", optarg) == 0)
+				a.search = SEARCH_BEAM;
 			else {
 				fprintf(stderr, "%s: unknown search algorithm\n", optarg);
 				exit(1);

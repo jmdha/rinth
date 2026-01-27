@@ -17,7 +17,7 @@ all:
 	src/state.c src/state_heap.c src/state_queue.c src/state_set.c \
 	src/expand.c src/expand_cp.c src/expand_sqlite.c \
 	src/eval.c src/eval_goal_count.c \
-	src/search.c src/search_bfs.c src/search_gbfs.c src/search_lazy.c \
+	src/search.c src/search_bfs.c src/search_gbfs.c src/search_lazy.c src/search_beam.c \
 	$(LIBS)
 
 for bench: LIBS += -lm
@@ -31,7 +31,7 @@ bench:
 	src/state.c src/state_heap.c src/state_queue.c src/state_set.c \
 	src/expand.c src/expand_cp.c src/expand_sqlite.c \
 	src/eval.c src/eval_goal_count.c \
-	src/search.c src/search_bfs.c src/search_gbfs.c src/search_lazy.c \
+	src/search.c src/search_bfs.c src/search_gbfs.c src/search_lazy.c src/search_beam.c \
 	$(LIBS)
 
 test:
@@ -45,11 +45,11 @@ test:
 	src/state.c src/state_heap.c src/state_queue.c src/state_set.c \
 	src/expand.c src/expand_cp.c src/expand_sqlite.c \
 	src/eval.c src/eval_goal_count.c \
-	src/search.c src/search_bfs.c src/search_gbfs.c src/search_lazy.c \
+	src/search.c src/search_bfs.c src/search_gbfs.c src/search_lazy.c src/search_beam.c \
 	$(LIBS)
 
 expr: all
 	rm -rf logs
 	mkdir logs
-	time parallel -j 16 --eta ./expr.sh ::: blocksworld{0..89} ::: cp ::: gbfs
+	time parallel -j 16 --eta ./expr.sh ::: blocksworld{0..89} ::: cp ::: gbfs beam
 	./collect.sh logs/*
