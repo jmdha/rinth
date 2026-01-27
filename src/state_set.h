@@ -7,6 +7,7 @@ typedef struct state_set state_set;
 
 state_set* ss_new(void);
 void       ss_free(state_set* ss);
+size_t     ss_size(const state_set* ss);
 size_t     ss_count(const state_set* ss);
 bool       ss_empty(const state_set* ss);
 bool       ss_contains(const state_set* ss, const state* s);

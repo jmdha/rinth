@@ -30,6 +30,16 @@ void ss_free(state_set* ss) {
 	free(ss);
 }
 
+size_t ss_size(const state_set* ss) {
+	size_t size = sizeof(state_set);
+
+	for (size_t i = 0; i < ss->cap; i++)
+		if (ss->set[i])
+			size += state_size(ss->set[i]);
+
+	return size;
+}
+
 size_t ss_count(const state_set* ss) {
 	return ss->len;
 }

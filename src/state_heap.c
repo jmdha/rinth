@@ -33,6 +33,16 @@ void sh_free(state_heap* sh) {
 	free(sh);
 }
 
+size_t sh_size(const state_heap* sh) {
+	size_t size = sizeof(state_heap);
+
+	for (size_t i = 0; i < sh->cap; i++)
+		if (sh->arr[i])
+			size += ss_size(sh->arr[i]);
+
+	return size;
+}
+
 size_t sh_count(const state_heap* sh) {
 	size_t count = 0;
 	for (size_t i = 0; i < sh->cap; i++)

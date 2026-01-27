@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "log.h"
 #include "search.h"
 #include "state_set.h"
 #include "state_heap.h"
@@ -31,6 +32,8 @@ path solve_gbfs(const state* init, const state* goal) {
 			}
 
 			if (state_covers(child, goal)) {
+				INFO("SS: %zu B", ss_size(visited));
+				INFO("SH: %zu B", sh_size(queue));
 				state_free(child);
 				state_free(node);
 				ss_free(visited);
