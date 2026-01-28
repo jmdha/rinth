@@ -28,10 +28,6 @@ path solve_beam(const state* init, const state* goal) {
 			sr_push(visited, node);
 			expand(node);
 			while ((child = successor(&action, args))) {
-				if (sr_contains(visited, child)) {
-					state_free(child);
-					continue;
-				}
 				if (state_covers(child, goal)) {
 					INFO("SR: %zu %zu mB", sr_count(visited), sr_size(visited) / 1000 / 1000);
 					state_free(child);
@@ -42,13 +38,17 @@ path solve_beam(const state* init, const state* goal) {
 					p.len = 0;
 					return p;
 				}
+				if (sr_contains(visited, child)) {
+					state_free(child);
+					continue;
+				}
 				sh_push(iqueue, child, eval(child));
 			}
 			state_free(node);
 		}
 		sh_free(queue);
 		queue = iqueue;
-		sh_reduce(queue, 8);
+		sh_reduce(queue, 64);
 	}
 
 	p.len = SIZE_MAX;
