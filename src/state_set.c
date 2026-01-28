@@ -52,7 +52,7 @@ bool ss_empty(const state_set* ss) {
 }
 
 bool ss_contains(const state_set* ss, const state* s) {
-	const uint64_t hash = state_hash(s);
+	const uint64_t hash = state_hash64(s);
 
 	for (size_t o = 0; o < ss->cap; o++) {
 		const size_t i = (hash + o) % ss->cap;
@@ -66,7 +66,7 @@ bool ss_contains(const state_set* ss, const state* s) {
 }
 
 void ss_insert(state** set, size_t cap, state* s) {
-	const uint64_t hash = state_hash(s);
+	const uint64_t hash = state_hash64(s);
 
 	for (size_t o = 0; o < cap; o++) {
 		const uint64_t i = (hash + o) % cap;
@@ -98,7 +98,7 @@ void ss_add(state_set* ss, state* s) {
 }
 
 void ss_remove(state_set* ss, state* s) {
-	const uint64_t hash = state_hash(s);
+	const uint64_t hash = state_hash64(s);
 
 	for (size_t o = 0; o < ss->cap; o++) {
 		const uint64_t i = (hash + o) % ss->cap;

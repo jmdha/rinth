@@ -39,8 +39,9 @@ size_t state_size(const state *s);
 // How many bits are used to store a fact on average
 float state_bpf(const state* s);
 
-// Generate a hash of state
-uint64_t state_hash(const state *s);
+uint16_t state_hash16(const state *s);
+uint32_t state_hash32(const state *s);
+uint64_t state_hash64(const state *s);
 
 // Frees state allocation
 void state_free(state *s);

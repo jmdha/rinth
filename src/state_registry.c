@@ -6,15 +6,23 @@
 #include "state_registry.h"
 
 typedef struct {
-	uint64_t hash;
+	uint64_t hash64;
+	uint32_t hash32;
+	uint16_t hash16;
 	uint16_t eval;
 } entry;
 
 static entry entry_new(const state* s) {
-	entry e = { 0 };
-	e.hash  = state_hash(s);
-	e.eval  = eval(s);
+	entry e  = { 0 };
+	e.hash64 = state_hash64(s);
+	e.hash32 = state_hash32(s);
+	e.hash16 = state_hash16(s);
+	e.eval   = eval(s);
 	return e;
+}
+
+static bool is_entry(const entry* e) {
+	return e->hash64 || e->hash32 || e->hash16 || e->eval;
 }
 
 static bool entry_equal(const entry* a, const entry* b) {
@@ -22,7 +30,7 @@ static bool entry_equal(const entry* a, const entry* b) {
 }
 
 static uint64_t entry_hash(const entry* e) {
-	return e->hash; // TODO improve hash
+	return e->hash64;
 }
 
 struct state_registry {
@@ -51,7 +59,7 @@ size_t sr_count(const state_registry* sr) {
 	size_t count = 0;
 
 	for (size_t i = 0; i < sr->cap; i++)
-		if (sr->arr[i].hash)
+		if (is_entry(&sr->arr[i]))
 			count++;
 
 	return count;
@@ -66,7 +74,7 @@ bool sr_contains(const state_registry* sr, const state* s) {
 	uint64_t hash = entry_hash(&e);
 	for (size_t o = 0; o < sr->cap; o++) {
 		const size_t i = (hash + o) % sr->cap;
-		if (sr->arr[i].hash == 0)
+		if (!is_entry(&sr->arr[i]))
 			return false;
 		if (entry_equal(&e, &sr->arr[i]))
 			return true;
@@ -78,7 +86,7 @@ void sr_insert(entry* entries, size_t cap, entry e) {
 	uint64_t hash = entry_hash(&e);
 	for (size_t o = 0; o < cap; o++) {
 		const size_t i = (hash + o) % cap;
-		if (entries[i].hash == 0) {
+		if (!is_entry(&entries[i])) {
 			entries[i] = e;
 			break;
 		}
@@ -91,7 +99,7 @@ void sr_grow(state_registry* sr) {
 	if (!arr)
 		exit(errno);
 	for (size_t i = 0; i < sr->cap; i++)
-		if (arr[i].hash == 0)
+		if (!is_entry(&arr[i]))
 			sr_insert(arr, cap, sr->arr[i]);
 	free(sr->arr);
 	sr->cap = cap;

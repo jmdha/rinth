@@ -7,6 +7,7 @@
 #include <errno.h>
 
 #include "state.h"
+#include "bit.h"
 
 static uint64_t create_fact(size_t predicate, size_t len, const size_t* args) {
         uint64_t fact = (uint64_t)1 + (uint64_t)predicate;
@@ -97,11 +98,29 @@ float state_bpf(const state* s) {
 	return 8 * (float) state_size(s) / state_count(s);
 }
 
-uint64_t state_hash(const struct state* s) {
-        uint64_t hash = 2166136261;
+uint16_t state_hash16(const state *s) {
+	uint16_t hash = 0;
+	for (size_t i = 0; i < s->count; i++) {
+		hash += popcount(s->facts[i] & 0xaa55aa55aa55aa55);
+		hash -= popcount(s->facts[i] & 0x55aa55aa55aa55aa);
+	}
+	return hash;
+}
+
+uint32_t state_hash32(const state *s) {
+	uint32_t hash = 2166136261lu;
+	for (size_t i = 0; i < s->count; i++) {
+		hash ^= s->facts[i];
+		hash *= 16777619lu;
+	}
+	return hash;
+}
+
+uint64_t state_hash64(const state* s) {
+        uint64_t hash = 14695981039346656037llu;
         for (size_t i = 0; i < s->count; i++) {
 		hash ^= s->facts[i];
-		hash *= 1099511628211;
+		hash *= 1099511628211llu;
 	}
         return hash;
 }
