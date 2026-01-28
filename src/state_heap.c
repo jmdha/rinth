@@ -80,7 +80,7 @@ void sh_reduce(state_heap* sh, size_t count) {
 		while (!ss_empty(sh->arr[i])) {
 			if (ccount < count)
 				break;
-			free(ss_pop(sh->arr[i]));
+			state_free(ss_pop(sh->arr[i]));
 			ccount--;
 		}
 	}

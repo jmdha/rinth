@@ -26,6 +26,9 @@ state_set* ss_new(void) {
 }
 
 void ss_free(state_set* ss) {
+	for (size_t i = 0; i < ss->cap; i++)
+		if (ss->set[i])
+			state_free(ss->set[i]);
 	free(ss->set);
 	free(ss);
 }
@@ -88,13 +91,8 @@ void ss_grow(state_set* ss) {
 }
 
 void ss_add(state_set* ss, state* s) {
-	if (GROWTH_FACTOR * ss->len > ss->cap) {
+	if (GROWTH_FACTOR * ss->len > ss->cap)
 		ss_grow(ss);
-		size_t size = sizeof(state_set);
-		for (size_t i = 0; i < ss->cap; i++)
-			if (ss->set[i])
-				size += state_size(ss->set[i]);
-	}
 	ss_insert(ss->set, ss->cap, s);
 	ss->len++;
 }

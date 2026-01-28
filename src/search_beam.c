@@ -3,7 +3,7 @@
 
 #include "log.h"
 #include "search.h"
-#include "state_set.h"
+#include "state_registry.h"
 #include "state_heap.h"
 #include "expand.h"
 #include "eval.h"
@@ -12,29 +12,31 @@ path solve_beam(const state* init, const state* goal) {
 	path        p;
 	size_t      action;
 	size_t      args[64];
-	state_set*  visited;
+	state_registry*  visited;
 	state_heap* queue;
 	state_heap* iqueue;
 	state*      node;
 	state*      child;
 
-	visited = ss_new();
+	visited = sr_new();
 	queue   = sh_new();
 	sh_push(queue, state_clone(init), 0);
 
 	while (!sh_empty(queue)) {
 		iqueue = sh_new();
 		while ((node = sh_pop(queue)) != NULL) {
-			ss_add(visited, state_clone(node));
+			sr_push(visited, node);
 			expand(node);
 			while ((child = successor(&action, args))) {
-				if (ss_contains(visited, child)) {
+				if (sr_contains(visited, child)) {
 					state_free(child);
 					continue;
 				}
 				if (state_covers(child, goal)) {
+					INFO("SR: %zu %zu mB", sr_count(visited), sr_size(visited) / 1000 / 1000);
 					state_free(child);
 					state_free(node);
+					sr_free(visited);
 					sh_free(queue);
 					sh_free(iqueue);
 					p.len = 0;
