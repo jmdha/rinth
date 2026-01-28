@@ -38,5 +38,5 @@ int main(int argc, char** argv) {
 	f_close(domain_str);
 	f_close(problem_str);
 
-        return 0;
+        return sol.len != 0;
 }

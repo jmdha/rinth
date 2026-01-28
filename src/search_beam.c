@@ -14,6 +14,7 @@ path solve_beam(const state* init, const state* goal) {
 	size_t      args[64];
 	state_set*  visited;
 	state_heap* queue;
+	state_heap* iqueue;
 	state*      node;
 	state*      child;
 
@@ -21,32 +22,33 @@ path solve_beam(const state* init, const state* goal) {
 	queue   = sh_new();
 	sh_push(queue, state_clone(init), 0);
 
-	while ((node = sh_pop(queue)) != NULL) {
-		ss_add(visited, state_clone(node));
-
-		expand(node);
-		while ((child = successor(&action, args))) {
-			if (ss_contains(visited, child)) {
-				state_free(child);
-				continue;
+	while (!sh_empty(queue)) {
+		iqueue = sh_new();
+		while ((node = sh_pop(queue)) != NULL) {
+			ss_add(visited, state_clone(node));
+			expand(node);
+			while ((child = successor(&action, args))) {
+				if (ss_contains(visited, child)) {
+					state_free(child);
+					continue;
+				}
+				if (state_covers(child, goal)) {
+					state_free(child);
+					state_free(node);
+					sh_free(queue);
+					sh_free(iqueue);
+					p.len = 0;
+					return p;
+				}
+				sh_push(iqueue, child, eval(child));
 			}
-
-			if (state_covers(child, goal)) {
-				INFO("SS: %zu %zu B", ss_count(visited), ss_size(visited));
-				INFO("SH: %zu %zu B", sh_count(queue), sh_size(queue));
-				state_free(child);
-				state_free(node);
-				ss_free(visited);
-				sh_free(queue);
-				p.len = 0;
-				return p;
-			}
-
-			sh_push(queue, child, eval(child));
+			state_free(node);
 		}
-		state_free(node);
-		sh_reduce(queue, 1024);
+		sh_free(queue);
+		queue = iqueue;
+		sh_reduce(queue, 8);
 	}
+
 	p.len = SIZE_MAX;
 	return p;
 }
