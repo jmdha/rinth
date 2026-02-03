@@ -55,6 +55,8 @@ args args_parse(int argc, char** argv) {
 		case 'h':
 			if (strcmp("goal_count", optarg) == 0)
 				a.eval = EVAL_GOAL_COUNT;
+			else if (strcmp("goal_graph", optarg) == 0)
+				a.eval = EVAL_GOAL_GRAPH;
 			else {
 				fprintf(stderr, "%s: unknown heuristic\n", optarg);
 				exit(1);

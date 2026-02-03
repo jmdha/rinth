@@ -1,6 +1,6 @@
 #include "eval.h"
 
-const state* goal = NULL;
+static const state* goal = NULL;
 
 void eval_init_goal_count(const task* def, eval_kind ekind) {
 	goal = def->goal;

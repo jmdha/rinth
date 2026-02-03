@@ -13,6 +13,10 @@ void eval_init(const task* def, eval_kind ekind) {
 		F_EVAL = eval_goal_count;
 		eval_init_goal_count(def, ekind);
 		break;
+	case EVAL_GOAL_GRAPH:
+		F_EVAL = eval_goal_graph;
+		eval_init_goal_graph(def, ekind);
+		break;
 	default:
 		fprintf(stderr, "%d: unexpected eval kind\n", ekind);
 		break;

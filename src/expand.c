@@ -75,20 +75,6 @@ state* successor(size_t* action_index, size_t* args) {
 		state_insert(s, atom->predicate, atom->arity, buf);
 	}
 
-	//state_iter* si = state_iter_new(s);
-	//size_t si_pred;
-	//size_t si_len;
-	//size_t si_args[256];
-	//printf("----STATE----\n");
-	//while (state_iter_step(si, &si_pred, &si_len, si_args)) {
-	//	printf("(");
-	//	printf("%.*s", (int) TASK->predicates[si_pred].len, TASK->predicates[si_pred].ptr);
-	//	for (size_t i = 0; i < si_len; i++)
-	//		printf(" %.*s", (int) TASK->objects[si_args[i]].len, TASK->objects[si_args[i]].ptr);
-	//	printf(")\n");
-	//}
-	//state_iter_free(si);
-
 	SUCCESSORS++;
 	return s;
 }

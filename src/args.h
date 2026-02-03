@@ -18,6 +18,7 @@ typedef enum {
 typedef enum {
 	EVAL_NONE,
 	EVAL_GOAL_COUNT,
+	EVAL_GOAL_GRAPH
 } eval_kind;
 
 typedef struct {
