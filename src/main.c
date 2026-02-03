@@ -1,3 +1,5 @@
+#define STB_DS_IMPLEMENTATION
+#include <stb/stb_ds.h>
 #include <stdio.h>
 
 #include "expand.h"
@@ -8,6 +10,7 @@
 #include "translate.h"
 #include "search.h"
 #include "eval.h"
+
 
 int main(int argc, char** argv) {
         log_init();
