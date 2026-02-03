@@ -6,14 +6,7 @@
 #include "log.h"
 #include "translate.h"
 
-void translate_predicates(string* out, const pddl_pred* in) {
-        TRACE("Translate predicates");
-        while ((in)->name.ptr)
-                memcpy(out++, &(in++)->name, sizeof(string));
-}
-
-void translate_objects(string* out, const string* in) {
-        TRACE("Translate objects");
+void clone_strings(string* out, const string* in) {
         while (in->ptr)
                 memcpy(out++, in++, sizeof(string));
 }
@@ -96,8 +89,8 @@ task translate_pddl(const pddl_domain* d, const pddl_problem* p) {
         pddl_validate(d, p);
 
         TRACE("Translate");
-        translate_predicates(t.predicates, d->predicates);
-        translate_objects(t.objects, p->objects);
+        clone_strings(t.predicates, d->predicates);
+        clone_strings(t.objects, p->objects);
         translate_actions(t.actions, d->actions, t.predicates);
         translate_facts(&t.init, p->inits, t.predicates, t.objects);
         translate_facts(&t.goal, p->goals, t.predicates, t.objects);

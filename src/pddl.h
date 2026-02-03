@@ -17,11 +17,6 @@
 typedef struct {
 	string      name;
 	string      vars[MAX_PDDL_VARS];
-} pddl_pred;
-
-typedef struct {
-	string      name;
-	string      vars[MAX_PDDL_VARS];
 	string      pre[MAX_PDDL_STACK];
 	string      eff[MAX_PDDL_STACK];
 } pddl_action;
@@ -29,7 +24,7 @@ typedef struct {
 typedef struct {
 	string      name;
 	string      requirements[MAX_PDDL_REQUIREMENTS];
-	pddl_pred   predicates[MAX_PDDL_PREDICATES];
+	string      predicates[MAX_PDDL_PREDICATES];
 	pddl_action actions[MAX_PDDL_ACTIONS];
 } pddl_domain;
 

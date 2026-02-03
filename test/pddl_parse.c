@@ -9,7 +9,7 @@ UTEST(pddl_parse_domain, empty) {
 
         ASSERT_EQ(NULL, d.name.ptr);
         ASSERT_EQ(NULL, d.requirements[0].ptr);
-        ASSERT_EQ(NULL, d.predicates[0].name.ptr);
+        ASSERT_EQ(NULL, d.predicates[0].ptr);
         ASSERT_EQ(NULL, d.actions[0].name.ptr);
 }
 
@@ -42,14 +42,14 @@ UTEST(pddl_parse_domain, predicates) {
 
         pddl_domain d = pddl_domain_parse(s);
 
-        ASSERT_EQ(1, d.predicates[0].name.len);
-        ASSERT_EQ(1, d.predicates[1].name.len);
-        ASSERT_EQ(1, d.predicates[2].name.len);
-        ASSERT_STRNEQ("a", d.predicates[0].name.ptr, d.predicates[0].name.len);
-        ASSERT_STRNEQ("b", d.predicates[1].name.ptr, d.predicates[1].name.len);
-        ASSERT_STRNEQ("c", d.predicates[2].name.ptr, d.predicates[2].name.len);
-        ASSERT_EQ(NULL, d.predicates[3].name.ptr);
-        ASSERT_EQ(0, d.predicates[3].name.len);
+        ASSERT_EQ(1, d.predicates[0].len);
+        ASSERT_EQ(1, d.predicates[1].len);
+        ASSERT_EQ(1, d.predicates[2].len);
+        ASSERT_STRNEQ("a", d.predicates[0].ptr, d.predicates[0].len);
+        ASSERT_STRNEQ("b", d.predicates[1].ptr, d.predicates[1].len);
+        ASSERT_STRNEQ("c", d.predicates[2].ptr, d.predicates[2].len);
+        ASSERT_EQ(NULL, d.predicates[3].ptr);
+        ASSERT_EQ(0, d.predicates[3].len);
 }
 
 UTEST(pddl_parse_domain, action_name) {

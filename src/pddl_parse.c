@@ -64,13 +64,15 @@ void parse_ids(const char** l, string* ids) {
         ids[0].len = 0;
 }
 
-void parse_predicates(const char** l, pddl_pred* preds) {
-        string t = {0};
-        while (lexer_next(l, &t) == LPAREN) {
-                assert(lexer_next(l, &preds[0].name) == ID);
-                parse_ids(l, preds[0].vars);
-                preds++;
-        }
+void parse_predicates(const char** l, string* preds) {
+	string s;
+	while (lexer_next(l, &s) == LPAREN) {
+		assert(lexer_next(l, preds) == ID);
+		while (lexer_next(l, &s) == ID) {}
+		preds++;
+	}
+	preds[0].ptr = NULL;
+	preds[0].len = 0;
 }
 
 void parse_expression(const char** l, string* stack) {
