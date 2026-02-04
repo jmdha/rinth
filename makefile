@@ -12,7 +12,7 @@ all:
 	gcc $(CFLAGS) -o $(NAME) \
 	src/main.c \
 	src/args.c src/bit.c src/misc.c src/io.c src/log.c src/algo.c \
-	src/pddl_parse.c src/pddl_validate.c \
+	src/pddl_parse.c \
 	src/task.c src/translate_pddl.c \
 	src/state.c src/state_heap.c src/state_queue.c src/state_set.c src/state_registry.c \
 	src/expand.c src/expand_cp.c src/expand_sqlite.c \
@@ -26,7 +26,7 @@ bench:
 	bench/main.c \
 	bench/state.c bench/pddl_parse.c \
 	src/args.c src/bit.c src/misc.c src/io.c src/log.c src/algo.c \
-	src/pddl_parse.c src/pddl_validate.c \
+	src/pddl_parse.c \
 	src/task.c src/translate_pddl.c \
 	src/state.c src/state_heap.c src/state_queue.c src/state_set.c src/state_registry.c \
 	src/expand.c src/expand_cp.c src/expand_sqlite.c \
@@ -40,7 +40,7 @@ test:
 	test/algo.c test/pddl_parse.c test/translate_pddl.c test/expand.c \
 	test/state.c test/state_heap.c \
 	src/args.c src/bit.c src/misc.c src/io.c src/log.c src/algo.c \
-	src/pddl_parse.c src/pddl_validate.c \
+	src/pddl_parse.c \
 	src/task.c src/translate_pddl.c \
 	src/state.c src/state_heap.c src/state_queue.c src/state_set.c src/state_registry.c \
 	src/expand.c src/expand_cp.c src/expand_sqlite.c \

@@ -85,9 +85,6 @@ void translate_facts(state** out, const pddl_atom* in, const string* preds, cons
 task translate_pddl(const pddl_domain* d, const pddl_problem* p) {
         task t = task_init();
 
-        TRACE("Validate");
-        pddl_validate(d, p);
-
         TRACE("Translate");
         clone_strings(t.predicates, d->predicates);
         clone_strings(t.objects, p->objects);
