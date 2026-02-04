@@ -40,10 +40,18 @@ donward --alias lama-first ${domain} ${problem}
 
 Do note: the limits are below that of the standard ipc 2023, namely 30 min time limit and 8 gb memory limit, this is intentional ... i can't be bothered to wait that long.
 
-### Coverage
+### Coverage - How many problems were solved (Higher is better)
 
 | Domain        | rinth         | powerlifted   | downward      |
 | ------------- | ------------- | ------------- | ------------- |
 | Blocksworld   | 32            | 35            | 53            |
 | ------------- | ------------- | ------------- | ------------- |
 | Total         | 32            | 35            | 53            |
+
+### Score - IPC score (Higher is better)
+
+| Domain        | rinth         | powerlifted   | downward      |
+| ------------- | ------------- | ------------- | ------------- |
+| Blocksworld   | 27            | 23            | 41            |
+| ------------- | ------------- | ------------- | ------------- |
+| Total         | 27            | 23            | 41            |
