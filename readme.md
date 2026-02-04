@@ -33,7 +33,7 @@ Problems [ipc2023 - learning](https://github.com/ipc2023-learning/benchmarks)
 ```
 Time limit: 5M
 Memory limit: 1GB
-rinth -e cp -s beam -d ${domain} -p ${problem}
+rinth -e cp -s beam -h goal_count -d ${domain} -p ${problem}
 powerlifted -s alt-bfws1 -e ff -g yannakis -d ${domain} -i ${problem}
 donward --alias lama-first ${domain} ${problem}
 ```
