@@ -18,6 +18,7 @@ timeout 5m ./rinth \
 ec=$?
 elapsed=$( date +%s.%N --date="$time_start seconds ago" )
 
+echo "EXPR_NAME rinth" >> $log
 echo "EXPR_TASK $task" >> $log
 echo "EXPR_EXPAND $expand" >> $log
 echo "EXPR_SEARCH $search" >> $log
