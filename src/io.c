@@ -9,6 +9,7 @@
 #include <errno.h>
 
 #include "io.h"
+#include "mem.h"
 
 struct file_buffer {
         int    fd;
@@ -24,26 +25,24 @@ char** f_open(const char* path) {
         fd = open(path, O_RDONLY);
         if (fd == -1) {
                 perror(path);
-                exit(1);
+                exit(errno);
         }
 
         struct stat sb;
         if (fstat(fd, &sb) == -1) {
                 perror(path);
                 close(fd);
-                exit(1);
+                exit(errno);
         }
         len = sb.st_size;
         buf = mmap(NULL, len, PROT_READ, MAP_PRIVATE, fd, 0);
         if (buf == MAP_FAILED) {
                 perror(path);
                 close(fd);
-                exit(1);
+                exit(errno);
         }
 
-        struct file_buffer* fb = malloc(sizeof(struct file_buffer));
-	if (!fb)
-		exit(errno);
+        struct file_buffer* fb = malloc_(sizeof(struct file_buffer));
         fb->fd                 = fd;
         fb->len                = len;
         fb->buf                = buf;

@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include <memory.h>
-#include <errno.h>
 
 #include "state_queue.h"
+#include "mem.h"
 
 struct state_queue {
 	size_t  len;
@@ -11,13 +11,11 @@ struct state_queue {
 };
 
 state_queue* sq_new(void) {
-	state_queue* sq = malloc(sizeof(state_queue));
+	state_queue* sq = malloc_(sizeof(state_queue));
 
 	sq->len = 0;
 	sq->cap = 8;
-	sq->ele = malloc(sq->cap * sizeof(state*));
-	if (!sq->ele)
-		exit(errno);
+	sq->ele = malloc_(sq->cap * sizeof(state*));
 
 	return sq;
 }
@@ -56,9 +54,7 @@ size_t sq_size(const state_queue* sq) {
 void sq_push(state_queue* sq, state* s) {
 	if (sq->len >= sq->cap) {
 		sq->cap = 2 * sq->cap;
-		sq->ele = realloc(sq->ele, sq->cap * sizeof(state*));
-		if (!sq->ele)
-			exit(errno);
+		sq->ele = realloc_(sq->ele, sq->cap * sizeof(state*));
 	}
 
 	sq->ele[sq->len++] = s;

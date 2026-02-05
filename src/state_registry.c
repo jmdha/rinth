@@ -1,7 +1,7 @@
-#include <errno.h>
 #include <stdlib.h>
 #include <memory.h>
 
+#include "mem.h"
 #include "eval.h"
 #include "state_registry.h"
 
@@ -40,12 +40,10 @@ struct state_registry {
 };
 
 state_registry* sr_new(void) {
-	state_registry* sr = malloc(sizeof(state_registry));
-	if (!sr)
-		exit(errno);
+	state_registry* sr = malloc_(sizeof(state_registry));
 	sr->len = 0;
 	sr->cap = 8;
-	sr->arr = calloc(8, sizeof(entry));
+	sr->arr = calloc_(8, sizeof(entry));
 	return sr;
 }
 
@@ -95,9 +93,7 @@ void sr_insert(entry* entries, size_t cap, entry e) {
 
 void sr_grow(state_registry* sr) {
 	const size_t cap = 4 * sr->cap;
-	entry*       arr = calloc(cap, sizeof(entry));
-	if (!arr)
-		exit(errno);
+	entry*       arr = calloc_(cap, sizeof(entry));
 	for (size_t i = 0; i < sr->cap; i++)
 		if (!is_entry(&arr[i]))
 			sr_insert(arr, cap, sr->arr[i]);

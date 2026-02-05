@@ -1,10 +1,10 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <errno.h>
 
 #include "state_heap.h"
 #include "state_set.h"
 #include "log.h"
+#include "mem.h"
 
 struct state_heap {
 	size_t      cap;
@@ -12,14 +12,10 @@ struct state_heap {
 };
 
 state_heap* sh_new(void) {
-	state_heap* sh = malloc(sizeof(state_heap));
-	if (!sh)
-		exit(errno);
+	state_heap* sh = malloc_(sizeof(state_heap));
 
 	sh->cap = 64;
-	sh->arr = malloc(sh->cap * sizeof(state_set*));
-	if (!sh->arr)
-		exit(errno);
+	sh->arr = malloc_(sh->cap * sizeof(state_set*));
 	for (size_t i = 0; i < sh->cap; i++)
 		sh->arr[i] = ss_new();
 
@@ -58,9 +54,7 @@ bool sh_empty(const state_heap* sh) {
 void sh_push(state_heap* sh, state* s, size_t val) {
 	if (val >= sh->cap) {
 		sh->cap *= 2;
-		sh->arr = realloc(sh->arr, sh->cap * sizeof(state_set*));
-		if (!sh->arr)
-			exit(errno);
+		sh->arr = realloc_(sh->arr, sh->cap * sizeof(state_set*));
 		for (size_t i = sh->cap / 2; i < sh->cap; i++)
 			sh->arr[i] = ss_new();
 	}

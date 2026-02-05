@@ -1,8 +1,7 @@
-#include <memory.h>
 #include <stdint.h>
-#include <errno.h>
 
 #include "algo.h"
+#include "mem.h"
 
 struct cp_iter {
         size_t** root;
@@ -15,14 +14,12 @@ void cp_free(cp_iter* cpi) {
 }
 
 cp_iter* cp_init(size_t** vals) {
-        cp_iter* cpi = malloc(sizeof(cp_iter));
+        cp_iter* cpi = malloc_(sizeof(cp_iter));
         cpi->root    = vals;
         size_t len   = 0;
         for (size_t i = 0; cpi->root[i]; i++)
                 len++;
-        cpi->offsets = calloc(len, sizeof(size_t));
-	if (!cpi->offsets)
-		exit(errno);
+        cpi->offsets = calloc_(len, sizeof(size_t));
         return cpi;
 }
 

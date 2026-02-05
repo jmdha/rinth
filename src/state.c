@@ -1,11 +1,11 @@
 #include <assert.h>
 #include <limits.h>
-#include <memory.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <errno.h>
+#include <memory.h>
 
+#include "mem.h"
 #include "state.h"
 #include "bit.h"
 
@@ -22,20 +22,16 @@ struct state {
 };
 
 state* state_new(void) {
-        state* s = malloc(sizeof(state));
-	if (!s)
-		exit(errno);
+        state* s = malloc_(sizeof(state));
         s->count = 0;
         s->facts = NULL;
         return s;
 }
 
 state* state_clone(const state* s) {
-        state* new = malloc(sizeof(state));
-	if (!new)
-		exit(errno);
+        state* new = malloc_(sizeof(state));
         new->count = s->count;
-        new->facts = malloc(new->count * sizeof(uint64_t));
+        new->facts = malloc_(new->count * sizeof(uint64_t));
         memcpy(new->facts, s->facts, new->count * sizeof(uint64_t));
         return new;
 }
@@ -141,18 +137,14 @@ void state_insert(struct state* s, size_t predicate, size_t len, const size_t* a
                 if (s->facts[i] == fact) {
                         return; // Already contains fact
                 } else if (s->facts[i] > fact) {
-                        s->facts = realloc(s->facts, sizeof(size_t) * ++s->count);
-			if (!s->facts)
-				exit(errno);
+                        s->facts = realloc_(s->facts, sizeof(size_t) * ++s->count);
                         memmove(&s->facts[i + 1], &s->facts[i],
                                 sizeof(size_t) * (s->count - i - 1));
                         s->facts[i] = fact;
                         return; // Inserted fact in sorted list
                 }
         }
-        s->facts               = realloc(s->facts, sizeof(uint64_t) * ++s->count);
-	if (!s->facts)
-		exit(errno);
+        s->facts               = realloc_(s->facts, sizeof(uint64_t) * ++s->count);
         s->facts[s->count - 1] = fact;
 }
 
@@ -166,11 +158,8 @@ void state_remove(struct state* s, size_t predicate, size_t len, const size_t* a
                                 free(s->facts);
                                 s->facts = NULL;
                                 s->count = 0;
-                        } else {
-                                s->facts = realloc(s->facts, sizeof(uint64_t) * --s->count);
-				if (!s->facts)
-					exit(errno);
-                        }
+                        } else
+                                s->facts = realloc_(s->facts, sizeof(uint64_t) * --s->count);
                         return;
                 } else if (s->facts[i] > fact) {
                         return;
@@ -184,9 +173,7 @@ struct state_iter {
 };
 
 state_iter* state_iter_new(const struct state* s) {
-        state_iter* si = malloc(sizeof(state_iter));
-	if (!si)
-		exit(errno);
+        state_iter* si = malloc_(sizeof(state_iter));
         si->state      = s;
         si->index      = 0;
         return si;
