@@ -6,37 +6,12 @@
 
 #include "log.h"
 #include "pddl.h"
+#include "parse.h"
 
 typedef enum { EOI, LPAREN, RPAREN, ID, MAX_KIND } kind;
 
-bool is_whitespace(char c) {
-        return ((unsigned char)c) - 1 <= 32;
-}
-
-bool is_text(char c) {
-        return c > 41;
-}
-
-const char* skip_whitespace(const char* l) {
-        while (is_whitespace(*l))
-                l++;
-        return l;
-}
-
-const char* skip_text(const char* l) {
-        while (is_text(*l))
-                l++;
-        return l;
-}
-
-const char* next_line(const char* l) {
-        while (*l != '\n')
-                l++;
-        return l;
-}
-
 kind lexer_next(const char** l, string* s) {
-        *l = skip_whitespace(*l);
+        skip_whitespace(l);
 
         s->ptr = (*l)++;
         s->len = 1;
@@ -48,10 +23,10 @@ kind lexer_next(const char** l, string* s) {
         case ')':
                 return RPAREN;
         case ';':
-                *l = next_line(*l);
+                next_line(l);
                 return lexer_next(l, s);
         default:
-                *l     = skip_text(*l);
+                skip_text(l);
                 s->len = *l - s->ptr;
                 return ID;
         }
