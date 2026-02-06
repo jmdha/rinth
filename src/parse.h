@@ -3,7 +3,7 @@
 
 #include <stddef.h>
 
-void parse_error(const char* str, size_t pos, const char* msg);
+void parse_error(const char* str, size_t pos, const char* msg, size_t len);
 
 bool is_whitespace(char c);
 bool is_text(char c);

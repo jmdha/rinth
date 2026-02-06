@@ -2,13 +2,6 @@
 
 rinth is a lifted planning engine.
 
-It features:
-- A 2 GB/s Parser
-- SQL based successor generation with SQLite3
-- And not much else
-
-It is technically, probably, complete, in that it can find a path from the initial state to goal. However, it is very feature-limited.
-
 ## Building
 To build the executable, simply run the following:
 ```

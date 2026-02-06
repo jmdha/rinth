@@ -1,190 +1,211 @@
-#include <assert.h>
-#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "log.h"
 #include "pddl.h"
 #include "parse.h"
 
 typedef enum { EOI, LPAREN, RPAREN, ID, MAX_KIND } kind;
 
-kind lexer_next(const char** l, string* s) {
-        skip_whitespace(l);
+typedef struct {
+	// Start of string
+	const char* str;
+	// Current position of lexer
+	const char* ptr;
+} lexer;
 
-        s->ptr = (*l)++;
-        s->len = 1;
-        switch (*s->ptr) {
-        case '\0':
-                return EOI;
-        case '(':
-                return LPAREN;
-        case ')':
-                return RPAREN;
-        case ';':
-                next_line(l);
-                return lexer_next(l, s);
-        default:
-                skip_text(l);
-                s->len = *l - s->ptr;
-                return ID;
-        }
+const char* kind_names[MAX_KIND] = {
+	"EOI", "LPAREN", "RPAREN", "ID"
+};
+
+void unexpected_keyword(const lexer* l, const string* s) {
+	char buf[1000];
+	sprintf(buf, "unexpected keyword %.*s", (int) s->len, s->ptr);
+	parse_error(l->str, l->ptr - l->str - s->len, buf, s->len);
 }
 
-void parse_ids(const char** l, string* ids) {
-        while (lexer_next(l, ids) == ID)
-                ids++;
-        ids[0].ptr = NULL;
-        ids[0].len = 0;
-}
+kind lexer_next(lexer* l, string* s) {
+	skip_whitespace(&l->ptr);
+	s->ptr = l->ptr++;
+	s->len = 1;
+	switch (*s->ptr) {
+		case '\0': return EOI;
+		case '(':  return LPAREN;
+		case ')':  return RPAREN;
+		case ';':
+			   next_line(&l->ptr);
+			   return lexer_next(l, s);
+		default:
+			   skip_text(&l->ptr);
+			   s->len = l->ptr - s->ptr;
+			   return ID;
 
-void parse_predicates(const char** l, string* preds) {
-	string s;
-	while (lexer_next(l, &s) == LPAREN) {
-		assert(lexer_next(l, preds) == ID);
-		while (lexer_next(l, &s) == ID) {}
-		preds++;
 	}
-	preds[0].ptr = NULL;
-	preds[0].len = 0;
 }
 
-void parse_expression(const char** l, string* stack) {
-        size_t d = 0;
+void lexer_expect(lexer* l, string* s, kind k) {
+	kind o = lexer_next(l, s);
+	if (o != k) {
+		char buf[1000];
+		sprintf(buf, "expected symbol %s found %s", kind_names[k], kind_names[o]);
+		parse_error(l->str, l->ptr - l->str - s->len, buf, s->len);
+	}
+}
+
+void lexer_expect_(lexer* l, kind k) {
+	string s;
+	kind o = lexer_next(l, &s);
+	if (o != k) {
+		char buf[1000];
+		sprintf(buf, "expected symbol %s found %s", kind_names[k], kind_names[o]);
+		parse_error(l->str, l->ptr - l->str - s.len, buf, s.len);
+	}
+}
+
+kind lexer_expect2(lexer* l, string* s, kind k1, kind k2) {
+	kind o = lexer_next(l, s);
+	if (o != k1 && o != k2) {
+		char buf[1000];
+		sprintf(buf, "expected symbol %s or %s found %s", kind_names[k1], kind_names[k2], kind_names[o]);
+		parse_error(l->str, l->ptr - l->str - s->len, buf, s->len);
+	}
+	return o;
+}
+
+kind lexer_expect2_(lexer* l, kind k1, kind k2) {
+	string s;
+	kind o = lexer_next(l, &s);
+	if (o != k1 && o != k2) {
+		char buf[1000];
+		sprintf(buf, "expected symbol %s or %s found %s", kind_names[k1], kind_names[k2], kind_names[o]);
+		parse_error(l->str, l->ptr - l->str - s.len, buf, s.len);
+	}
+	return o;
+}
+
+void parse_id(lexer* l, string* s) {
+	lexer_expect(l, s, ID);
+	lexer_expect_(l, RPAREN);
+}
+
+void parse_ids(lexer* l, string* s) {
+	while (lexer_expect2(l, s, ID, RPAREN) == ID)
+		s++;
+	s[0].ptr = NULL;
+	s[0].len = 0;
+}
+
+void parse_predicates(lexer* l, string* s) {
+	string tmp;
+	while (lexer_expect2(l, &tmp, LPAREN, RPAREN) == LPAREN) {
+		lexer_expect(l, s, ID);
+		while (lexer_expect2(l, &tmp, ID, RPAREN) == ID) {}
+		s++;
+	}
+	s[0].ptr = NULL;
+	s[0].len = 0;
+}
+
+void parse_expression(lexer* l, string* stack) {
+        size_t d = 1;
+	stack[0].ptr = l->ptr - 1;
+	stack[0].len = 1;
+	stack++;
         do {
-                kind k = lexer_next(l, stack++);
-                if (k == LPAREN)
-                        d++;
-                else if (k == RPAREN)
-                        d--;
+		switch (lexer_next(l, stack++)) {
+		case LPAREN: d++; break;
+		case RPAREN: d--; break;
+		default: break;
+		}
         } while (d > 0);
 }
 
-void parse_action(const char** l, pddl_action* action) {
-        string t = {0};
-
-        assert(lexer_next(l, &action->name) == ID);
-        while (lexer_next(l, &t) != RPAREN) {
-                if (strncmp(t.ptr, ":parameters", t.len) == 0) {
-                        assert(lexer_next(l, &t) == LPAREN);
-                        parse_ids(l, action->vars);
-                } else if (strncmp(t.ptr, ":precondition", t.len) == 0) {
-                        parse_expression(l, action->pre);
-                } else if (strncmp(t.ptr, ":effect", t.len) == 0) {
-                        parse_expression(l, action->eff);
-                } else {
-                        fprintf(stderr, "unexpected keyword %.*s\n", (int)t.len, t.ptr);
-                        exit(1);
-                }
-        }
+void parse_action(lexer* l, pddl_action* a) {
+	string tmp;
+	lexer_expect(l, &a->name, ID);
+	while (lexer_expect2(l, &tmp, ID, RPAREN) == ID) {
+		lexer_expect_(l, LPAREN);
+		if (strncmp(tmp.ptr, ":parameters", tmp.len) == 0)
+			parse_ids(l, a->vars);
+		else if (strncmp(tmp.ptr, ":precondition", tmp.len) == 0)
+			parse_expression(l, a->pre);
+		else if (strncmp(tmp.ptr, ":effect", tmp.len) == 0)
+			parse_expression(l, a->eff);
+		else
+			unexpected_keyword(l, &tmp);
+	}
 }
 
-const char* pddl_domain_match(pddl_domain* d, const char* l) {
-        string t = {0};
+void domain_parse_next(lexer* l, pddl_domain* d, size_t* a) {
+	string s;
 
-        assert(lexer_next(&l, &t) == ID);
-        if (strncmp(t.ptr, "domain", t.len) == 0) {
-                TRACE("Parse domain name");
-                assert(lexer_next(&l, &d->name) == ID);
-                assert(lexer_next(&l, &t) == RPAREN);
-        } else if (strncmp(t.ptr, ":requirements", t.len) == 0) {
-                TRACE("Parse domain requirements");
-                parse_ids(&l, d->requirements);
-        } else if (strncmp(t.ptr, ":predicates", t.len) == 0) {
-                TRACE("Parse domain predicates");
-                parse_predicates(&l, d->predicates);
-        } else if (strncmp(t.ptr, ":action", t.len) == 0) {
-                TRACE("Parse domain action");
-                for (pddl_action* a = d->actions; a; a++) {
-                        if (a->name.ptr)
-                                continue;
-                        parse_action(&l, a);
-                        break;
-                }
-        } else {
-                fprintf(stderr, "unexpected keyword %.*s\n", (int)t.len, t.ptr);
-                exit(1);
-        }
-
-        return l;
+	lexer_expect(l, &s, ID);
+	if (strncmp(s.ptr, "domain", s.len) == 0)
+		parse_id(l, &d->name);
+	else if (strncmp(s.ptr, ":requirements", s.len) == 0)
+		parse_ids(l, d->requirements);
+	else if (strncmp(s.ptr, ":predicates", s.len) == 0)
+		parse_predicates(l, d->predicates);
+	else if (strncmp(s.ptr, ":action", s.len) == 0)
+		parse_action(l, &d->actions[(*a)++]);
+	else
+		unexpected_keyword(l, &s);
 }
 
 pddl_domain pddl_domain_parse(const char* s) {
-        pddl_domain d = {0};
-        string      t = {0};
-        kind        k = 0;
+        pddl_domain d = { 0 };
+	lexer       l = { .str = s, .ptr = s };
+	size_t      a = 0;
 
-        TRACE("Parse domain");
+	lexer_expect_(&l, LPAREN);
+	lexer_expect_(&l, ID);
 
-        assert(lexer_next(&s, &t) == LPAREN);
-        assert(lexer_next(&s, &t) == ID);
+	while (lexer_expect2_(&l, LPAREN, RPAREN) == LPAREN)
+		domain_parse_next(&l, &d, &a);
 
-        while ((k = lexer_next(&s, &t)) != EOI) {
-                if (k == RPAREN)
-                        break;
-                assert(k == LPAREN);
-                s = pddl_domain_match(&d, s);
-        }
-
-        return d;
+	return d;
 }
 
-void parse_atoms(const char** l, pddl_atom* atoms) {
-        string t = {0};
-        while (lexer_next(l, &t) == LPAREN) {
-                assert(lexer_next(l, &atoms[0].predicate) == ID);
-                parse_ids(l, atoms[0].vars);
-                atoms++;
-        }
+void parse_atoms(lexer* l, pddl_atom* atoms) {
+	while (lexer_expect2_(l, LPAREN, RPAREN) == LPAREN) {
+		lexer_expect(l, &atoms[0].predicate, ID);
+		parse_ids(l, atoms[0].vars);
+		atoms++;
+	}
 }
 
-const char* pddl_problem_match(pddl_problem* p, const char* l) {
-        string t = {0};
+void problem_parse_next(lexer* l, pddl_problem* p) {
+	string s;
 
-        assert(lexer_next(&l, &t) == ID);
-        if (strncmp(t.ptr, "problem", t.len) == 0) {
-                TRACE("Parse problem name");
-                assert(lexer_next(&l, &p->name) == ID);
-                assert(lexer_next(&l, &t) == RPAREN);
-        } else if (strncmp(t.ptr, ":domain", t.len) == 0) {
-                TRACE("Parse problem domain");
-                assert(lexer_next(&l, &p->domain) == ID);
-                assert(lexer_next(&l, &t) == RPAREN);
-        } else if (strncmp(t.ptr, ":objects", t.len) == 0) {
-                TRACE("Parse problem objects");
-                parse_ids(&l, p->objects);
-        } else if (strncmp(t.ptr, ":init", t.len) == 0) {
-                TRACE("Parse problem inits");
-                parse_atoms(&l, p->inits);
-        } else if (strncmp(t.ptr, ":goal", t.len) == 0) {
-                TRACE("Parse problem goals");
-                assert(lexer_next(&l, &t) == LPAREN);
-                assert(lexer_next(&l, &t) == ID);
-                parse_atoms(&l, p->goals);
-                assert(lexer_next(&l, &t) == RPAREN);
-        }
-
-        return l;
+	lexer_expect(l, &s, ID);
+	if (strncmp(s.ptr, "problem", s.len) == 0)
+		parse_id(l, &p->name);
+	else if (strncmp(s.ptr, ":domain", s.len) == 0)
+		parse_id(l, &p->domain);
+	else if (strncmp(s.ptr, ":objects", s.len) == 0)
+		parse_ids(l, p->objects);
+	else if (strncmp(s.ptr, ":init", s.len) == 0)
+		parse_atoms(l, p->inits);
+	else if (strncmp(s.ptr, ":goal", s.len) == 0) {
+		lexer_expect_(l, LPAREN);
+		lexer_expect(l, &s, ID);
+		if (strncmp(s.ptr, "and", s.len) != 0)
+			unexpected_keyword(l, &s);
+		parse_atoms(l, p->goals);
+		lexer_expect_(l, RPAREN);
+	} else
+		unexpected_keyword(l, &s);
 }
 
 pddl_problem pddl_problem_parse(const char* s) {
-        pddl_problem p = {0};
-        string       t = {0};
-        kind         k = 0;
+        pddl_problem p = { 0 };
+	lexer        l = { .str = s, .ptr = s };
 
-        TRACE("Parse problem");
+	lexer_expect_(&l, LPAREN);
+	lexer_expect_(&l, ID);
 
-        assert(lexer_next(&s, &t) == LPAREN);
-        assert(lexer_next(&s, &t) == ID);
-
-        while ((k = lexer_next(&s, &t)) != EOI) {
-                if (k == RPAREN)
-                        break;
-
-                assert(k == LPAREN);
-                s = pddl_problem_match(&p, s);
-        }
+	while (lexer_expect2_(&l, LPAREN, RPAREN) == LPAREN)
+		problem_parse_next(&l, &p);
 
         return p;
 }
