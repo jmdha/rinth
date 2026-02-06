@@ -2,6 +2,17 @@
 
 rinth is a lifted planning engine.
 
+Features:
+  - 2 GB/s parser of PDDL
+  - Parser includes full error handling
+```
+parse failed: char 75
+ (:objets  b1 b2)
+  | unexpected keyword :objets
+```
+  - SQL based successor generation with SQLite3
+
+
 ## Building
 To build the executable, simply run the following:
 ```
