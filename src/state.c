@@ -1,13 +1,13 @@
 #include <assert.h>
 #include <limits.h>
+#include <memory.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <memory.h>
 
+#include "bit.h"
 #include "mem.h"
 #include "state.h"
-#include "bit.h"
 
 static uint64_t create_fact(size_t predicate, size_t len, const size_t* args) {
         uint64_t fact = (uint64_t)1 + (uint64_t)predicate;
@@ -60,7 +60,7 @@ bool state_contains(const struct state* s, size_t predicate, size_t len, const s
 bool state_equal(const struct state* a, const struct state* b) {
         if (a->count != b->count)
                 return false;
-	return memcmp(a->facts, b->facts, a->count * sizeof(uint64_t)) == 0;
+        return memcmp(a->facts, b->facts, a->count * sizeof(uint64_t)) == 0;
 }
 
 bool state_covers(const struct state* a, const struct state* b) {
@@ -91,33 +91,33 @@ size_t state_size(const struct state* s) {
 }
 
 float state_bpf(const state* s) {
-	return 8 * (float) state_size(s) / state_count(s);
+        return 8 * (float)state_size(s) / state_count(s);
 }
 
-uint16_t state_hash16(const state *s) {
-	uint16_t hash = 0;
-	for (size_t i = 0; i < s->count; i++) {
-		hash += popcount(s->facts[i] & 0xaa55aa55aa55aa55);
-		hash -= popcount(s->facts[i] & 0x55aa55aa55aa55aa);
-	}
-	return hash;
+uint16_t state_hash16(const state* s) {
+        uint16_t hash = 0;
+        for (size_t i = 0; i < s->count; i++) {
+                hash += popcount(s->facts[i] & 0xaa55aa55aa55aa55);
+                hash -= popcount(s->facts[i] & 0x55aa55aa55aa55aa);
+        }
+        return hash;
 }
 
-uint32_t state_hash32(const state *s) {
-	uint32_t hash = 2166136261lu;
-	for (size_t i = 0; i < s->count; i++) {
-		hash ^= s->facts[i];
-		hash *= 16777619lu;
-	}
-	return hash;
+uint32_t state_hash32(const state* s) {
+        uint32_t hash = 2166136261lu;
+        for (size_t i = 0; i < s->count; i++) {
+                hash ^= s->facts[i];
+                hash *= 16777619lu;
+        }
+        return hash;
 }
 
 uint64_t state_hash64(const state* s) {
         uint64_t hash = 14695981039346656037llu;
         for (size_t i = 0; i < s->count; i++) {
-		hash ^= s->facts[i];
-		hash *= 1099511628211llu;
-	}
+                hash ^= s->facts[i];
+                hash *= 1099511628211llu;
+        }
         return hash;
 }
 

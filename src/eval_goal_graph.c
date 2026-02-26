@@ -2,8 +2,6 @@
 
 #include "eval.h"
 
-void eval_init_goal_graph(const task* def, eval_kind ekind) {
-}
+void eval_init_goal_graph(const task* def, eval_kind ekind) {}
 
-size_t eval_goal_graph(const state* s) {
-}
+size_t eval_goal_graph(const state* s) {}

@@ -65,21 +65,21 @@ void translate_actions(action* out, const pddl_action* in, const string* preds) 
 }
 
 atom translate_fact(const pddl_atom* in, const string* preds, const string* objects) {
-	atom out = {0};
+        atom out      = {0};
         out.predicate = sfind(preds, &in->predicate) - preds;
         out.arity     = slen(in->vars);
         for (size_t i = 0; in->vars[i].ptr; i++)
                 out.vars[i] = sfind(objects, &in->vars[i]) - objects;
-	return out;
+        return out;
 }
 
 void translate_facts(state** out, const pddl_atom* in, const string* preds, const string* objects) {
         TRACE("Translate facts");
-	*out = state_new();
+        *out = state_new();
         while (in->predicate.ptr) {
                 const atom a = translate_fact(in++, preds, objects);
-		state_insert(*out, a.predicate, a.arity, a.vars);
-	}
+                state_insert(*out, a.predicate, a.arity, a.vars);
+        }
 }
 
 task translate_pddl(const pddl_domain* d, const pddl_problem* p) {

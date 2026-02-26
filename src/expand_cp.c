@@ -2,8 +2,8 @@
 
 #include "algo.h"
 #include "expand.h"
-#include "misc.h"
 #include "mem.h"
+#include "misc.h"
 
 size_t        COUNT   = SIZE_MAX;
 const action* ACTIONS = NULL;
@@ -13,17 +13,17 @@ const state*  STATE   = NULL;
 cp_iter*      CP      = NULL;
 
 void fini(void) {
-	for (size_t i = 0; ARGS[i]; i++) {
-		for (size_t t = 0; ARGS[i][t]; t++)
-			free(ARGS[i][t]);
-		free(ARGS[i]);
-	}
-	free(ARGS);
+        for (size_t i = 0; ARGS[i]; i++) {
+                for (size_t t = 0; ARGS[i][t]; t++)
+                        free(ARGS[i][t]);
+                free(ARGS[i]);
+        }
+        free(ARGS);
 }
 
 void expand_init_cp(const task* def) {
-	atexit(fini);
-	COUNT = 0;
+        atexit(fini);
+        COUNT   = 0;
         ACTIONS = def->actions;
         for (size_t i = 0; ACTIONS[i].name.ptr; i++)
                 COUNT++;
@@ -31,13 +31,13 @@ void expand_init_cp(const task* def) {
         ARGS = calloc_((1 + COUNT), sizeof(size_t**));
         for (size_t i = 0; ACTIONS[i].name.ptr; i++) {
                 ARGS[i] = calloc_((1 + ACTIONS[i].arity), sizeof(size_t*));
-	}
+        }
         for (size_t i = 0; ACTIONS[i].name.ptr; i++)
                 for (size_t t = 0; t < ACTIONS[i].arity; t++) {
                         ARGS[i][t] = malloc_((1 + slen(def->objects)) * sizeof(size_t));
                         for (size_t j = 0; j < slen(def->objects); j++)
                                 ARGS[i][t][j] = j;
-			ARGS[i][t][slen(def->objects)] = SIZE_MAX;
+                        ARGS[i][t][slen(def->objects)] = SIZE_MAX;
                 }
 }
 
@@ -70,21 +70,21 @@ bool is_legal(const state* s, const action* a, const size_t* args) {
 }
 
 bool expand_step_cp(size_t* action, size_t* args) {
-	do {
-		if (ACTION >= COUNT)
-			return false;
-		if (!CP)
-			CP = cp_init(ARGS[ACTION]);
-        	if (!cp_step(CP, args)) {
-        	        ACTION++;
-        	        if (CP) {
-        	                cp_free(CP);
-				CP = NULL;
-			}
-			continue;
-        	}
-	} while (!is_legal(STATE, &ACTIONS[ACTION], args));
+        do {
+                if (ACTION >= COUNT)
+                        return false;
+                if (!CP)
+                        CP = cp_init(ARGS[ACTION]);
+                if (!cp_step(CP, args)) {
+                        ACTION++;
+                        if (CP) {
+                                cp_free(CP);
+                                CP = NULL;
+                        }
+                        continue;
+                }
+        } while (!is_legal(STATE, &ACTIONS[ACTION], args));
 
-	*action = ACTION;
+        *action = ACTION;
         return ACTION < COUNT;
 }
