@@ -12,10 +12,13 @@ static const action* ACTIONS = NULL;
 void (*f_expand)(const state*);
 bool (*f_expand_step)(size_t*, size_t*);
 
+static size_t EXPANSIONS = 0;
 static size_t SUCCESSORS = 0;
 
 static void fini(void) {
+	INFO("States expaneded %zu", EXPANSIONS);
         INFO("Successors generated %zu", SUCCESSORS);
+	INFO("Branching factor %zu", SUCCESSORS / EXPANSIONS);
 }
 
 void expand_init(const task* t, expand_kind ekind) {
@@ -47,6 +50,8 @@ void expand(const state* s) {
         f_expand(s);
 
         STATE = s;
+
+	EXPANSIONS++;
 }
 
 bool expand_step(size_t* action, size_t* args) {
