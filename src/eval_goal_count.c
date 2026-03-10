@@ -2,7 +2,7 @@
 
 static const state* goal = NULL;
 
-void eval_init_goal_count(const task* def, eval_kind ekind) {
+void eval_init_goal_count(const task* def) {
         goal = def->goal;
 }
 
