@@ -2,6 +2,7 @@
 #define PARSE_H
 
 #include <stddef.h>
+#include <stdbool.h>
 
 void parse_error(const char* str, size_t pos, const char* msg, size_t len);
 
