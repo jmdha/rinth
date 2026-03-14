@@ -30,7 +30,7 @@ bench:
 	src/task.c src/translate_pddl.c \
 	src/state.c src/state_heap.c src/state_queue.c src/state_set.c src/state_registry.c \
 	src/expand.c src/expand_cp.c src/expand_sqlite.c \
-	src/eval.c src/eval_goal_count.c src/eval_goal_graph.c \
+	src/eval.c src/eval_goal_count.c src/eval_hadd.c src/eval_hff.c src/eval_hmax.c \
 	src/search.c src/search_bfs.c src/search_gbfs.c src/search_lazy.c src/search_beam.c \
 	$(LIBS)
 
@@ -44,7 +44,7 @@ test:
 	src/task.c src/translate_pddl.c \
 	src/state.c src/state_heap.c src/state_queue.c src/state_set.c src/state_registry.c \
 	src/expand.c src/expand_cp.c src/expand_sqlite.c \
-	src/eval.c src/eval_goal_count.c src/eval_goal_graph.c \
+	src/eval.c src/eval_goal_count.c src/eval_hadd.c src/eval_hff.c src/eval_hmax.c \
 	src/search.c src/search_bfs.c src/search_gbfs.c src/search_lazy.c src/search_beam.c \
 	$(LIBS)
 
