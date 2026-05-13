@@ -53,7 +53,7 @@ args args_parse(int argc, char** argv) {
                 case 'h':
                         if (strcmp("goal_count", optarg) == 0)
                                 a.eval = EVAL_GOAL_COUNT;
-			else if (strcmp("hadd", optarg) == 0)
+                        else if (strcmp("hadd", optarg) == 0)
                                 a.eval = EVAL_HADD;
                         else if (strcmp("hff", optarg) == 0)
                                 a.eval = EVAL_HFF;

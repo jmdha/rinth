@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "expand.h"
 #include "search.h"
 
 path solve(const state* init, const state* goal, search_kind skind) {
