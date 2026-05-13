@@ -51,5 +51,5 @@ test:
 expr: all
 	rm -rf logs
 	mkdir logs
-	time parallel -j 16 --eta ./expr.sh ::: blocksworld{0..29} ::: cp ::: beam
+	time parallel -j 16 --eta ./expr.sh ::: blocksworld_easy{1..30} blocksworld_medium{1..30} ::: cp ::: beam
 	./collect.sh logs/*
