@@ -1,36 +1,34 @@
 #include <memory.h>
 #include <stdlib.h>
 
-#include "eval.h"
 #include "mem.h"
 #include "state_registry.h"
 
 typedef struct {
-        uint64_t hash64;
-        uint32_t hash32;
-        uint16_t hash16;
-        uint16_t eval;
+        uint64_t hash;
+        uint64_t parent;
 } entry;
 
-static entry entry_new(const state* s) {
-        entry e  = {0};
-        e.hash64 = state_hash64(s);
-        e.hash32 = state_hash32(s);
-        e.hash16 = state_hash16(s);
-        e.eval   = eval(s);
+static entry entry_new(const state* s, const state* p) {
+        entry e = {0};
+
+        e.hash = state_hash64(s);
+        if (p)
+                e.parent = state_hash64(p);
+
         return e;
 }
 
 static bool is_entry(const entry* e) {
-        return e->hash64 || e->hash32 || e->hash16 || e->eval;
+        return e->hash;
 }
 
 static bool entry_equal(const entry* a, const entry* b) {
-        return memcmp(a, b, sizeof(entry)) == 0;
+        return a->hash == b->hash;
 }
 
 static uint64_t entry_hash(const entry* e) {
-        return e->hash64;
+        return e->hash;
 }
 
 struct state_registry {
@@ -68,7 +66,7 @@ size_t sr_size(const state_registry* sr) {
 }
 
 bool sr_contains(const state_registry* sr, const state* s) {
-        entry    e    = entry_new(s);
+        entry    e    = entry_new(s, NULL);
         uint64_t hash = entry_hash(&e);
         for (size_t o = 0; o < sr->cap; o++) {
                 const size_t i = (hash + o) % sr->cap;
@@ -102,9 +100,11 @@ void sr_grow(state_registry* sr) {
         sr->arr = arr;
 }
 
-void sr_push(state_registry* sr, const state* s) {
+void sr_push(state_registry* sr, const state* s, const state* p) {
         if (4 * sr->len > sr->cap)
                 sr_grow(sr);
-        sr_insert(sr->arr, sr->cap, entry_new(s));
+        sr_insert(sr->arr, sr->cap, entry_new(s, p));
         sr->len++;
 }
+
+bool sr_ischild(state_registry* sr, const state* p, const state* c) {}

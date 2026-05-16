@@ -22,19 +22,19 @@ path solve_gbfs(const state* init, const state* goal) {
         sh_push(queue, state_clone(init), 0);
 
         while ((node = sh_pop(queue)) != NULL) {
-                sr_push(visited, state_clone(node));
-
                 expand(node);
                 while ((child = successor(&action, args))) {
                         if (sr_contains(visited, child)) {
                                 state_free(child);
                                 continue;
                         }
+                        sr_push(visited, child, node);
 
                         if (state_covers(child, goal)) {
                                 INFO("SH: %zu %zu B", sh_count(queue), sh_size(queue));
                                 state_free(child);
                                 state_free(node);
+                                sr_free(visited);
                                 sh_free(queue);
                                 p.len = 0;
                                 return p;
@@ -44,6 +44,7 @@ path solve_gbfs(const state* init, const state* goal) {
                 }
                 state_free(node);
         }
+
         p.len = SIZE_MAX;
         return p;
 }

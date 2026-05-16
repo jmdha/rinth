@@ -21,11 +21,11 @@ path solve_beam(const state* init, const state* goal) {
         visited = sr_new();
         queue   = sh_new();
         sh_push(queue, state_clone(init), 0);
+        sr_push(visited, init, NULL);
 
         while (!sh_empty(queue)) {
                 iqueue = sh_new();
                 while ((node = sh_pop(queue)) != NULL) {
-                        sr_push(visited, node);
                         expand(node);
                         while ((child = successor(&action, args))) {
                                 if (state_covers(child, goal)) {
@@ -39,6 +39,8 @@ path solve_beam(const state* init, const state* goal) {
                                         p.len = 0;
                                         return p;
                                 }
+                                sr_push(visited, node, child);
+
                                 if (sr_contains(visited, child)) {
                                         state_free(child);
                                         continue;
