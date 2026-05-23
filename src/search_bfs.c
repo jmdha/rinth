@@ -8,26 +8,36 @@ path solve_bfs(const state* init, const state* goal) {
         size_t       args[64];
         state*       node;
         state*       child;
-        state_queue* sq;
+        state_queue* queue;
+	state_registry* visited;
 
-        sq = sq_new();
-        sq_push(sq, state_clone(init));
+        queue = sq_new();
+	visited = sr_new();
+        sq_push(queue, state_clone(init));
 
-        while ((node = sq_pop(sq))) {
+        while ((node = sq_pop(queue))) {
                 expand(node);
                 while ((child = successor(&action, args))) {
+                        if (sr_contains(visited, child)) {
+                                state_free(child);
+                                continue;
+                        }
+                        sr_push(visited, node, child);
+
                         if (state_covers(child, goal)) {
+				p = trace(visited, init, child);
                                 state_free(node);
                                 state_free(child);
-                                sq_free(sq, true);
+                                sq_free(queue, true);
+                                sr_free(visited);
                                 p.len = 0;
                                 return p;
                         }
-                        sq_push(sq, child);
+                        sq_push(queue, child);
                 }
                 state_free(node);
         }
-        sq_free(sq, true);
+        sq_free(queue, true);
         p.len = SIZE_MAX;
         return p;
 }

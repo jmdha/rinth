@@ -32,6 +32,7 @@ path solve_gbfs(const state* init, const state* goal) {
 
                         if (state_covers(child, goal)) {
                                 INFO("SH: %zu %zu B", sh_count(queue), sh_size(queue));
+				p = trace(visited, init, child);
                                 state_free(child);
                                 state_free(node);
                                 sr_free(visited);

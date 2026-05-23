@@ -2,6 +2,7 @@
 #define SEARCH_H
 
 #include <stdint.h>
+#include "state_registry.h"
 
 #include "args.h"
 #include "state.h"
@@ -18,5 +19,7 @@ path solve_dfs(const state* init, const state* goal);
 path solve_gbfs(const state* init, const state* goal);
 path solve_lazy(const state* init, const state* goal);
 path solve_beam(const state* init, const state* goal);
+
+path trace(const state_registry* sr, const state* init, const state* goal);
 
 #endif

@@ -18,3 +18,9 @@ path solve(const state* init, const state* goal, search_kind skind) {
                 exit(1);
         }
 }
+
+path trace(const state_registry* sr, const state* init, const state* goal) {
+	path p;
+
+	return p;
+}
