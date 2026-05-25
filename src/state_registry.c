@@ -1,4 +1,5 @@
 #include <memory.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "mem.h"
@@ -15,20 +16,10 @@ static entry entry_new(const state* s, const state* p) {
         e.hash = state_hash64(s);
         if (p)
                 e.parent = state_hash64(p);
+        else
+                e.parent = 0;
 
         return e;
-}
-
-static bool is_entry(const entry* e) {
-        return e->hash;
-}
-
-static bool entry_equal(const entry* a, const entry* b) {
-        return a->hash == b->hash;
-}
-
-static uint64_t entry_hash(const entry* e) {
-        return e->hash;
 }
 
 struct state_registry {
@@ -51,11 +42,22 @@ void sr_free(state_registry* sr) {
         free(sr);
 }
 
+size_t sr_get(const state_registry* sr, uint64_t hash) {
+        for (size_t o = 0; o < sr->cap; o++) {
+                const size_t i = (hash + o) % sr->cap;
+                if (!sr->arr[i].hash)
+                        return SIZE_MAX;
+                if (hash == sr->arr[i].hash)
+                        return i;
+        }
+        return SIZE_MAX;
+}
+
 size_t sr_count(const state_registry* sr) {
         size_t count = 0;
 
         for (size_t i = 0; i < sr->cap; i++)
-                if (is_entry(&sr->arr[i]))
+                if (sr->arr[i].hash)
                         count++;
 
         return count;
@@ -66,23 +68,13 @@ size_t sr_size(const state_registry* sr) {
 }
 
 bool sr_contains(const state_registry* sr, const state* s) {
-        entry    e    = entry_new(s, NULL);
-        uint64_t hash = entry_hash(&e);
-        for (size_t o = 0; o < sr->cap; o++) {
-                const size_t i = (hash + o) % sr->cap;
-                if (!is_entry(&sr->arr[i]))
-                        return false;
-                if (entry_equal(&e, &sr->arr[i]))
-                        return true;
-        }
-        return false;
+        return sr_get(sr, state_hash64(s)) != SIZE_MAX;
 }
 
 void sr_insert(entry* entries, size_t cap, entry e) {
-        uint64_t hash = entry_hash(&e);
         for (size_t o = 0; o < cap; o++) {
-                const size_t i = (hash + o) % cap;
-                if (!is_entry(&entries[i])) {
+                const size_t i = (e.hash + o) % cap;
+                if (!entries[i].hash) {
                         entries[i] = e;
                         break;
                 }
@@ -93,7 +85,7 @@ void sr_grow(state_registry* sr) {
         const size_t cap = 4 * sr->cap;
         entry*       arr = calloc_(cap, sizeof(entry));
         for (size_t i = 0; i < sr->cap; i++)
-                if (!is_entry(&arr[i]))
+                if (!arr[i].hash)
                         sr_insert(arr, cap, sr->arr[i]);
         free(sr->arr);
         sr->cap = cap;
@@ -107,4 +99,9 @@ void sr_push(state_registry* sr, const state* s, const state* p) {
         sr->len++;
 }
 
-bool sr_ischild(state_registry* sr, const state* p, const state* c) {}
+uint64_t sr_parent(const state_registry* sr, uint64_t hash) {
+        size_t idx = sr_get(sr, hash);
+        if (idx != SIZE_MAX)
+                return sr->arr[idx].parent;
+        return SIZE_MAX;
+}

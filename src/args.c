@@ -15,7 +15,7 @@ args args_parse(int argc, char** argv) {
         a.eval   = EVAL_GOAL_COUNT;
 
         int opt;
-        while ((opt = getopt(argc, argv, "t:d:p:s:e:h:")) != -1) {
+        while ((opt = getopt(argc, argv, "t:d:p:s:e:h:o")) != -1) {
                 switch (opt) {
                 case 't':
                         a.path_task = optarg;
@@ -63,6 +63,9 @@ args args_parse(int argc, char** argv) {
                                 fprintf(stderr, "%s: unknown heuristic\n", optarg);
                                 exit(1);
                         }
+                        break;
+                case 'o':
+                        a.print_path = true;
                         break;
                 default:
                         print_help();

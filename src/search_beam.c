@@ -32,18 +32,17 @@ path solve_beam(const state* init, const state* goal) {
                                         state_free(child);
                                         continue;
                                 }
-                                sr_push(visited, node, child);
+                                sr_push(visited, child, node);
 
                                 if (state_covers(child, goal)) {
                                         INFO("SR: %zu %zu mB", sr_count(visited),
                                              sr_size(visited) / 1000 / 1000);
-					p = trace(visited, init, child);
+                                        p = trace(visited, init, child);
                                         state_free(child);
                                         state_free(node);
                                         sr_free(visited);
                                         sh_free(queue);
                                         sh_free(iqueue);
-                                        p.len = 0;
                                         return p;
                                 }
 

@@ -36,7 +36,9 @@ int main(int argc, char** argv) {
         INFO("INITIALIZATION FINISHED");
 
         path sol = solve(def.init, def.goal, a.search);
-        printf("%zu\n", sol.len);
+
+        if (a.print_path)
+                path_print(&sol, &def);
 
         task_free(&def);
         f_close(domain_str);
