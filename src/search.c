@@ -25,8 +25,8 @@ path trace(const state_registry* sr, const state* init, const state* goal) {
         path     out = {0};
         uint64_t phash[PATH_MAX];
         phash[out.len++] = state_hash64(goal);
-        for (size_t i = 0; i <= PATH_MAX; i++) {
-                if (i == PATH_MAX) {
+        for (size_t i = 0; i < PATH_MAX; i++) {
+                if (i == PATH_MAX - 1) {
                         fprintf(stderr, "trace reached PATH_MAX\n");
                         exit(1);
                 }

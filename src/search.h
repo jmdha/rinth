@@ -8,7 +8,7 @@
 #include "state.h"
 #include "task.h"
 
-#define PATH_MAX 1024
+#define PATH_MAX 8192
 
 typedef struct {
         size_t len;
